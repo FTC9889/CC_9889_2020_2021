@@ -7,6 +7,5 @@ dependencies {
     implementation (name: 'tensorflow-lite-0.0.0-nightly', ext:'aar')
 
     implementation 'com.acmerobotics.roadrunner:core:0.4.7'
-    implementation 'org.openftc:easyopencv:1.3'
     implementation 'org.openftc:rev-extensions-2:1.2'
 }

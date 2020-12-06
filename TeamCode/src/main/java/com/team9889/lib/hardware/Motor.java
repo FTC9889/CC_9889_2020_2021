@@ -3,9 +3,11 @@ package com.team9889.lib.hardware;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.util.Hardware;
 import com.team9889.ftc2019.subsystems.Robot;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.openftc.revextensions2.ExpansionHubMotor;
 import org.openftc.revextensions2.RevBulkData;
 
@@ -29,12 +31,36 @@ public class Motor {
         this.motor.setDirection(direction);
         if (Brake)
             this.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        else
+            this.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        if (RunWithoutEncoder)
+            this.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        else
+            this.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        if(resetEncoder){
+            position = motor.getCurrentPosition();
+            this.resetEncoder();
+        }
+    }
+
+    public Motor(HardwareMap hardwareMap, String id, double ratio, DcMotorSimple.Direction direction,
+                 boolean Brake, boolean RunWithoutEncoder, boolean resetEncoder, PIDCoefficients pid){
+        this.motor = (ExpansionHubMotor) hardwareMap.dcMotor.get(id);
+        this.ratio = ratio;
+        numHardwareUsesThisUpdate ++;
+        this.motor.setDirection(direction);
+        if (Brake)
+            this.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        else
+            this.motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         if (RunWithoutEncoder)
             this.motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if(resetEncoder){
             position = motor.getCurrentPosition();
             this.resetEncoder();
         }
+
+        motor.setPIDCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, pid);
     }
 
     public Motor(HardwareMap hardwareMap, String id) {
@@ -66,5 +92,9 @@ public class Motor {
 
     public void resetEncoder(){
         offsetPosition = position;
+    }
+
+    public void setRPM(double rpm) {
+        motor.setVelocity(rpm * 360, AngleUnit.DEGREES);
     }
 }

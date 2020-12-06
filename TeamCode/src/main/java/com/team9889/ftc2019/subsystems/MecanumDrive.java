@@ -3,12 +3,11 @@ package com.team9889.ftc2019.subsystems;
 import android.util.Log;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.team9889.ftc2019.Constants;
 import com.team9889.lib.android.FileReader;
 import com.team9889.lib.android.FileWriter;
 import com.team9889.lib.control.math.cartesian.Rotation2d;
-import com.team9889.lib.odometry.Odometry;
+import com.team9889.lib.control.kinematics.Odometry;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -39,8 +38,8 @@ public class MecanumDrive extends Subsystem {
 //            readAngleFromFile();
         }
 
-        odometry.reverseLeftEncoder();
-        odometry.reverseNormalEncoder();
+//        odometry.reverseLeftEncoder();
+//        odometry.reverseNormalEncoder();
     }
 
     @Override
@@ -50,9 +49,9 @@ public class MecanumDrive extends Subsystem {
 //        telemetry.addData("Right Encoder", "" + Robot.getInstance().intakeLeft.getPosition());
 //        telemetry.addData("Side Encoder", "" + Robot.getInstance().intakeRight.getPosition());
 
-        telemetry.addData("x", odometry.returnXCoordinate());
-        telemetry.addData("Y", odometry.returnYCoordinate());
-        telemetry.addData("Angle", odometry.returnOrientation());
+//        telemetry.addData("x", odometry.returnXCoordinate());
+//        telemetry.addData("Y", odometry.returnYCoordinate());
+//        telemetry.addData("Angle", odometry.returnOrientation());
 
 //        telemetry.addData("Side Encoder", Robot.getInstance().intakeRight.getPosition());
 
@@ -69,7 +68,7 @@ public class MecanumDrive extends Subsystem {
 
     @Override
     public void update() {
-        odometry.update();
+//        odometry.update();
 
 //        if (updated) {
 //            setCurrentPose(new Pose2d(odometry.getPoseEstimate().getX(),
@@ -123,26 +122,28 @@ public class MecanumDrive extends Subsystem {
     }
 
     public void writeAngleToFile() {
-        FileWriter angleWriter = new FileWriter(filename);
-        angleWriter.write(gyroAngle.getTheda(AngleUnit.RADIANS));
-        angleWriter.close();
+//        FileWriter angleWriter = new FileWriter(filename);
+//        angleWriter.write(gyroAngle.getTheda(AngleUnit.RADIANS));
+//        angleWriter.close();
+
+        angleFromAuton = gyroAngle.getTheda(AngleUnit.RADIANS);
     }
 
-    public void readAngleFromFile() {
-        try {
-            FileReader angleReader = new FileReader(filename);
-            String[] rows = angleReader.lines();
-            if (rows[rows.length - 1] != null) {
-                String value = rows[rows.length - 1];
-                angleFromAuton = Double.parseDouble(value);
-                angleReader.close();
-            } else{
-                angleFromAuton = 0;
-            }
-        } catch (NumberFormatException e) {
-            angleFromAuton = 0;
-        }
-    }
+//    public void readAngleFromFile() {
+//        try {
+//            FileReader angleReader = new FileReader(filename);
+//            String[] rows = angleReader.lines();
+//            if (rows[rows.length - 1] != null) {
+//                String value = rows[rows.length - 1];
+//                angleFromAuton = Double.parseDouble(value);
+//                angleReader.close();
+//            } else{
+//                angleFromAuton = 0;
+//            }
+//        } catch (NumberFormatException e) {
+//            angleFromAuton = 0;
+//        }
+//    }
 
     public void setFieldCentricPower(double x, double y, double rotation){
         double angle = getAngle().getTheda(AngleUnit.RADIANS);
@@ -173,10 +174,6 @@ public class MecanumDrive extends Subsystem {
         Robot.getInstance().fRDrive.setPower(v2);
         Robot.getInstance().bLDrive.setPower(v3);
         Robot.getInstance().bRDrive.setPower(v4);
-        Log.i("FRDrive", "" + v2);
-        Log.i("BRDrive", "" + v4);
-        Log.i("FLDrive", "" + v1);
-        Log.i("BLDrive", "" + v3);
     }
 
     public double getSpeed(double xPosition, double yPosition, double rotation){

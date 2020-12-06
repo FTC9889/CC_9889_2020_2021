@@ -4,6 +4,7 @@ import com.qualcomm.hardware.rev.RevTouchSensor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -70,8 +71,8 @@ public class Robot{
     private boolean mAuto = false;
 
     boolean debugging = false;
-    private com.team9889.lib.android.FileWriter writer = new FileWriter("Drive3.csv");
-    private com.team9889.lib.android.FileWriter poseWriter = new FileWriter("Pose.csv");
+//    private com.team9889.lib.android.FileWriter writer = new FileWriter("Drive3.csv");
+//    private com.team9889.lib.android.FileWriter poseWriter = new FileWriter("Pose.csv");
 
     public void init(HardwareMap hardwareMap, boolean auto){
         timer.reset();
@@ -93,28 +94,30 @@ public class Robot{
 
         // Drive
         fLDrive = new Motor(hardwareMap, Constants.DriveConstants.kLeftDriveMasterId, 1,
-                DcMotorSimple.Direction.FORWARD, true, false, true);
+                DcMotorSimple.Direction.FORWARD, true, true, true);
         bLDrive = new Motor(hardwareMap, Constants.DriveConstants.kLeftDriveSlaveId, 1,
-                DcMotorSimple.Direction.FORWARD, true, false, true);
+                DcMotorSimple.Direction.FORWARD, true, true, true);
         fRDrive = new Motor(hardwareMap, Constants.DriveConstants.kRightDriveMasterId, 1,
-                DcMotorSimple.Direction.REVERSE, true, false, true);
+                DcMotorSimple.Direction.REVERSE, true, true, true);
         bRDrive = new Motor(hardwareMap, Constants.DriveConstants.kRightDriveSlaveId, 1,
-                DcMotorSimple.Direction.REVERSE, true, false, true);
+                DcMotorSimple.Direction.REVERSE, true, true, true);
 
         //Intake
         intakeLeft = new Motor(hardwareMap, Constants.IntakeConstants.kIntakeLeftMotorId, 1,
-                DcMotorSimple.Direction.FORWARD, false, true, false);
-        intakeRight = new Motor(hardwareMap, Constants.IntakeConstants.kIntakeRightMotorId, 1,
                 DcMotorSimple.Direction.REVERSE, false, true, false);
+        intakeRight = new Motor(hardwareMap, Constants.IntakeConstants.kIntakeRightMotorId, 1,
+                DcMotorSimple.Direction.FORWARD, false, true, false);
 
         //FlyWheel
+        PIDCoefficients pidNew = new PIDCoefficients(.008, 0, 0);
         flyWheel = new Motor(hardwareMap, Constants.LiftConstants.kFlyWheel, 1,
-                DcMotorSimple.Direction.FORWARD, false, false, true);
+                DcMotorSimple.Direction.REVERSE, false, false, true);
 
         fwArm = hardwareMap.get(Servo.class, Constants.LiftConstants.kFWArm);
 
         wgGrabber = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGGrabber);
         wgLeft = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGLeft);
+        wgLeft.setDirection(Servo.Direction.REVERSE);
         wgRight = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGRight);
 
         imu = new RevIMU("imu1", hardwareMap);
@@ -122,7 +125,7 @@ public class Robot{
         if (auto)
             debugging = true;
 
-        if(debugging) writer.write("clock,x,y,theda");
+//        if(debugging) writer.write("clock,x,y,theda");
 
         getMecanumDrive().init(auto);
         getIntake().init(auto);
@@ -136,44 +139,36 @@ public class Robot{
 
     private ElapsedTime updateTimer = new ElapsedTime();
     public void update(){
-        RobotLog.v("loop time " + (timer.milliseconds()));
+        RobotLog.v("Loop Time: " + String.valueOf(timer.milliseconds()) + " | dt: " + String.valueOf(updateTimer.milliseconds()));
 
         getMecanumDrive().getAngle().getTheda(AngleUnit.RADIANS);
 
-//        if (mAuto){
-//            bulkDataMaster = revHubMaster.getBulkInputData();
-            bulkDataSlave = revHubSlave.getBulkInputData();
+        if (false)
+            bulkDataMaster = revHubMaster.getBulkInputData();
 
-//            fRDrive.update(bulkDataMaster);
-//            bRDrive.update(bulkDataMaster);
-//            fLDrive.update(bulkDataMaster);
-//            bLDrive.update(bulkDataMaster);
+        bulkDataSlave = revHubSlave.getBulkInputData();
+        RobotLog.a("Volts: " + String.valueOf(revHubSlave.read12vMonitor(ExpansionHubEx.VoltageUnits.VOLTS)));
 
-//            intakeLeft.update(bulkDataSlave);
-//            intakeRight.update(bulkDataSlave);
+        flyWheel.update(bulkDataSlave);
 
-            flyWheel.update(bulkDataSlave);
+        mMecanumDrive.update();
 
-            mMecanumDrive.update();
-//        }
-
-        if(debugging)
-            writer.write(updateTimer.milliseconds() + "," + getMecanumDrive().getCurrentPose().getX() + ","
-                    + getMecanumDrive().getCurrentPose().getY() + ","
-                    + -Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS)
-            );
+//        if(debugging)
+//            writer.write(updateTimer.milliseconds() + "," + getMecanumDrive().getCurrentPose().getX() + ","
+//                    + getMecanumDrive().getCurrentPose().getY() + ","
+//                    + -Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS)
+//            );
 
         updateTimer.reset();
 
-        while (timer.milliseconds() - lastTime < 25){
-            Thread.yield();
-        }
+        while (timer.milliseconds() - lastTime < 25){}
 
         lastTime = (int) timer.milliseconds();
     }
 
     public void outputToTelemetry(Telemetry telemetry) {
         getMecanumDrive().outputToTelemetry(telemetry);
+        getFlyWheel().outputToTelemetry(telemetry);
 
         if(false) {
             telemetry.addData("Loop Time", (timer.milliseconds() - lastTime));
@@ -181,8 +176,6 @@ public class Robot{
     }
 
     public void stop(){
-        if(debugging) writer.close();
-
         for (Motor motor:Arrays.asList(fLDrive, fRDrive, bLDrive, bRDrive, intakeLeft, intakeRight)) {
             motor.setPower(0);
         }

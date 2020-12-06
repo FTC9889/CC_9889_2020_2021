@@ -1,5 +1,7 @@
 package com.team9889.ftc2019;
 
+import android.app.backup.RestoreObserver;
+
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2019.subsystems.Robot;
@@ -19,38 +21,15 @@ import java.io.IOException;
 public class Teleop extends Team9889Linear {
 
     private ElapsedTime loopTimer = new ElapsedTime();
-    private boolean driveSlow = false;
-    private boolean first = true;
-    private boolean liftDownLimit = false;
+    ElapsedTime armTimer = new ElapsedTime();
+    boolean on = false;
 
-    private boolean intaking = false;
-    private boolean blockDetectorFirst = true;
-
-    //  lift automation
-    private boolean automateScoring = false;
-    private ElapsedTime automatedScoringTimer = new ElapsedTime();
-
-    private boolean automateCapStone = false;
-    private ElapsedTime automatedCapStoneTimer = new ElapsedTime();
-    private boolean stoneWasThere = false;
-
-    private boolean timeOverride = false;
-
-    private boolean autoCapFirst = true, done = false;
-    private ElapsedTime autoCapTime = new ElapsedTime();
+    boolean extend = false;
 
     @Override
     public void runOpMode() {
         DriverStation driverStation = new DriverStation(gamepad1, gamepad2);
         waitForStart(false);
-
-        Robot.odometryLifter.setPosition(0.5);
-        Robot.teamMarkerDeployServo.setPosition(1);
-
-        Robot.getLift().GrabberOpen();
-        Robot.getMecanumDrive().OpenFoundationHook();
-
-        Robot.getLift().LinearBarIn();
 
         while (opModeIsActive()) {
             // dt timer
@@ -59,175 +38,83 @@ public class Teleop extends Team9889Linear {
             // If not resetting imu, normal operation
             if(!driverStation.resetIMU()) {
                 // Drive
-
-                if(Math.abs(driverStation.getX()) < 0.01 && Math.abs(driverStation.getY()) < 0.01 &&
-                        Math.abs(driverStation.getSteer()) < 0.01 && gamepad1.start) {
-                    // if y<20 -> slower foward
-                    // if y>35 -> half speed
-                    // if y>50 -> full
-
-                    // if x > 20 -> left
-                    // if x near 20 -> center
-                    // if x < 20 -> right
-
-                    double forward = 0;
-                    double turn = 0;
-                    if (pipeline.getMinPoint().x == 40 && pipeline.getMinPoint().y == 60){
-                        forward = .5;
-                    } else if(pipeline.getMinPoint().y > 25)
-                        forward = 1;
-                    else if(pipeline.getMinPoint().y < 25)
-                        forward = 0.5;
-
-                    double center = 38.5;
-                    if (pipeline.getMinPoint().x == 40 && pipeline.getMinPoint().y == 60){
-
-                    } else if (pipeline.getMinPoint().x > center + 5 && pipeline.getMinPoint().x < center + 20)
-                        turn = -0.2;
-                    else if (pipeline.getMinPoint().x < center - 5 && pipeline.getMinPoint().x > center - 20)
-                        turn = 0.2;
-                    else if (pipeline.getMinPoint().x <= center - 20)
-                        turn = .4;
-                    else if (pipeline.getMinPoint().x >= center + 20){
-                        turn = -.4;
-                    }
-                    else
-                        turn = 0;
-
-                    telemetry.addData("turn", turn);
-
-                    Robot.getMecanumDrive().setPower(0, forward, turn);
-                } else {
-                    double slowDownFactor = driverStation.getSlowDownFactor();
-                    Robot.getMecanumDrive().setFieldCentricPower(
-                            driverStation.getX() / slowDownFactor,
-                            driverStation.getY() / slowDownFactor,
-                            driverStation.getSteer() / slowDownFactor);
-                }
-
-                // CapStone
-                if ((driverStation.capStoneAuto(true, done) || done) && (matchTime.seconds() > 120 - 30 || timeOverride)){
-                    if (autoCapFirst){
-                        autoCapFirst = false;
-                        autoCapTime.reset();
-                    }else if (autoCapTime.milliseconds() < 300){
-                        Robot.getLift().GrabberOpen();
-                    }else if (autoCapTime.milliseconds() >= 300 && autoCapTime.milliseconds() < 500){
-                        Robot.getLift().SetLiftPower(-1);
-                    }else if (autoCapTime.milliseconds() >= 500 && autoCapTime.milliseconds() < 600){
-                        Robot.getLift().SetLiftPower(0);
-                        Robot.getLift().LinearBarIn();
-                        Robot.teamMarkerDeployServo.setPosition(-1);
-                        done = true;
-                    }else if (autoCapTime.milliseconds() >= 600){
-                        done = false;
-                        autoCapFirst = true;
-                    }
-                }else if (!automateScoring && !automateCapStone) {
-                    Robot.getLift().SetLiftPower(driverStation.getLiftPower(Robot.downLimit.isPressed()));
-
-                    if (driverStation.getLinearBarIn(first))
-                        Robot.getLift().LinearBarIn();
-                    else
-                        Robot.getLift().LinearBarOut();
-
-                    if (Robot.downLimit.isPressed() && driverStation.getGrabberOpen(first)){
-                        Robot.grabber.setPosition(1);
-                    }else if (driverStation.getGrabberOpen(first)) {
-                        Robot.getLift().GrabberOpen();
-                    } else {
-                        Robot.getLift().GrabberClose();
-                    }
-
-                    automateScoring = driverStation.scoreStone() && !driverStation.getLinearBarIn(true);
-                    automatedScoringTimer.reset();
-
-                    first = true;
-                } else {
-                    if (automatedScoringTimer.milliseconds() < 500) {
-                        Robot.getLift().GrabberOpen();
-                    } else if (automatedScoringTimer.milliseconds() < 750 && automatedScoringTimer.milliseconds() > 250) {
-                        Robot.getLift().SetLiftPower(-0.7);
-                    } else if (automatedScoringTimer.milliseconds() < 1250 + 200 && automatedScoringTimer.milliseconds() > 750) {
-                        Robot.getLift().SetLiftPower(0);
-                        Robot.getLift().LinearBarIn();
-                    } else if (!Robot.getLift().isDown() && (automatedScoringTimer.milliseconds() > 1250 + 200 && automatedScoringTimer.milliseconds() < 2000 + 700)) {
-                        Robot.getLift().GrabberClose();
-                        Robot.getLift().SetLiftPower(1);
-                    } else {
-                        Robot.getLift().SetLiftPower(0);
-                        automateScoring = false;
-                    }
-                    first = false;
-                }
-
-                if (gamepad2.right_stick_button && gamepad2.left_stick_button){
-                    timeOverride = true;
-                }
-
-                if ((matchTime.seconds() > 120 - 30 || timeOverride) && driverStation.releaseTapeMeasure())
-                    Robot.tapeMeasureDeploy.setPosition(0.5);
-                else if (matchTime.seconds() > 120 - 30 || timeOverride) {
-                    if (driverStation.capStone(true)) {
-                        Robot.teamMarkerDeployServo.setPosition(-1);
-                    } else {
-                        Robot.teamMarkerDeployServo.setPosition(1);
-                    }
-                }
-
-                // Intake Servos
-
-                if (driverStation.getIntakeFlip())
-                    Robot.getIntake().IntakeFlip();
-                else if (driverStation.getIntake())
-                    Robot.getIntake().IntakeDown();
-                else
-                    Robot.getIntake().IntakeUp();
+                Robot.getMecanumDrive().setFieldCentricPower(driverStation.getX() / driverStation.getSlowDownFactor(),
+                        driverStation.getY() / driverStation.getSlowDownFactor(), driverStation.getSteer() / driverStation.getSlowDownFactor());
 
                 if (driverStation.getStartIntaking()) {
                     Robot.getIntake().Intake();
-                    Robot.getLift().GrabberOpen();
-                    intaking = true;
                 } else if (driverStation.getStopIntaking()) {
                     Robot.getIntake().Stop();
-                    intaking = false;
                 } else if (driverStation.getStartOuttaking()) {
                     Robot.getIntake().Outtake();
-                    intaking = false;
                 }
 
-                // Foundation Hook
-                if (driverStation.getFoundationClose())
-                    Robot.getMecanumDrive().CloseFoundationHook();
-                else
-                    Robot.getMecanumDrive().OpenFoundationHook();
-
-                if (intaking && blockDetectorFirst) {
-                    if (Robot.blockDetector.getDistance(DistanceUnit.INCH) < 4) {
-                        Robot.getIntake().Stop();
-                        Robot.getLift().GrabberClose();
-                        blockDetectorFirst = false;
-                    }
-                } else if (!blockDetectorFirst) {
-                    if (Robot.blockDetector.getDistance(DistanceUnit.INCH) > 4) {
-                        blockDetectorFirst = true;
-                    }
+                if (gamepad1.x){
+                    on = true;
+                } else if (gamepad1.start) {
+                    on = false;
                 }
+
+                if (gamepad1.right_bumper && on) {
+                    if (armTimer.milliseconds() > 200) {
+                        if (extend) {
+                            Robot.fwArm.setPosition(1);
+                            extend = false;
+                        } else {
+                            Robot.fwArm.setPosition(0);
+                            extend = true;
+                        }
+
+                        armTimer.reset();
+                    }
+                } else if (armTimer.milliseconds() > 200) {
+                    Robot.fwArm.setPosition(0);
+                    extend = true;
+                }
+
+                if (!driverStation.getWG()) {
+                    Robot.wgLeft.setPosition(.8);
+                    Robot.wgRight.setPosition(.8);
+                } else if (driverStation.getWG()) {
+                    Robot.wgLeft.setPosition(0.3);
+                    Robot.wgRight.setPosition(0.3);
+                }
+
+                if (driverStation.getWGG()) {
+                    Robot.wgGrabber.setPosition(.3);
+                } else if (!driverStation.getWGG()) {
+                    Robot.wgGrabber.setPosition(0.1);
+                }
+
+                if (gamepad1.dpad_right){
+                    Robot.wgLeft.setPosition(.5);
+                    Robot.wgRight.setPosition(.5);
+                    Robot.wgGrabber.setPosition(.3);
+                }
+
             } else {
                 Robot.getMecanumDrive().setPower(0,0,0);
                 Robot.getMecanumDrive().writeAngleToFile();
-                Robot.getMecanumDrive().readAngleFromFile();
+//                Robot.getMecanumDrive().readAngleFromFile();
+            }
+
+            while (loopTimer.milliseconds() < 20) {
+
+            }
+
+            if (on) {
+//                    Robot.flyWheel.setRPM(5000);
+                Robot.getFlyWheel().setFlyWheelSpeed(5700, loopTimer.milliseconds());
+            }
+            else if (!on) {
+                Robot.flyWheel.setPower(0);
             }
 
             telemetry.addData("Loop Time", loopTimer.milliseconds());
-            telemetry.addData("Slow Drive", driveSlow);
-            telemetry.addData("Gyro After Auto", Robot.getMecanumDrive().angleFromAuton);
-            telemetry.addData("left lift height", -Robot.leftLift.getPosition());
-            telemetry.addData("right lift height", -Robot.rightLift.getPosition());
+//            telemetry.addData("Gyro After Auto", Robot.getMecanumDrive().angleFromAuton);
             telemetry.addData("left intake", -Robot.intakeLeft.getPosition());
             telemetry.addData("right intake", -Robot.intakeRight.getPosition());
-
-            telemetry.addData("Magnet", Robot.downLimit.isPressed());
+            telemetry.addData("Fly Wheel", Robot.flyWheel.getPosition());
 
             Robot.outputToTelemetry(telemetry);
 
@@ -235,14 +122,5 @@ public class Teleop extends Team9889Linear {
 
             Robot.update();
         }
-
-        Runnable ShutDownCameraThread = new Runnable() {
-            @Override
-            public void run() {
-                phoneCam.stopStreaming();
-            }
-        };
-
-        new Thread(ShutDownCameraThread).start();
     }
 }

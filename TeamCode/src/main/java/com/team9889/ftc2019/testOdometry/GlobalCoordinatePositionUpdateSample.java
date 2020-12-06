@@ -4,9 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.team9889.ftc2019.Constants;
-import com.team9889.ftc2019.subsystems.Robot;
-import com.team9889.lib.odometry.Odometry;
 
 /**
  * Created by Sarthak on 6/1/2019.

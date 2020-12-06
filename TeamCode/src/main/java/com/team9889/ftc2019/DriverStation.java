@@ -49,7 +49,7 @@ public class DriverStation {
     }
 
     boolean getStartIntaking(){
-        return gamepad1.a || gamepad1.start;
+        return gamepad1.a;
     }
 
     boolean getStopIntaking() {
@@ -60,16 +60,28 @@ public class DriverStation {
         return gamepad1.y;
     }
 
-    private boolean intakeToggle = true;
-    private boolean intakeDown = true;
-    boolean getIntake() {
-        if(gamepad1.right_bumper && intakeToggle && !intakeFlipDown) {
-            intakeDown = !intakeDown;
-            intakeToggle = false;
-        } else if(!gamepad1.right_bumper)
-            intakeToggle = true;
+    private boolean wgToggle = true;
+    private boolean wgDown = false;
+    boolean getWG() {
+        if(gamepad1.left_bumper && wgToggle) {
+            wgDown = !wgDown;
+            wgToggle = false;
+        } else if(!gamepad1.left_bumper)
+            wgToggle = true;
 
-        return intakeDown;
+        return wgDown;
+    }
+
+    private boolean wggToggle = true;
+    private boolean wggOpen = false;
+    boolean getWGG() {
+        if(gamepad1.dpad_up && wggToggle) {
+            wggOpen = !wggOpen;
+            wggToggle = false;
+        } else if(!gamepad1.dpad_up)
+            wggToggle = true;
+
+        return wggOpen;
     }
 
     private boolean intakeFlipToggle = true;
@@ -89,26 +101,26 @@ public class DriverStation {
     private boolean slowDownToggle = true;
     private boolean slowDown = false;
     double getSlowDownFactor() {
-        if(gamepad1.x && slowDownToggle) {
+        if(gamepad1.back && slowDownToggle) {
             slowDown = !slowDown;
             slowDownToggle = false;
-        } else if(!gamepad1.x)
+        } else if(!gamepad1.back)
             slowDownToggle = true;
 
-        return slowDown ? 1.8 : 1;
+        return slowDown ? 3 : 1;
     }
 
-    private boolean foundationToggle = false;
-    private boolean foundationClose = false;
-    boolean getFoundationClose() {
-        if(gamepad2.dpad_up && foundationToggle) {
-            foundationClose = !foundationClose;
-            foundationToggle = false;
-        } else if(!gamepad2.dpad_up)
-            foundationToggle = true;
-
-        return foundationClose;
-    }
+//    private boolean foundationToggle = false;
+//    private boolean foundationClose = false;
+//    boolean getFoundationClose() {
+//        if(gamepad2.dpad_up && foundationToggle) {
+//            foundationClose = !foundationClose;
+//            foundationToggle = false;
+//        } else if(!gamepad2.dpad_up)
+//            foundationToggle = true;
+//
+//        return foundationClose;
+//    }
 
     private boolean grabberToggle = true;
     private boolean grabberOpen = true;

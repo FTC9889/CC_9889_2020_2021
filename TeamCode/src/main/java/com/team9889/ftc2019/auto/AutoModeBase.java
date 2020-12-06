@@ -73,14 +73,6 @@ public abstract class AutoModeBase extends Team9889Linear {
 
         ThreadAction(new RobotUpdate(autoTimer));
 
-        // From Camera -> To Stone Position
-        if (positionOfSkyStone < 130 && positionOfSkyStone > 59)
-            currentSkyStonePosition = SkyStonePosition.LEFT;
-        else if (positionOfSkyStone > 129)
-            currentSkyStonePosition = SkyStonePosition.MIDDLE;
-        else if (positionOfSkyStone < 60)
-            currentSkyStonePosition = SkyStonePosition.RIGHT;
-
         // If the opmode is still running, run auto
         if (opModeIsActive() && !isStopRequested()) {
             run(currentAutoRunning, currentSkyStonePosition);

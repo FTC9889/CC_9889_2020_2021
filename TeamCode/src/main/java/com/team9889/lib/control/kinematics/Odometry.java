@@ -1,4 +1,4 @@
-package com.team9889.lib.odometry;
+package com.team9889.lib.control.kinematics;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -11,9 +11,6 @@ import org.opencv.core.Point;
 
 import java.io.File;
 
-/**
- * Created by Sarthak on 6/1/2019.
- */
 public class Odometry {
     //Odometry wheels
     private Motor verticalEncoderLeft, verticalEncoderRight, horizontalEncoder;

@@ -45,10 +45,6 @@ public class Intake extends Action {
             if(intake) Robot.getInstance().getIntake().SetIntakePower(fullSpeed ? 1.0 : 0.5);
             else Robot.getInstance().getIntake().SetIntakePower(0);
         }
-        else if(timer.milliseconds() > 200) {
-            if (intake) Robot.getInstance().getIntake().SetRollerPower(1);
-            else Robot.getInstance().getIntake().SetRollerPower(0);
-        }
     }
 
     @Override

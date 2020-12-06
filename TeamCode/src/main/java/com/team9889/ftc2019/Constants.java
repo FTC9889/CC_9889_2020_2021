@@ -14,8 +14,8 @@ public class Constants {
             "w7VkFMqB+DQuNk8n1pvJP87FFo99kr653cjMwO4TYbztNmUYaQUXjHHNhOFxHufN42r7YcCErvX90n/gIvs4" +
             "wrvffXGyU/xkmSaTJzrgiy8R+ZJx2T0JcEJ0m1UUEoF2BmW4ONAVv/TkG9ESGf6iAmx66vrVm3tk6+YY+1q1";
 
-    public final static String kRevHubMaster = "4";
-    public final static String kRevHubSlave = "1";
+    public final static String kRevHubMaster = "C";
+    public final static String kRevHubSlave = "E";
 
     public final static String kWebcam = "Webcam";
 
