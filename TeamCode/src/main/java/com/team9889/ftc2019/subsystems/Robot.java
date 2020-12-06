@@ -22,6 +22,7 @@ import org.openftc.revextensions2.RevBulkData;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -30,7 +31,7 @@ import java.util.Date;
 
 public class Robot{
 
-//    public WebcamName webcam;
+    // public WebcamName webcam;
 
     public Motor fLDrive, fRDrive, bLDrive, bRDrive;
     public RevIMU imu = null;
@@ -45,13 +46,9 @@ public class Robot{
     public boolean redAuto;
 
     public RevBulkData bulkDataMaster, bulkDataSlave;
-    ExpansionHubEx revHubMaster, revHubSlave;
+    private ExpansionHubEx revHubMaster, revHubSlave;
 
     public HardwareMap hardwareMap;
-
-    public static ElapsedTime timer = new ElapsedTime();
-    public static double lastTime = 0;
-    public static ElapsedTime gyroTimer = new ElapsedTime();
 
     private static Robot mInstance = null;
 
@@ -68,16 +65,10 @@ public class Robot{
     private WobbleGoal mWG = new WobbleGoal();
     private Camera mCamera = new Camera();
 
-    private boolean mAuto = false;
-
-    boolean debugging = false;
-//    private com.team9889.lib.android.FileWriter writer = new FileWriter("Drive3.csv");
-//    private com.team9889.lib.android.FileWriter poseWriter = new FileWriter("Pose.csv");
+    // List of subsystems
+    private List<Subsystem> subsystems = Arrays.asList(mMecanumDrive, mIntake, mFW, mWG, mCamera);
 
     public void init(HardwareMap hardwareMap, boolean auto){
-        timer.reset();
-        gyroTimer.reset();
-        this.mAuto = auto;
         this.hardwareMap = hardwareMap;
 
         Date currentData = new Date();
@@ -90,7 +81,7 @@ public class Robot{
         revHubSlave = hardwareMap.get(ExpansionHubEx.class, Constants.kRevHubSlave);
 
         // Camera
-//        webcam = hardwareMap.get(WebcamName.class, Constants.kWebcam);
+        // webcam = hardwareMap.get(WebcamName.class, Constants.kWebcam);
 
         // Drive
         fLDrive = new Motor(hardwareMap, Constants.DriveConstants.kLeftDriveMasterId, 1,
@@ -109,7 +100,6 @@ public class Robot{
                 DcMotorSimple.Direction.FORWARD, false, true, false);
 
         //FlyWheel
-        PIDCoefficients pidNew = new PIDCoefficients(.008, 0, 0);
         flyWheel = new Motor(hardwareMap, Constants.LiftConstants.kFlyWheel, 1,
                 DcMotorSimple.Direction.REVERSE, false, false, true);
 
@@ -122,63 +112,40 @@ public class Robot{
 
         imu = new RevIMU("imu1", hardwareMap);
 
-        if (auto)
-            debugging = true;
-
-//        if(debugging) writer.write("clock,x,y,theda");
-
-        getMecanumDrive().init(auto);
-        getIntake().init(auto);
-        getFlyWheel().init(auto);
-        getWobbleGoal().init(auto);
-        getCamera().init(auto);
-
-        timer.reset();
+        // Init all subsystems
+        for (Subsystem subsystem : subsystems) {
+            subsystem.init(auto);
+        }
     }
 
-
-    private ElapsedTime updateTimer = new ElapsedTime();
-    public void update(){
-        RobotLog.v("Loop Time: " + String.valueOf(timer.milliseconds()) + " | dt: " + String.valueOf(updateTimer.milliseconds()));
-
-        getMecanumDrive().getAngle().getTheda(AngleUnit.RADIANS);
-
-        if (false)
-            bulkDataMaster = revHubMaster.getBulkInputData();
-
+    // Update data from Hubs and Apply new data
+    public void update() {
+        // Update Bulk Data
+        bulkDataMaster = revHubMaster.getBulkInputData();
         bulkDataSlave = revHubSlave.getBulkInputData();
-        RobotLog.a("Volts: " + String.valueOf(revHubSlave.read12vMonitor(ExpansionHubEx.VoltageUnits.VOLTS)));
 
+        // Update Motors
         flyWheel.update(bulkDataSlave);
 
-        mMecanumDrive.update();
+        // Update Subsystems
+        for (Subsystem subsystem : subsystems)
+            subsystem.update();
 
-//        if(debugging)
-//            writer.write(updateTimer.milliseconds() + "," + getMecanumDrive().getCurrentPose().getX() + ","
-//                    + getMecanumDrive().getCurrentPose().getY() + ","
-//                    + -Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS)
-//            );
-
-        updateTimer.reset();
-
-        while (timer.milliseconds() - lastTime < 25){}
-
-        lastTime = (int) timer.milliseconds();
     }
 
+    // Output Telemetry for all subsystems
     public void outputToTelemetry(Telemetry telemetry) {
-        getMecanumDrive().outputToTelemetry(telemetry);
-        getFlyWheel().outputToTelemetry(telemetry);
+        for (Subsystem subsystem : subsystems)
+            subsystem.outputToTelemetry(telemetry);
 
-        if(false) {
-            telemetry.addData("Loop Time", (timer.milliseconds() - lastTime));
-        }
     }
 
+    // Stop all subsystems
     public void stop(){
-        for (Motor motor:Arrays.asList(fLDrive, fRDrive, bLDrive, bRDrive, intakeLeft, intakeRight)) {
-            motor.setPower(0);
-        }
+        for (Subsystem subsystem : subsystems)
+            subsystem.stop();
+        revHubMaster.close();
+        revHubSlave.close();
     }
 
     public MecanumDrive getMecanumDrive(){

@@ -24,7 +24,7 @@ public class TuneFollowPathPIDAuto extends AutoModeBase {
     boolean lRToggle = true, upDownToggle = true, speedToggle = true, addToggle = true;
 
     @Override
-    public void run(Side side, SkyStonePosition stonePosition) {
+    public void run(Side side) {
         while (opModeIsActive()) {
             Robot.update();
 

@@ -20,7 +20,7 @@ import java.util.List;
 public class BlueAuto extends AutoModeBase {
 
     @Override
-    public void run(AutoModeBase.Side side, AutoModeBase.SkyStonePosition stonePosition) {
+    public void run(AutoModeBase.Side side) {
 
     }
 }

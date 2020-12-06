@@ -62,8 +62,6 @@ public class MecanumDrive extends Subsystem {
 //        Log.i("Right Offset", "" + Right_Position_Offset);
 //        Log.i("Left Offset", "" + Left_Position_Offset);
 //        Log.i("Side Offset", "" + Y_Position_Offset);
-
-
     }
 
     @Override
@@ -79,6 +77,14 @@ public class MecanumDrive extends Subsystem {
 //        odometry.update();
 
         updated = true;
+    }
+
+    @Override
+    public void stop() {
+        Robot.getInstance().fLDrive.setPower(0);
+        Robot.getInstance().fRDrive.setPower(0);
+        Robot.getInstance().bLDrive.setPower(0);
+        Robot.getInstance().bRDrive.setPower(0);
     }
 
     private void resetOdometryEncoders() {

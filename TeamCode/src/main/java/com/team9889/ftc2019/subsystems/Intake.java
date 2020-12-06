@@ -25,6 +25,11 @@ public class Intake extends Subsystem {
 
     }
 
+    @Override
+    public void stop() {
+        Stop();
+    }
+
     public void SetIntakePower(double power){
         Robot.getInstance().intakeLeft.setPower(power);
         Robot.getInstance().intakeRight.setPower(power);
@@ -36,7 +41,6 @@ public class Intake extends Subsystem {
         SetIntakePower(-0.45);
     }
     public void Stop(){
-
         SetIntakePower(0);
     }
 }

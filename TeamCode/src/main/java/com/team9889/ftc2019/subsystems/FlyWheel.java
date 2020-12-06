@@ -25,7 +25,7 @@ import java.util.Timer;
 
 public class FlyWheel extends Subsystem{
 
-    PID pid = new PID(.001, 0, 0);
+    private PID pid = new PID(.001, 0, 0);
 
     @Override
     public void init(boolean auto) {}
@@ -39,7 +39,14 @@ public class FlyWheel extends Subsystem{
     }
 
     @Override
-    public void update() {}
+    public void update() {
+
+    }
+
+    @Override
+    public void stop() {
+        Robot.getInstance().flyWheel.setPower(0);
+    }
 
     double flySpeed = 0;
     double lastMotorPos = 0;

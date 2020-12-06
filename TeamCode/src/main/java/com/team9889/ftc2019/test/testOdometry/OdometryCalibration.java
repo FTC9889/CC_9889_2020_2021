@@ -1,4 +1,4 @@
-package com.team9889.ftc2019.testOdometry;
+package com.team9889.ftc2019.test.testOdometry;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;

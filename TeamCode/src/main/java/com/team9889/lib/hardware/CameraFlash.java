@@ -10,7 +10,7 @@ import static android.hardware.Camera.Parameters.FLASH_MODE_TORCH;
 /**
  * Created by joshua9889 on 11/15/2017.
  */
-
+@Deprecated
 public class CameraFlash implements Light {
 
     private Camera mCamera = null;

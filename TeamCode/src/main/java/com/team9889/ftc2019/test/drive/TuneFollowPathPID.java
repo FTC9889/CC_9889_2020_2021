@@ -28,7 +28,7 @@ public class TuneFollowPathPID extends Team9889Linear {
     public void runOpMode() throws InterruptedException {
         waitForStart(false);
 
-        ThreadAction(new RobotUpdate(true));
+        ThreadAction(new RobotUpdate());
 
         while (opModeIsActive()) {
 //            Robot.update();

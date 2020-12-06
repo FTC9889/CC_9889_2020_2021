@@ -1,11 +1,5 @@
 package com.team9889.ftc2019.subsystems;
 
-import android.util.Log;
-
-import com.team9889.ftc2019.Constants;
-import com.team9889.lib.CruiseLib;
-import com.team9889.lib.control.controllers.PID;
-
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
@@ -25,6 +19,11 @@ public class WobbleGoal extends Subsystem{
 
     @Override
     public void update() {
+
+    }
+
+    @Override
+    public void stop() {
 
     }
 }

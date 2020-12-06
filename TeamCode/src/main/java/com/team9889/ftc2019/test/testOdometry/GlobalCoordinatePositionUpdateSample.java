@@ -1,4 +1,4 @@
-package com.team9889.ftc2019.testOdometry;
+package com.team9889.ftc2019.test.testOdometry;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;

@@ -20,7 +20,7 @@ import java.util.List;
 public class TestPurePursuit extends AutoModeBase {
 
     @Override
-    public void run(Side side, SkyStonePosition stonePosition) {
+    public void run(Side side) {
         ArrayList<Path> paths = new ArrayList<>();
 
         Side Side_ = Side.RED;

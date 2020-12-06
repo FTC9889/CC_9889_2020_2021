@@ -17,13 +17,14 @@ import java.io.IOException;
  * Created by MannoMation on 1/14/2019.
  */
 
-@TeleOp(name = "Teleop")
+@TeleOp
 public class Teleop extends Team9889Linear {
 
     private ElapsedTime loopTimer = new ElapsedTime();
     ElapsedTime armTimer = new ElapsedTime();
     boolean on = false;
 
+    double lastTime;
     boolean extend = false;
 
     @Override
@@ -32,9 +33,6 @@ public class Teleop extends Team9889Linear {
         waitForStart(false);
 
         while (opModeIsActive()) {
-            // dt timer
-            loopTimer.reset();
-
             // If not resetting imu, normal operation
             if(!driverStation.resetIMU()) {
                 // Drive
@@ -95,7 +93,6 @@ public class Teleop extends Team9889Linear {
             } else {
                 Robot.getMecanumDrive().setPower(0,0,0);
                 Robot.getMecanumDrive().writeAngleToFile();
-//                Robot.getMecanumDrive().readAngleFromFile();
             }
 
             while (loopTimer.milliseconds() < 20) {
@@ -103,7 +100,6 @@ public class Teleop extends Team9889Linear {
             }
 
             if (on) {
-//                    Robot.flyWheel.setRPM(5000);
                 Robot.getFlyWheel().setFlyWheelSpeed(5700, loopTimer.milliseconds());
             }
             else if (!on) {
@@ -111,16 +107,16 @@ public class Teleop extends Team9889Linear {
             }
 
             telemetry.addData("Loop Time", loopTimer.milliseconds());
-//            telemetry.addData("Gyro After Auto", Robot.getMecanumDrive().angleFromAuton);
-            telemetry.addData("left intake", -Robot.intakeLeft.getPosition());
-            telemetry.addData("right intake", -Robot.intakeRight.getPosition());
+            // telemetry.addData("left intake", -Robot.intakeLeft.getPosition());
+            // telemetry.addData("right intake", -Robot.intakeRight.getPosition());
             telemetry.addData("Fly Wheel", Robot.flyWheel.getPosition());
-
             Robot.outputToTelemetry(telemetry);
-
             telemetry.update();
 
             Robot.update();
+
+            // dt timer
+            loopTimer.reset();
         }
     }
 }

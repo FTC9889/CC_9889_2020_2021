@@ -14,7 +14,7 @@ import java.util.List;
 //@Disabled
 public class OdometryWheelTest extends AutoModeBase {
     @Override
-    public void run(Side side, SkyStonePosition stonePosition) {
+    public void run(Side side) {
         Side Side_ = Side.BLUE;
         List<Path> pose = new ArrayList<>();
         Robot.redAuto = false;

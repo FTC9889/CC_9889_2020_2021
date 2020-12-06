@@ -10,9 +10,6 @@ import com.team9889.ftc2019.Team9889Linear;
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous
 @Disabled
 public class Autonomous extends Team9889Linear {
-    boolean stop = false;
-    int skyStonePosition = 1;
-
     @Override
     public void runOpMode() throws InterruptedException {
 
