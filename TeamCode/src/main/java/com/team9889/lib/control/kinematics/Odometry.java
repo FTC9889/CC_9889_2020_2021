@@ -1,15 +1,10 @@
 package com.team9889.lib.control.kinematics;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ReadWriteFile;
-import com.team9889.ftc2019.Constants;
+import com.team9889.ftc2020.Constants;
 import com.team9889.lib.hardware.Motor;
 
-import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.opencv.core.Point;
-
-import java.io.File;
 
 public class Odometry {
     //Odometry wheels

@@ -1,0 +1,36 @@
+package com.team9889.ftc2020.auto.actions.utl;
+
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.team9889.ftc2020.auto.actions.Action;
+
+/**
+ * Created by joshua9889 on 8/28/2018.
+ */
+
+public class Wait extends Action {
+    private ElapsedTime t;
+    private int timeToWaitMilli;
+
+    /**
+     * @param waitTime Milliseconds
+     */
+    public Wait(int waitTime){
+        timeToWaitMilli = waitTime;
+    }
+
+    @Override
+    public void start() {
+        t = new ElapsedTime();
+    }
+
+    @Override
+    public void update() {}
+
+    @Override
+    public boolean isFinished() {
+        return t.milliseconds()>timeToWaitMilli;
+    }
+
+    @Override
+    public void done() {}
+}
