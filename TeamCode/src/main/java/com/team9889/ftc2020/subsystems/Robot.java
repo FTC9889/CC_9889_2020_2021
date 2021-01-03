@@ -9,6 +9,7 @@ import com.team9889.lib.hardware.Motor;
 import com.team9889.lib.hardware.RevIMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.RevBulkData;
 
@@ -24,12 +25,12 @@ import java.util.List;
 
 public class Robot{
 
-    // public WebcamName webcam;
+//     public WebcamName webcam;
 
     public Motor fLDrive, fRDrive, bLDrive, bRDrive;
     public RevIMU imu = null;
 
-    public Motor intakeLeft, intakeRight;
+    public Motor intakeLeft, intakeRight, centerOdometry;
 
     public Motor flyWheel;
     public Servo fwArm;
@@ -74,7 +75,7 @@ public class Robot{
         revHubSlave = hardwareMap.get(ExpansionHubEx.class, Constants.kRevHubSlave);
 
         // Camera
-        // webcam = hardwareMap.get(WebcamName.class, Constants.kWebcam);
+//         webcam = hardwareMap.get(WebcamName.class, Constants.kWebcam);
 
         // Drive
         fLDrive = new Motor(hardwareMap, Constants.DriveConstants.kLeftDriveMasterId, 1,
@@ -88,9 +89,11 @@ public class Robot{
 
         //Intake
         intakeLeft = new Motor(hardwareMap, Constants.IntakeConstants.kIntakeLeftMotorId, 1,
-                DcMotorSimple.Direction.REVERSE, false, true, false);
+                DcMotorSimple.Direction.REVERSE, false, false, true);
         intakeRight = new Motor(hardwareMap, Constants.IntakeConstants.kIntakeRightMotorId, 1,
-                DcMotorSimple.Direction.FORWARD, false, true, false);
+                DcMotorSimple.Direction.FORWARD, false, true, true);
+        centerOdometry = new Motor(hardwareMap, Constants.IntakeConstants.kCenterOdometryId, 1,
+                DcMotorSimple.Direction.FORWARD, false, true, true);
 
         //FlyWheel
         flyWheel = new Motor(hardwareMap, Constants.LiftConstants.kFlyWheel, 1,
@@ -119,6 +122,11 @@ public class Robot{
 
         // Update Motors
         flyWheel.update(bulkDataSlave);
+
+
+        intakeLeft.update(bulkDataSlave);
+        intakeRight.update(bulkDataSlave);
+        centerOdometry.update(bulkDataSlave);
 
         // Update Subsystems
         for (Subsystem subsystem : subsystems)

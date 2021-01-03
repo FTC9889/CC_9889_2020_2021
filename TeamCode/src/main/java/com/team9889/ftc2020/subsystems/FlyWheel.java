@@ -10,7 +10,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class FlyWheel extends Subsystem{
 
-    private PID pid = new PID(.001, 0, 0);
+    private PID pid = new PID(.001, 0, 0.0005);
 
     @Override
     public void init(boolean auto) {}

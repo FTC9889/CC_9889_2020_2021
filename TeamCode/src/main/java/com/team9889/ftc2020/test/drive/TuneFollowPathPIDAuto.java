@@ -3,7 +3,7 @@ package com.team9889.ftc2020.test.drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.team9889.ftc2020.auto.AutoModeBase;
-import com.team9889.ftc2020.auto.actions.drive.DriveFollowPath;
+//import com.team9889.ftc2020.auto.actions.drive.DriveFollowPath;
 import com.team9889.lib.control.Path;
 import com.team9889.lib.control.controllers.PID;
 
@@ -42,7 +42,7 @@ public class TuneFollowPathPIDAuto extends AutoModeBase {
                         Robot.getMecanumDrive().getCurrentPose().getHeading()),
                         new Pose2d(1, 1, 2), 8.5, maxVelocity));
 
-                runAction(new DriveFollowPath(path, pid, telemetry));
+//                runAction(new DriveFollowPath(path, pid, telemetry));
             }
 
             if (gamepad1.dpad_left && lRToggle) {

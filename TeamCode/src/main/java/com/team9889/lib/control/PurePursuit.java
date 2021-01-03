@@ -142,6 +142,18 @@ public class PurePursuit {
             }
         }
 
+        if (bestPoint != null) {
+            if (!changedLine) {
+                if (Math.pow(radius1, 2) - (Math.pow(robotPos.x - endOfLine.x, 2) + Math.pow(robotPos.y - endOfSecLine.y, 2)) >= 0) {
+                    bestPoint = endOfLine;
+                }
+            } else {
+                if (Math.pow(radius2, 2) - (Math.pow(robotPos.x - endOfSecLine.x, 2) + Math.pow(robotPos.y - endOfSecLine.y, 2)) >= 0) {
+                    bestPoint = endOfSecLine;
+                }
+            }
+        }
+
         Log.i("Point : ", "" + bestPoint);
 
         return new Object[] {bestPoint, changedLine};

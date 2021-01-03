@@ -33,7 +33,8 @@ public class Intake extends Subsystem {
         Robot.getInstance().intakeRight.setPower(power);
     }
     public void Intake(){
-        SetIntakePower(0.45);
+//        SetIntakePower(0.45);
+        SetIntakePower(0.8);
     }
     public void Outtake(){
         SetIntakePower(-0.45);

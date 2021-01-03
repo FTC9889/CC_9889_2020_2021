@@ -2,11 +2,14 @@ package com.team9889.ftc2020.test.drive;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.Team9889Linear;
 import com.team9889.ftc2020.auto.actions.drive.DrivePurePursuit;
 import com.team9889.ftc2020.auto.actions.utl.RobotUpdate;
 import com.team9889.lib.control.Path;
 import com.team9889.lib.control.controllers.PID;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import java.util.ArrayList;
 
@@ -17,9 +20,11 @@ import java.util.ArrayList;
 @TeleOp
 public class TunePurePursuitPID extends Team9889Linear {
     ArrayList<Path> path = new ArrayList<>();
-    double p = 0, i = 0, d = 0.008;
-    double maxVelocity = .5;
+    double p = 0.03, i = 0, d = 0.3;
+    double maxVelocity = 1;
     int number = 1;
+
+    ElapsedTime loopTimer = new ElapsedTime();
 
     boolean lRToggle = true, upDownToggle = true, speedToggle = true;
 
@@ -36,10 +41,10 @@ public class TunePurePursuitPID extends Team9889Linear {
 
             if (gamepad1.a) {
                 path.add(new Path(new Pose2d(
+                        1,
                         0,
-                        0,
-                        90),
-                        new Pose2d(5, 5, 3), 4, maxVelocity));
+                        Robot.getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES) + 90),
+                        new Pose2d(1, 1, 2), 30, maxVelocity));
 
                 runAction(new DrivePurePursuit(path, pid));
                 path.clear();
@@ -58,19 +63,19 @@ public class TunePurePursuitPID extends Team9889Linear {
             if (gamepad1.dpad_up && upDownToggle) {
                 upDownToggle = false;
                 if (number < 2)
-                    p += 0.001;
+                    p += .001;
                 else if (number == 2)
-                    i += 0.001;
+                    i += .001;
                 else if (number > 2)
-                    d += 0.001;
+                    d += .1;
             } else if (gamepad1.dpad_down && upDownToggle) {
                 upDownToggle = false;
                 if (number < 2)
-                    p -= 0.001;
+                    p -= .001;
                 else if (number == 2)
-                    i -= 0.001;
+                    i -= .001;
                 else if (number > 2)
-                    d -= 0.001;
+                    d -= .001;
             } else if (!gamepad1.dpad_down && !gamepad1.dpad_up) {
                 upDownToggle = true;
             }
@@ -85,6 +90,9 @@ public class TunePurePursuitPID extends Team9889Linear {
                 speedToggle = true;
             }
 
+            while (loopTimer.milliseconds() < 20) {
+
+            }
 
             if (number < 2)
                 telemetry.addData("PID", "[" + p + "]" + ", " + i + ", " + d);
@@ -100,6 +108,7 @@ public class TunePurePursuitPID extends Team9889Linear {
             Robot.outputToTelemetry(telemetry);
 
             telemetry.update();
+            loopTimer.reset();
         }
     }
 }

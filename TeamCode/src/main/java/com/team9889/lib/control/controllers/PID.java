@@ -1,5 +1,7 @@
 package com.team9889.lib.control.controllers;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.util.RobotLog;
 
 /**
@@ -39,7 +41,7 @@ public class PID extends FeedBackController {
     @Override
     public double update(double current, double wanted) {
          error = wanted - current;
-
+        Log.i("Error", error + "");
 
         if(first){
             // P control first time
@@ -50,13 +52,19 @@ public class PID extends FeedBackController {
             } catch (Exception ignored){}
         } else {
             double currentTime = System.currentTimeMillis() - lastTime;
+            Log.i("Time", currentTime + "");
+
             integral = integral + (error *currentTime);
             if (integral > maxIntegral)
                 integral = 0;
             if (currentTime != 0)
                 derivative = (error - error_prior)/currentTime;
+            Log.i("Derivative", derivative + "");
 
+//            .3104 + (-0.0814 * )
             output = (p * error) + (i * integral) + (d * derivative);
+            Log.i("Output Breakdown", p + " * " + error + " * " + ", " + i + " * " + integral + ", " + d + " * " + derivative);
+            Log.i("Output", output + "");
         }
 
         lastTime = System.currentTimeMillis();

@@ -10,6 +10,7 @@ import com.team9889.lib.control.Path;
 import com.team9889.lib.control.PurePursuit;
 import com.team9889.lib.control.controllers.PID;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.opencv.core.Point;
 
 import java.util.ArrayList;
@@ -23,9 +24,9 @@ public class DrivePurePursuit extends Action {
     int lineNum = 0;
 
     PurePursuit pp = new PurePursuit();
-    private PID xPID = new PID(-0.3, 0, -0.2);
-    private PID yPID = new PID(-0.2, 0, -2.0);
-    private PID orientationPID = new PID(0.01, 0, 0.008);
+    private PID xPID = new PID(0.05, 0, 1);
+    private PID yPID = new PID(0.1, 0, 1);
+    private PID orientationPID = new PID(0.04, 0, 2.5);
 
     private int angleCounter = 0;
     private int xCounter = 0;
@@ -43,15 +44,17 @@ public class DrivePurePursuit extends Action {
 
     @Override
     public void start() {
-        paths.add(0, new Path(Robot.getInstance().getMecanumDrive().odometry.returnPose(),
+        paths.add(0, new Path(Robot.getInstance().getMecanumDrive().getCurrentPose(),
                 paths.get(0).getTolerancePose(), paths.get(0).getRadius(), paths.get(0).getMaxVelocity()));
     }
 
     @Override
     public void update() {
-        Robot.getInstance().update();
+        Log.i("HI", "hi");
+//        Robot.getInstance().update();
 
-        Point robotPos = Robot.getInstance().getMecanumDrive().odometry.returnPoint();
+        Point robotPos = new Point(Robot.getInstance().getMecanumDrive().getAdjustedPose().getX(),
+                Robot.getInstance().getMecanumDrive().getAdjustedPose().getY());
 
         Object[] ppObject;
         if (lineNum + 2 >= paths.size()){ // 5
@@ -76,9 +79,9 @@ public class DrivePurePursuit extends Action {
             lineNum++;
         }
 
-        double xPower = xPID.update(Robot.getInstance().getMecanumDrive().odometry.returnXCoordinate(),
+        double xPower = xPID.update(Robot.getInstance().getMecanumDrive().getAdjustedPose().getX(),
                 point.x);
-        double yPower = yPID.update(Robot.getInstance().getMecanumDrive().odometry.returnYCoordinate(),
+        double yPower = yPID.update(Robot.getInstance().getMecanumDrive().getAdjustedPose().getY(),
                 point.y);
 
         Log.i("Line Number : ", "" + lineNum);
@@ -91,7 +94,7 @@ public class DrivePurePursuit extends Action {
         }else
             wantedAngle = paths.get(lineNum + 1).getPose().getHeading();
 
-        double turn = wantedAngle - Robot.getInstance().getMecanumDrive().odometry.returnOrientation();
+        double turn = wantedAngle - Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES);
 
         if (turn > 180){
             turn = turn - 360;
@@ -103,23 +106,27 @@ public class DrivePurePursuit extends Action {
         double rotation = orientationPID.update(turn, 0);
 
         double maxPower = paths.get(lineNum + 1).getMaxVelocity();
-        xPower = CruiseLib.limitValue(xPower, -.2, -maxPower, .2, maxPower);
-        yPower = CruiseLib.limitValue(yPower, -.2, -maxPower, .2, maxPower);
-        rotation = CruiseLib.limitValue(rotation, -.2, -paths.get(lineNum + 1).getMaxTurnVelocity(),
-                .2, paths.get(lineNum + 1).getMaxTurnVelocity());
+        xPower = CruiseLib.limitValue(xPower, maxPower, -maxPower);
+        yPower = CruiseLib.limitValue(yPower, maxPower, -maxPower);
+        rotation = CruiseLib.limitValue(rotation, paths.get(lineNum + 1).getMaxTurnVelocity());
 
         lastPoint = point;
-        Robot.getInstance().getMecanumDrive().setFieldCentricAutoPower(-xPower, -yPower, rotation);
+
+        Log.i("Powers : ", xPower + ", " + yPower + ", "+ rotation);
+        Robot.getInstance().getMecanumDrive().setFieldCentricAutoPower(-xPower, yPower, rotation);
+
+        Log.i("Pos", Robot.getInstance().getMecanumDrive().getCurrentPose() + "");
+        Log.i("Adj Pos", Robot.getInstance().getMecanumDrive().getAdjustedPose() + "");
     }
 
     @Override
     public boolean isFinished() {
         Pose2d tolerancePose = paths.get(paths.size() - 1).getTolerancePose();
 
-        if (Math.abs(paths.get(paths.size() - 1).getPoint().x - Robot.getInstance().getMecanumDrive().odometry.returnXCoordinate())
+        if (Math.abs(paths.get(paths.size() - 1).getPoint().x - Robot.getInstance().getMecanumDrive().getAdjustedPose().getX())
                 < Math.abs(tolerancePose.getX())) xCounter++; else xCounter = 0;
 
-        if (Math.abs(paths.get(paths.size() - 1).getPoint().y - Robot.getInstance().getMecanumDrive().odometry.returnYCoordinate())
+        if (Math.abs(paths.get(paths.size() - 1).getPoint().y - Robot.getInstance().getMecanumDrive().getAdjustedPose().getY())
                 < Math.abs(tolerancePose.getY())) yCounter++; else yCounter = 0;
 
         if (Math.abs(orientationPID.getError()) < Math.abs(tolerancePose.getHeading()))

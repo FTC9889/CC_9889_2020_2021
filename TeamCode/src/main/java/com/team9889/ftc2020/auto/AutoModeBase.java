@@ -35,13 +35,6 @@ public abstract class AutoModeBase extends Team9889Linear {
         }
     }
 
-    // Test getting the Side number
-    public static void main(String... args) {
-        com.team9889.ftc2020.auto.AutoModeBase.Side side = AutoModeBase.Side.BLUE;
-
-        System.out.println(AutoModeBase.Side.getNum(side));
-    }
-
     // Checks for a saved file to see what auto we are running?
     // TODO: Use gamepad or maybe camera to select which auto to run
     private void setCurrentAutoRunning(){

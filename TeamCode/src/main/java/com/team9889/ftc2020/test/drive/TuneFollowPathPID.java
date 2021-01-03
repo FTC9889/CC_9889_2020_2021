@@ -3,7 +3,8 @@ package com.team9889.ftc2020.test.drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.team9889.ftc2020.Team9889Linear;
-import com.team9889.ftc2020.auto.actions.drive.DriveFollowPath;
+//import com.team9889.ftc2020.auto.actions.drive.DriveFollowPath;
+import com.team9889.ftc2020.auto.actions.drive.DrivePurePursuit;
 import com.team9889.ftc2020.auto.actions.utl.RobotUpdate;
 import com.team9889.lib.control.Path;
 import com.team9889.lib.control.controllers.PID;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @TeleOp
 public class TuneFollowPathPID extends Team9889Linear {
-    List<Path> path = new ArrayList<>();
+    ArrayList<Path> path = new ArrayList<>();
     double p = 0, i = 0, d = 0.008;
     double maxVelocity = .5;
     int number = 1;
@@ -31,23 +32,16 @@ public class TuneFollowPathPID extends Team9889Linear {
         ThreadAction(new RobotUpdate());
 
         while (opModeIsActive()) {
-//            Robot.update();
+            Robot.update();
 
             PID pid = new PID(p, i, d);
 
             if (gamepad1.a) {
                 path.add(new Path(new Pose2d(
-                        24,
-                        0,
-                        0),
+                        24, 0, 0),
                         new Pose2d(1, 1, 2), 5, maxVelocity));
-                path.add(new Path(new Pose2d(
-                        48,
-                        12,
-                        90),
-                        new Pose2d(2, 2, 3), 5, maxVelocity));
 
-                runAction(new DriveFollowPath(path, pid, telemetry));
+                runAction(new DrivePurePursuit(path, pid));
             }
 
             if (gamepad1.dpad_left && lRToggle) {
@@ -105,6 +99,8 @@ public class TuneFollowPathPID extends Team9889Linear {
             Robot.outputToTelemetry(telemetry);
 
             telemetry.update();
+
+//            UpdateActions();
         }
     }
 }

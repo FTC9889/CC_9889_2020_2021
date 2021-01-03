@@ -40,21 +40,20 @@ public class Constants {
          * (Wheel Diameter * PI) / Counts Per Rotation
          */
         public final static double ENCODER_TO_DISTANCE_RATIO = (WheelDiameter * Math.PI) / 537.6;
-        public final static double AngleToInchRatio = (Math.PI / 180.) * (WheelbaseWidth / 2.);
+        public final static double AngleToInchRatio = (Math.PI / 180.) * (WheelbaseWidth / 2);
         public final static double InchToTick = 537.6 / (Math.PI * 4.1);
     }
 
     public static class OdometryConstants {
 
-        private static double WheelDiameter = 38.45 / 25.4;  // https://www.rotacaster.com.au/shop/35mm-rotacaster-wheels/index
-//        private static double WheelDiameter = 35 / 25.4;  // https://www.rotacaster.com.au/shop/35mm-rotacaster-wheels/index
-        public final static double ENCODER_TO_DISTANCE_RATIO = 1440 / (WheelDiameter * Math.PI); // https://www.rotacaster.com.au/shop/35mm-rotacaster-wheels/index  Step 4
+//        private static double WheelDiameter = 38.45 / 25.4;  // https://www.rotacaster.com.au/shop/35mm-rotacaster-wheels/index
+        private static double WheelDiameter = 35 / 25.4;  // https://www.rotacaster.com.au/shop/35mm-rotacaster-wheels/index
+        public final static double ENCODER_TO_DISTANCE_RATIO = ((WheelDiameter * Math.PI) * ((((double) 40) / ((double) 24)))) / 1440; // https://www.rotacaster.com.au/shop/35mm-rotacaster-wheels/index  Step 4
+//        0.005007837
     }
 
     public static void main(String[] args) {
-        double test = 1/DriveConstants.ENCODER_TO_DISTANCE_RATIO;
-        double ratio = test/59.417845420974258687049938325739;
-        System.out.println(0.00085 / ratio);
+        System.out.println(OdometryConstants.ENCODER_TO_DISTANCE_RATIO * 4741);
     }
 
    /*---------------------
@@ -67,6 +66,7 @@ public class Constants {
     public static class IntakeConstants {
         public final static String kIntakeLeftMotorId = "li";
         public final static String kIntakeRightMotorId = "ri";
+        public final static String kCenterOdometryId = "co";
     }
 
     /*---------------------

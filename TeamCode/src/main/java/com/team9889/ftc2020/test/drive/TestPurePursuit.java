@@ -22,10 +22,11 @@ public class TestPurePursuit extends AutoModeBase {
         Side Side_ = Side.RED;
         Robot.redAuto = true;
 
-        paths.add(new Path(new Pose2d(0, 48, 0), new Pose2d(2, 2, 3), 6, .5));
-        paths.add(new Path(new Pose2d(48, 48, 90), new Pose2d(2, 2, 3), 6, 1));
-        paths.add(new Path(new Pose2d(48, 0, 0), new Pose2d(2, 2, 3), 6, .5));
-        paths.add(new Path(new Pose2d(0, 0, 0), new Pose2d(2, 2, 3), 6, 1));
+        paths.add(new Path(new Pose2d(48, 0, 0), new Pose2d(2, 3, 5), 6, .3));
+        paths.add(new Path(new Pose2d(48, 0, 0), new Pose2d(2, 3, 5), 6, .3));
+        paths.add(new Path(new Pose2d(48, 0, 0), new Pose2d(2, 3, 5), 6, .3));
+        paths.add(new Path(new Pose2d(48, 0, 0), new Pose2d(2, 3, 5), 6, .3));
+//        paths.add(new Path(new Pose2d(20, 0, 0), new Pose2d(2, 3, 5), 6, .3));
 
         runAction(new DrivePurePursuit(paths));
     }

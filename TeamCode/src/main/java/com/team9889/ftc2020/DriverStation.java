@@ -73,7 +73,7 @@ public class DriverStation {
     }
 
     private boolean wggToggle = true;
-    private boolean wggOpen = false;
+    private boolean wggOpen = true;
     boolean getWGG() {
         if(gamepad1.dpad_up && wggToggle) {
             wggOpen = !wggOpen;
