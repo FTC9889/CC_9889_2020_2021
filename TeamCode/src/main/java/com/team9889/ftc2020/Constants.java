@@ -102,7 +102,7 @@ public class Constants {
 
     //Settings for Camera
     public static class CameraConstants {
-        public final static String kCameraXAxisId = "cameraxaxis";
-        public final static String kCameraYAxisId = "camerayaxis";
+        public final static String kCameraXId = "camerax";
+        public final static String kCameraYId = "cameray";
     }
 }

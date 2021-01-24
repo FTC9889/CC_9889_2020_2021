@@ -1,21 +1,57 @@
 package com.team9889.ftc2020.subsystems;
 
+import com.team9889.ftc2020.auto.AutoModeBase;
+import com.team9889.lib.detectors.ScanForGoal;
+import com.team9889.lib.detectors.ScanForRS;
+import com.team9889.lib.detectors.ScanForWG;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.opencv.core.Point;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraRotation;
 
 /**
  * Created by MannoMation on 10/27/2018.
  */
 
 public class Camera extends Subsystem{
+    ScanForGoal scanForGoal = new ScanForGoal();
+    ScanForWG scanForWG = new ScanForWG();
+    ScanForRS scanForRS = new ScanForRS();
+
+    public enum CameraStates {
+        GOAL, WG, RS, NULL
+    }
+    public CameraStates currentCamState = CameraStates.NULL;
+
+    enum Pipelines {
+        GOAL, WG, RS, NULL
+    }
+    Pipelines currentPipeline = Pipelines.NULL;
 
     @Override
-    public void init(boolean auto) {
-
+    public void init(final boolean auto) {
+        Robot.getInstance().camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        {
+            @Override
+            public void onOpened()
+            {
+                Robot.getInstance().camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+                if (auto) {
+                    setScanForRS();
+                    setRSCamPos();
+                } else {
+                    setScanForGoal();
+                    setGoalCamPos();
+                }
+            }
+        });
     }
 
     @Override
     public void outputToTelemetry(Telemetry telemetry) {
-
+        telemetry.addData("Pos Of Target", getPosOfTarget());
+        telemetry.addData("Box", getRSBox().toString());
     }
 
     @Override
@@ -26,5 +62,69 @@ public class Camera extends Subsystem{
     @Override
     public void stop() {
 
+    }
+
+    public AutoModeBase.Boxes getRSBox () {
+        AutoModeBase.Boxes box = AutoModeBase.Boxes.CLOSE;
+        if (Math.abs(getPosOfTarget().y) == 0) {
+            box = AutoModeBase.Boxes.CLOSE;
+        } else if (Math.abs(getPosOfTarget().y) < .25) {
+            box = AutoModeBase.Boxes.MIDDLE;
+        } else if (Math.abs(getPosOfTarget().y) >= .25) {
+            box = AutoModeBase.Boxes.FAR;
+        }
+
+        return box;
+    }
+
+    public void setScanForGoal () {
+        Robot.getInstance().camera.setPipeline(scanForGoal);
+        currentPipeline = Pipelines.GOAL;
+    }
+
+    public void setScanForWG () {
+        Robot.getInstance().camera.setPipeline(scanForWG);
+        currentPipeline = Pipelines.WG;
+    }
+
+    public void setScanForRS () {
+        Robot.getInstance().camera.setPipeline(scanForRS);
+        currentPipeline = Pipelines.RS;
+    }
+
+    public Point getPosOfTarget () {
+        Point posToReturn = new Point();
+        switch (currentPipeline) {
+            case GOAL:
+                posToReturn = scanForGoal.getPoint();
+                break;
+
+            case WG:
+                posToReturn = scanForWG.getPoint();
+                break;
+            case RS:
+                posToReturn = scanForRS.getPoint();
+                break;
+        }
+
+        return posToReturn;
+    }
+
+    public void setWGCamPos () {
+        currentCamState = CameraStates.WG;
+        Robot.getInstance().xCam.setPosition(1);
+        Robot.getInstance().yCam.setPosition(.85);
+    }
+
+    public void setGoalCamPos () {
+        currentCamState = CameraStates.GOAL;
+        Robot.getInstance().xCam.setPosition(.25);
+        Robot.getInstance().yCam.setPosition(.6);
+    }
+
+    public void setRSCamPos () {
+        currentCamState = CameraStates.RS;
+        Robot.getInstance().xCam.setPosition(.25);
+        Robot.getInstance().yCam.setPosition(.85);
     }
 }

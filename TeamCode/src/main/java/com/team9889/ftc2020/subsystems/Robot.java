@@ -10,6 +10,9 @@ import com.team9889.lib.hardware.RevIMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvInternalCamera2;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.RevBulkData;
 
@@ -25,7 +28,8 @@ import java.util.List;
 
 public class Robot{
 
-//     public WebcamName webcam;
+    public WebcamName webcam;
+    OpenCvCamera camera;
 
     public Motor fLDrive, fRDrive, bLDrive, bRDrive;
     public RevIMU imu = null;
@@ -36,6 +40,8 @@ public class Robot{
     public Servo fwArm;
 
     public Servo wgGrabber, wgLeft, wgRight;
+
+    public Servo xCam, yCam;
 
     public boolean redAuto;
 
@@ -75,7 +81,8 @@ public class Robot{
         revHubSlave = hardwareMap.get(ExpansionHubEx.class, Constants.kRevHubSlave);
 
         // Camera
-//         webcam = hardwareMap.get(WebcamName.class, Constants.kWebcam);
+        webcam = hardwareMap.get(WebcamName.class, Constants.kWebcam);
+        camera = OpenCvCameraFactory.getInstance().createWebcam(webcam);
 
         // Drive
         fLDrive = new Motor(hardwareMap, Constants.DriveConstants.kLeftDriveMasterId, 1,
@@ -105,6 +112,9 @@ public class Robot{
         wgLeft = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGLeft);
         wgLeft.setDirection(Servo.Direction.REVERSE);
         wgRight = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGRight);
+
+        xCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraXId);
+        yCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraYId);
 
         imu = new RevIMU("imu1", hardwareMap);
 

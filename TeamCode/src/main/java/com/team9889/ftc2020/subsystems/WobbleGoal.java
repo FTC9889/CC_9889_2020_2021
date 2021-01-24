@@ -9,7 +9,9 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class WobbleGoal extends Subsystem{
     @Override
     public void init(boolean auto) {
-
+        if (auto) {
+            Robot.getInstance().wgGrabber.setPosition(.65);
+        }
     }
 
     @Override
@@ -25,5 +27,15 @@ public class WobbleGoal extends Subsystem{
     @Override
     public void stop() {
 
+    }
+
+    public void setWGDown () {
+        Robot.getInstance().wgLeft.setPosition(0.4);
+        Robot.getInstance().wgRight.setPosition(0.4);
+    }
+
+    public void setWGUp () {
+        Robot.getInstance().wgLeft.setPosition(0.8);
+        Robot.getInstance().wgRight.setPosition(0.8);
     }
 }

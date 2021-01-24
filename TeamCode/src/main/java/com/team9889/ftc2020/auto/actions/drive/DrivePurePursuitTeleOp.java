@@ -18,7 +18,7 @@ import java.util.ArrayList;
 /**
  * Created by Eric on 8/26/2020.
  */
-public class DrivePurePursuit extends Action {
+public class DrivePurePursuitTeleOp extends Action {
     ArrayList<Path> paths;
 
     int lineNum = 0;
@@ -33,11 +33,11 @@ public class DrivePurePursuit extends Action {
     private int yCounter = 0;
     Point lastPoint = new Point();
 
-    public DrivePurePursuit (ArrayList<Path> paths) {
+    public DrivePurePursuitTeleOp(ArrayList<Path> paths) {
         this.paths = paths;
     }
 
-    public DrivePurePursuit (ArrayList<Path> paths, PID pid) {
+    public DrivePurePursuitTeleOp(ArrayList<Path> paths, PID pid) {
         this.paths = paths;
         this.orientationPID = pid;
     }
@@ -70,7 +70,7 @@ public class DrivePurePursuit extends Action {
         }
 
         if (ppObject[0] == null){
-            ppObject[0] = paths.get(lineNum + 1).getPoint();
+            ppObject[0] = lastPoint;
         }
 
         Point point = (Point) ppObject[0];
@@ -114,16 +114,9 @@ public class DrivePurePursuit extends Action {
         double rotation = orientationPID.update(turn, 0);
 
         double maxPower = paths.get(lineNum + 1).getMaxVelocity();
-        if (xPID.getError() > paths.get(lineNum + 1).getTolerancePose().getX()) {
-            xPower = CruiseLib.limitValue(xPower, -.25, -maxPower, .25, maxPower);
-        }
-        if (yPID.getError() > paths.get(lineNum + 1).getTolerancePose().getY()) {
-            yPower = CruiseLib.limitValue(yPower, -.25, -maxPower, .25, maxPower);
-        }
-
-        if (orientationPID.getError() > paths.get(lineNum + 1).getTolerancePose().getHeading()) {
-            rotation = CruiseLib.limitValue(rotation, -.1, maxPower, .1, maxPower);
-        }
+        xPower = CruiseLib.limitValue(xPower, -.2, -maxPower, .2, maxPower);
+        yPower = CruiseLib.limitValue(yPower, -.2, -maxPower, .2, maxPower);
+        rotation = CruiseLib.limitValue(rotation, -.1, maxPower, .1, maxPower);
 
         lastPoint = point;
 
@@ -132,6 +125,8 @@ public class DrivePurePursuit extends Action {
 
         Log.i("Pos", Robot.getInstance().getMecanumDrive().getCurrentPose() + "");
         Log.i("Adj Pos", Robot.getInstance().getMecanumDrive().getAdjustedPose() + "");
+
+        Robot.getInstance().update();
     }
 
     @Override

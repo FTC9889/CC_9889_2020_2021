@@ -11,7 +11,7 @@ import com.team9889.ftc2020.auto.AutoModeBase;
 public class BlueAuto extends AutoModeBase {
 
     @Override
-    public void run(AutoModeBase.Side side) {
+    public void run(Side side, Boxes box) {
 
     }
 }

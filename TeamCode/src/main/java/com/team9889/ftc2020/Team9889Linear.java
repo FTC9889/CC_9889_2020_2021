@@ -2,6 +2,7 @@ package com.team9889.ftc2020;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.View;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -33,50 +34,19 @@ public abstract class Team9889Linear extends LinearOpMode {
     // Match Timer
     protected ElapsedTime matchTime = new ElapsedTime();
 
-    // Background
-//    private View relativeLayout;
-
-//    OpenCvCamera phoneCam;
-//    public double positionOfSkyStone;
-//    TeleOpStonePipeline pipeline = new TeleOpStonePipeline();
-
     public void waitForStart(boolean autonomous) {
-//        int relativeLayoutId = hardwareMap.appContext.getResources().
-//                getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
-//        relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
-
         Robot.init(hardwareMap, autonomous);
 
         telemetry.setMsTransmissionInterval(autonomous ? 50:1000);
 
         if(autonomous){
-//            phoneCam.openCameraDevice();
-//            ScanForSkyStonesPipeline scanForSkyStonesPipeline = new ScanForSkyStonesPipeline();
-//            phoneCam.setPipeline(scanForSkyStonesPipeline);
-//            phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPSIDE_DOWN);
-
-
             // Autonomous Init Loop code
             while(isInInitLoop()){
                 telemetry.addData("Waiting for Start","");
-//                positionOfSkyStone = scanForSkyStonesPipeline.getPositionOfSkyStone();
-//                telemetry.addData("Position", scanForSkyStonesPipeline.getPositionOfSkyStone());
                 Robot.outputToTelemetry(telemetry);
                 telemetry.update();
             }
-//            Runnable ShutDownCameraThread = new Runnable() {
-//                @Override
-//                public void run() {
-//                    phoneCam.stopStreaming();
-//                }
-//            };
-
-//            new Thread(ShutDownCameraThread).start();
         } else {
-//            phoneCam.openCameraDevice();
-//            phoneCam.setPipeline(pipeline);
-//            phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPSIDE_DOWN);
-
             // Teleop Init Loop code
             while(isInInitLoop()){
                 telemetry.addData("Waiting for Start","");

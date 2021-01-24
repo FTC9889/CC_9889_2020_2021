@@ -1,6 +1,7 @@
 package com.team9889.ftc2020;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * Created by MannoMation on 12/14/2018.
@@ -65,6 +66,7 @@ public class DriverStation {
     boolean getWG() {
         if(gamepad1.left_bumper && wgToggle) {
             wgDown = !wgDown;
+
             wgToggle = false;
         } else if(!gamepad1.left_bumper)
             wgToggle = true;
@@ -108,6 +110,18 @@ public class DriverStation {
             slowDownToggle = true;
 
         return slowDown ? 3 : 1;
+    }
+
+    private boolean fwToggle = true;
+    private boolean fwOn = false;
+    boolean getFW() {
+        if(gamepad1.x && fwToggle) {
+            fwOn = !fwOn;
+            fwToggle = false;
+        } else if(!gamepad1.x)
+            fwToggle = true;
+
+        return fwOn;
     }
 
 //    private boolean foundationToggle = false;

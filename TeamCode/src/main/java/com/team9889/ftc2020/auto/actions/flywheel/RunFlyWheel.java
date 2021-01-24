@@ -9,23 +9,27 @@ import com.team9889.ftc2020.subsystems.Robot;
  */
 public class RunFlyWheel extends Action {
     ElapsedTime loopTimer = new ElapsedTime();
+    ElapsedTime timer = new ElapsedTime();
 
     @Override
     public void start() {
         loopTimer.reset();
+        timer.reset();
     }
 
     @Override
     public void update() {
-        Robot.getInstance().getFlyWheel().setFlyWheelSpeed(5200, loopTimer.milliseconds());
+        loopTimer.reset();
 
-        while (loopTimer.milliseconds() > 20) {
+        while (loopTimer.milliseconds() < 20) {
         }
+
+        Robot.getInstance().getFlyWheel().setFlyWheelSpeed(5200, loopTimer.milliseconds());
     }
 
     @Override
     public boolean isFinished() {
-        return false;
+        return timer.milliseconds() > 8000;
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.Team9889Linear;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.auto.actions.utl.RobotUpdate;
+import com.team9889.ftc2020.subsystems.Camera;
 
 /**
  * Created by joshua9889 on 8/5/2017.
@@ -35,6 +36,11 @@ public abstract class AutoModeBase extends Team9889Linear {
         }
     }
 
+    public enum Boxes {
+        CLOSE, MIDDLE, FAR
+    }
+    public Boxes box;
+
     // Checks for a saved file to see what auto we are running?
     // TODO: Use gamepad or maybe camera to select which auto to run
     private void setCurrentAutoRunning(){
@@ -42,7 +48,7 @@ public abstract class AutoModeBase extends Team9889Linear {
     }
 
     // Method to implement in the auto to run the autonomous
-    public abstract void run(Side side);
+    public abstract void run(Side side, Boxes box);
 
     @Override
     public void runOpMode() throws InterruptedException{
@@ -51,11 +57,13 @@ public abstract class AutoModeBase extends Team9889Linear {
         waitForStart(true);
         autoTimer.reset();
 
+        box = Robot.getCamera().getRSBox();
+
         ThreadAction(new RobotUpdate());
 
         // If the opmode is still running, run auto
         if (opModeIsActive() && !isStopRequested()) {
-            run(currentAutoRunning);
+            run(currentAutoRunning, box);
         }
 
         // Stop all movement

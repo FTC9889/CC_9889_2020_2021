@@ -25,13 +25,13 @@ public class PID extends FeedBackController {
 
     private double p, i, d;
 
-    private double error_prior;
+    public double error_prior;
     private double integral;
     private double lastTime = 0;
     double output;
     private double maxIntegral = 0;
 
-    private boolean first = true;
+    public boolean first = true;
 
     private double error = 1000000;
 
@@ -40,7 +40,7 @@ public class PID extends FeedBackController {
 
     @Override
     public double update(double current, double wanted) {
-         error = wanted - current;
+        error = wanted - current;
         Log.i("Error", error + "");
 
         if(first){

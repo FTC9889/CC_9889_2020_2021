@@ -109,7 +109,7 @@ public class MecanumDrive extends Subsystem {
         Robot.getInstance().bRDrive.setPower(0);
     }
 
-    private void resetOdometryEncoders() {
+    public void resetOdometryEncoders() {
         Right_Position_Offset = Right_OdometryPosition();
         Left_Position_Offset = Left_OdometryPosition();
         Y_Position_Offset = Y_OdometryPosition();
@@ -215,14 +215,15 @@ public class MecanumDrive extends Subsystem {
 
 class Odometry extends ThreeTrackingWheelLocalizer {
 
-    private static final double LATERAL_DISTANCE = 4.375;
-    private static final double FORWARD_OFFSET = .25;
+    private static final double LATERAL_DISTANCE = 4.6875;
+    private static final double FORWARD_OFFSET = 0.15625;
 
     Odometry() {
         super(Arrays.asList(
                 new Pose2d(FORWARD_OFFSET, -LATERAL_DISTANCE, Math.toRadians(0)),
                 new Pose2d(FORWARD_OFFSET, LATERAL_DISTANCE, Math.toRadians(0)),
-                new Pose2d(0, 0, Math.toRadians(90))
+//                new Pose2d(-0.1875, 0.09375, Math.toRadians(90))
+                new Pose2d(1.125, 0.375, Math.toRadians(90))
         ));
     }
 

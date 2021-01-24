@@ -16,7 +16,7 @@ import java.util.ArrayList;
 public class TestPurePursuit extends AutoModeBase {
 
     @Override
-    public void run(Side side) {
+    public void run(Side side, Boxes box) {
         ArrayList<Path> paths = new ArrayList<>();
 
         Side Side_ = Side.RED;
