@@ -55,7 +55,7 @@ public class CruiseLib {
                                     double posMin, double posMax){
         if(val>negMin && val<0)
             return negMin;
-        else if(val>negMax && val<0)
+        else if(val<negMax && val<0)
             return negMax;
         else if(val<posMin && val>0)
             return posMin;

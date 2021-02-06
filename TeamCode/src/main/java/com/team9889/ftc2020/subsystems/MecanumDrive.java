@@ -79,7 +79,7 @@ public class MecanumDrive extends Subsystem {
     public void update() {
         odometry.update();
 
-        double adjustValue = -0.0000;
+        double adjustValue = 0.000015;
 //        double adjustValue = 0.0;
         if(timer.milliseconds() > 0)
             velocityPose = currentPose.minus(lastPoseOfRobotBeforeDriftCalc).div(timer.seconds()).times(adjustValue);
@@ -223,7 +223,7 @@ class Odometry extends ThreeTrackingWheelLocalizer {
                 new Pose2d(FORWARD_OFFSET, -LATERAL_DISTANCE, Math.toRadians(0)),
                 new Pose2d(FORWARD_OFFSET, LATERAL_DISTANCE, Math.toRadians(0)),
 //                new Pose2d(-0.1875, 0.09375, Math.toRadians(90))
-                new Pose2d(1.125, 0.375, Math.toRadians(90))
+                new Pose2d(-0.375, -1.125, Math.toRadians(90))
         ));
     }
 

@@ -92,6 +92,7 @@ public class Constants {
         public final static String kWGGrabber = "wggrabber";
         public final static String kWGLeft = "wgleft";
         public final static String kWGRight = "wgright";
+        public final static String kWGDetector = "wgd";
     }
 
     /*---------------------

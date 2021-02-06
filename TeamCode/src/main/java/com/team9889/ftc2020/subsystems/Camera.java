@@ -42,7 +42,7 @@ public class Camera extends Subsystem{
                     setRSCamPos();
                 } else {
                     setScanForGoal();
-                    setGoalCamPos();
+//                    setGoalCamPos();
                 }
             }
         });

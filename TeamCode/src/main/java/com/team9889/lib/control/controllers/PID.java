@@ -37,6 +37,11 @@ public class PID extends FeedBackController {
 
     double derivative;
 
+    public static void main(String[] args) {
+        PID pid = new PID(.001, 0, 0.0005);
+
+        System.out.println(pid.update(0, 5000));
+    }
 
     @Override
     public double update(double current, double wanted) {

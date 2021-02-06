@@ -1,6 +1,7 @@
 package com.team9889.ftc2020.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
@@ -40,6 +41,7 @@ public class Robot{
     public Servo fwArm;
 
     public Servo wgGrabber, wgLeft, wgRight;
+    public DistanceSensor wgDetector;
 
     public Servo xCam, yCam;
 
@@ -104,7 +106,7 @@ public class Robot{
 
         //FlyWheel
         flyWheel = new Motor(hardwareMap, Constants.LiftConstants.kFlyWheel, 1,
-                DcMotorSimple.Direction.REVERSE, false, false, true);
+                DcMotorSimple.Direction.REVERSE, false, true, true);
 
         fwArm = hardwareMap.get(Servo.class, Constants.LiftConstants.kFWArm);
 
@@ -112,6 +114,8 @@ public class Robot{
         wgLeft = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGLeft);
         wgLeft.setDirection(Servo.Direction.REVERSE);
         wgRight = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGRight);
+
+        wgDetector = hardwareMap.get(DistanceSensor.class, Constants.WobbleGoalConstants.kWGDetector);
 
         xCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraXId);
         yCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraYId);

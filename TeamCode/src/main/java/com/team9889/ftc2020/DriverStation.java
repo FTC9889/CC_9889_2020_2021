@@ -63,12 +63,14 @@ public class DriverStation {
 
     private boolean wgToggle = true;
     private boolean wgDown = false;
+    public  boolean codePress = false;
     boolean getWG() {
-        if(gamepad1.left_bumper && wgToggle) {
+        if((gamepad1.left_bumper && wgToggle) || codePress) {
             wgDown = !wgDown;
 
             wgToggle = false;
-        } else if(!gamepad1.left_bumper)
+            codePress = false;
+        } else if(!gamepad1.left_bumper && !codePress)
             wgToggle = true;
 
         return wgDown;

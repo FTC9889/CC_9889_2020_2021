@@ -114,15 +114,22 @@ public class DrivePurePursuit extends Action {
         double rotation = orientationPID.update(turn, 0);
 
         double maxPower = paths.get(lineNum + 1).getMaxVelocity();
-        if (xPID.getError() > paths.get(lineNum + 1).getTolerancePose().getX()) {
+        Log.i("PID", "" + xPID.getError());
+        if (Math.abs(xPID.getError()) > paths.get(lineNum + 1).getTolerancePose().getX()) {
             xPower = CruiseLib.limitValue(xPower, -.25, -maxPower, .25, maxPower);
-        }
-        if (yPID.getError() > paths.get(lineNum + 1).getTolerancePose().getY()) {
-            yPower = CruiseLib.limitValue(yPower, -.25, -maxPower, .25, maxPower);
+        } else {
+            xPower = CruiseLib.limitValue(xPower, -.1, -maxPower, .1, maxPower);
         }
 
-        if (orientationPID.getError() > paths.get(lineNum + 1).getTolerancePose().getHeading()) {
-            rotation = CruiseLib.limitValue(rotation, -.1, maxPower, .1, maxPower);
+
+        if (Math.abs(yPID.getError()) > paths.get(lineNum + 1).getTolerancePose().getY()) {
+            yPower = CruiseLib.limitValue(yPower, -.25, -maxPower, .25, maxPower);
+        } else {
+            yPower = CruiseLib.limitValue(yPower, -.1, -maxPower, .1, maxPower);
+        }
+
+        if (Math.abs(orientationPID.getError()) > (paths.get(lineNum + 1).getTolerancePose().getHeading() / 2)) {
+            rotation = CruiseLib.limitValue(rotation, -.1, -maxPower, .1, maxPower);
         }
 
         lastPoint = point;
