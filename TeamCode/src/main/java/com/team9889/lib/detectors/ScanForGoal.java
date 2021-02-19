@@ -1,5 +1,8 @@
 package com.team9889.lib.detectors;
 
+import android.graphics.Bitmap;
+
+import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -31,6 +34,8 @@ public class ScanForGoal extends OpenCvPipeline {
     private Mat hsvThresholdOutput = new Mat();
     private Mat maskOutput = new Mat();
     private ArrayList<MatOfPoint> filterContoursOutput = new ArrayList<MatOfPoint>();
+
+    public Mat bitmap;
 
     private Point point = new Point(1e10, 1e10);
 
@@ -126,7 +131,13 @@ public class ScanForGoal extends OpenCvPipeline {
             point = new Point((mc.get(i).x / ((double) blurOutput.width() / 2)) - 1, (mc.get(i).y / ((double) blurOutput.height() / 2)) - 1);
         }
 
+//        Utils.matToBitmap(blurOutput, bitmap);
+        bitmap = blurOutput;
         return blurOutput;
+    }
+
+    public Mat getImage () {
+        return bitmap;
     }
 
     /**

@@ -50,7 +50,6 @@ public class DrivePurePursuit extends Action {
 
     @Override
     public void update() {
-        Log.i("HI", "hi");
 //        Robot.getInstance().update();
 
         Point robotPos = new Point(Robot.getInstance().getMecanumDrive().getAdjustedPose().getX(),
@@ -135,7 +134,7 @@ public class DrivePurePursuit extends Action {
         lastPoint = point;
 
         Log.i("Powers : ", xPower + ", " + yPower + ", "+ rotation);
-        Robot.getInstance().getMecanumDrive().setFieldCentricAutoPower(-xPower, yPower, rotation);
+        Robot.getInstance().getMecanumDrive().setFieldCentricAutoPower(xPower, yPower, rotation);
 
         Log.i("Pos", Robot.getInstance().getMecanumDrive().getCurrentPose() + "");
         Log.i("Adj Pos", Robot.getInstance().getMecanumDrive().getAdjustedPose() + "");

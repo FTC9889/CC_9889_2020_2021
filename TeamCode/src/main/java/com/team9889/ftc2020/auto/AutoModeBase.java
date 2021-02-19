@@ -59,7 +59,7 @@ public abstract class AutoModeBase extends Team9889Linear {
 
         box = Robot.getCamera().getRSBox();
 
-        ThreadAction(new RobotUpdate());
+//        ThreadAction(new RobotUpdate());
 
         // If the opmode is still running, run auto
         if (opModeIsActive() && !isStopRequested()) {

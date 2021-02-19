@@ -19,7 +19,7 @@ import java.util.List;
  */
 
 public class MecanumDrive extends Subsystem {
-    public double x, y, xSpeed, ySpeed;
+    public double x, y, xSpeed, ySpeed, turnSpeed;
 
     public Pose2d currentPose = new Pose2d();
     public Rotation2d gyroAngle = new Rotation2d();
@@ -79,8 +79,8 @@ public class MecanumDrive extends Subsystem {
     public void update() {
         odometry.update();
 
+//        double adjustValue = 0.00012;
         double adjustValue = 0.000015;
-//        double adjustValue = 0.0;
         if(timer.milliseconds() > 0)
             velocityPose = currentPose.minus(lastPoseOfRobotBeforeDriftCalc).div(timer.seconds()).times(adjustValue);
         else
@@ -92,13 +92,33 @@ public class MecanumDrive extends Subsystem {
         if (updated) {
             setCurrentPose(new Pose2d(odometry.getPoseEstimate().getX(),
                     odometry.getPoseEstimate().getY(),
-                    gyroAngle.getTheda(AngleUnit.RADIANS)));
-//            updated = false;
+                    -gyroAngle.getTheda(AngleUnit.RADIANS)));
         }
         odometry.update();
-//        else {
 
         updated = true;
+
+        xSpeed = 0;
+        ySpeed = 0;
+        turnSpeed = 0;
+    }
+
+    public void adjustEncoder (double value, double lastValue) {
+        double velocityValue;
+        double adjustValue = 0.00012;
+        if(timer.milliseconds() > 0)
+            velocityValue = ((value - lastValue) / timer.seconds()) * adjustValue;
+        else
+            velocityValue = ((value - lastValue) / (20/1000)) * adjustValue;
+        lastPoseOfRobotBeforeDriftCalc = currentPose;
+        timer.reset();
+        driftCalc = driftCalc.plus(velocityPose);
+
+        if (updated) {
+            setCurrentPose(new Pose2d(odometry.getPoseEstimate().getX(),
+                    odometry.getPoseEstimate().getY(),
+                    -gyroAngle.getTheda(AngleUnit.RADIANS)));
+        }
     }
 
     @Override

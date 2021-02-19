@@ -2,7 +2,7 @@ package com.team9889.lib.control.controllers;
 
 public class PIDF extends PID {
 
-    private double kFF;
+    public double kFF;
 
     public PIDF(double kP, double kI, double kD, double kF) {
         super(kP, kI, kD);

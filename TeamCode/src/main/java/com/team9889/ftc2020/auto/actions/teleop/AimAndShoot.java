@@ -50,40 +50,40 @@ public class AimAndShoot extends Action {
     boolean driveDone = false;
     @Override
     public void update() {
-        Point robotPos = new Point(Robot.getInstance().getMecanumDrive().getAdjustedPose().getX(),
-                Robot.getInstance().getMecanumDrive().getAdjustedPose().getY());
-
-        double angle = CalculatePose(robotPos);
-        Log.i("angle 2", angle + "");
-
-        double wantedAngle;
-        if (angle > 180) {
-            wantedAngle = angle - 360;
-        } else if (angle < -180) {
-            wantedAngle = angle + 360;
-        } else
-            wantedAngle = angle;
-
-        double turn = wantedAngle - Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES);
-
-        if (turn > 180) {
-            turn = turn - 360;
-        } else if (turn < -180) {
-            turn = turn + 360;
-        }
-        turn *= -1;
-
-        double rotation = orientationPID.update(turn, 0);
-        rotation = CruiseLib.limitValue(rotation, .8);
+//        Point robotPos = new Point(Robot.getInstance().getMecanumDrive().getAdjustedPose().getX(),
+//                Robot.getInstance().getMecanumDrive().getAdjustedPose().getY());
+//
+//        double angle = CalculatePose(robotPos);
+//        Log.i("angle 2", angle + "");
+//
+//        double wantedAngle;
+//        if (angle > 180) {
+//            wantedAngle = angle - 360;
+//        } else if (angle < -180) {
+//            wantedAngle = angle + 360;
+//        } else
+//            wantedAngle = angle;
+//
+//        double turn = wantedAngle - Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES);
+//
+//        if (turn > 180) {
+//            turn = turn - 360;
+//        } else if (turn < -180) {
+//            turn = turn + 360;
+//        }
+//        turn *= -1;
+//
+//        double rotation = orientationPID.update(turn, 0);
+//        rotation = CruiseLib.limitValue(rotation, .8);
 
 //        if (Math.abs(orientationPID.getError()) < 20) {
 //            Robot.getInstance().getMecanumDrive().setFieldCentricAutoPower(0, 0, rotation);
 //        } else {
-            camOrientationPID.update(Robot.getInstance().getCamera().getPosOfTarget().x, -.05);
+        camOrientationPID.update(Robot.getInstance().getCamera().getPosOfTarget().x, 0.2);
 //            if (Math.abs(camOrientationPID.getError()) > .5) {
 //                Robot.getInstance().getMecanumDrive().setFieldCentricPower(0, 0, -camOrientationPID.getOutput() * 2);
 //            } else {
-                Robot.getInstance().getMecanumDrive().setFieldCentricPower(0, 0, -camOrientationPID.getOutput() / 1.5);
+        Robot.getInstance().getMecanumDrive().turnSpeed -= camOrientationPID.getOutput() / 1.5;
 //            }
 //        }
     }

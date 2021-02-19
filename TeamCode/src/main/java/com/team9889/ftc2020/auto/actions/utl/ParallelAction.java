@@ -1,6 +1,7 @@
 package com.team9889.ftc2020.auto.actions.utl;
 
 import com.team9889.ftc2020.auto.actions.Action;
+import com.team9889.ftc2020.subsystems.Robot;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,9 +36,12 @@ public class ParallelAction extends Action {
             int actionIndex = actionList.indexOf(action);
             if(!action.isFinished() && !isFinished[actionIndex])
                 action.update();
-            else
+            else {
+                action.done();
                 isFinished[actionIndex] = true;
+            }
         }
+        Robot.getInstance().update();
     }
 
     @Override
@@ -51,8 +55,8 @@ public class ParallelAction extends Action {
 
     @Override
     public void done() {
-        for (Action action : actionList) {
-            action.done();
-        }
+//        for (Action action : actionList) {
+//            action.done();
+//        }
     }
 }

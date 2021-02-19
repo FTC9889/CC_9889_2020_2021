@@ -30,7 +30,7 @@ import java.util.List;
 public class Robot{
 
     public WebcamName webcam;
-    OpenCvCamera camera;
+    public OpenCvCamera camera;
 
     public Motor fLDrive, fRDrive, bLDrive, bRDrive;
     public RevIMU imu = null;
@@ -106,7 +106,7 @@ public class Robot{
 
         //FlyWheel
         flyWheel = new Motor(hardwareMap, Constants.LiftConstants.kFlyWheel, 1,
-                DcMotorSimple.Direction.REVERSE, false, true, true);
+                DcMotorSimple.Direction.REVERSE, false, false, true);
 
         fwArm = hardwareMap.get(Servo.class, Constants.LiftConstants.kFWArm);
 

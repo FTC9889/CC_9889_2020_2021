@@ -23,7 +23,7 @@ public class PID extends FeedBackController {
         this.d = kD;
     }
 
-    private double p, i, d;
+    public double p, i, d;
 
     public double error_prior;
     private double integral;

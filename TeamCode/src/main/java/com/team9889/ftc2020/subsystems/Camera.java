@@ -1,11 +1,15 @@
 package com.team9889.ftc2020.subsystems;
 
+import android.util.Log;
+
 import com.team9889.ftc2020.auto.AutoModeBase;
 import com.team9889.lib.detectors.ScanForGoal;
 import com.team9889.lib.detectors.ScanForRS;
 import com.team9889.lib.detectors.ScanForWG;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -15,7 +19,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
  */
 
 public class Camera extends Subsystem{
-    ScanForGoal scanForGoal = new ScanForGoal();
+    public ScanForGoal scanForGoal = new ScanForGoal();
     ScanForWG scanForWG = new ScanForWG();
     ScanForRS scanForRS = new ScanForRS();
 
@@ -27,7 +31,7 @@ public class Camera extends Subsystem{
     enum Pipelines {
         GOAL, WG, RS, NULL
     }
-    Pipelines currentPipeline = Pipelines.NULL;
+    public Pipelines currentPipeline = Pipelines.NULL;
 
     @Override
     public void init(final boolean auto) {
@@ -42,6 +46,7 @@ public class Camera extends Subsystem{
                     setRSCamPos();
                 } else {
                     setScanForGoal();
+                    Log.i("Hi", "");
 //                    setGoalCamPos();
                 }
             }
@@ -56,12 +61,11 @@ public class Camera extends Subsystem{
 
     @Override
     public void update() {
-
     }
 
     @Override
     public void stop() {
-
+        Robot.getInstance().camera.stopStreaming();
     }
 
     public AutoModeBase.Boxes getRSBox () {
@@ -124,7 +128,7 @@ public class Camera extends Subsystem{
 
     public void setRSCamPos () {
         currentCamState = CameraStates.RS;
-        Robot.getInstance().xCam.setPosition(.25);
+        Robot.getInstance().xCam.setPosition(.37);
         Robot.getInstance().yCam.setPosition(.85);
     }
 }

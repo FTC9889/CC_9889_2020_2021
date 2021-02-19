@@ -2,10 +2,13 @@ package com.team9889.ftc2020.auto.actions.flywheel;
 
 import android.util.Log;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.Robot;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
  * Created by Eric on 12/5/2020.
@@ -15,11 +18,15 @@ public class ShootRings extends Action {
     private ElapsedTime shootTimer = new ElapsedTime();
     private ElapsedTime loopTimer = new ElapsedTime();
     private ElapsedTime totalTimer = new ElapsedTime();
-    int stage = 0, ringsShot = 0, rings;
+    int stage = 0, ringsShot = 0, rings, time;
     boolean extend = false;
 
-    public ShootRings (int rings) {
+    Telemetry telemetry;
+
+    public ShootRings (int rings, int time, Telemetry telemetry) {
         this.rings = rings;
+        this.time = time;
+        this.telemetry = telemetry;
     }
 
     @Override
@@ -28,21 +35,19 @@ public class ShootRings extends Action {
         loopTimer.reset();
         totalTimer.reset();
 
-//        Robot.getInstance().getFlyWheel().lastMotorPos = 0;
-//        Robot.getInstance().flyWheel.resetEncoder();
+        Robot.getInstance().getFlyWheel().lastMotorPos = 0;
+        Robot.getInstance().flyWheel.resetEncoder();
     }
 
     @Override
     public void update() {
-        loopTimer.reset();
-
-        if (totalTimer.milliseconds() > 2000 && shootTimer.milliseconds() > 500) {
+        if (totalTimer.milliseconds() > time && shootTimer.milliseconds() > 500) {
             if (extend) {
-                Robot.getInstance().fwArm.setPosition(.7);
+                Robot.getInstance().fwArm.setPosition(0.45);
                 extend = false;
                 ringsShot++;
             } else {
-                Robot.getInstance().fwArm.setPosition(0);
+                Robot.getInstance().fwArm.setPosition(1);
                 extend = true;
             }
 
@@ -51,14 +56,21 @@ public class ShootRings extends Action {
 
         while (loopTimer.milliseconds() < 20){}
 
-        RobotLog.a("Loops Time: " + String.valueOf(loopTimer.milliseconds()) + " | Velocity: " + String.valueOf(Robot.getInstance().flyWheel.getVelocity()));
+//        RobotLog.a("Loops Time: " + String.valueOf(loopTimer.milliseconds()) + " | Velocity: " + String.valueOf(Robot.getInstance().flyWheel.getVelocity()));
 
-        Robot.getInstance().getFlyWheel().setFlyWheelSpeed(5200, loopTimer.milliseconds());
+        Robot.getInstance().flyWheel.motor.setVelocity(1150);
+
+//        2950
+        telemetry.addData("Speed", Robot.getInstance().getFlyWheel().flySpeed);
+        telemetry.update();
+
+        Robot.getInstance().update();
+        loopTimer.reset();
     }
 
     @Override
     public boolean isFinished() {
-        return ringsShot >= rings;
+        return ringsShot >= rings && !extend;
     }
 
     @Override
