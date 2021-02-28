@@ -2,7 +2,10 @@ package com.team9889.ftc2020.subsystems;
 
 import android.util.Log;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.team9889.ftc2020.auto.AutoModeBase;
+import com.team9889.lib.CruiseLib;
+import com.team9889.lib.control.controllers.PID;
 import com.team9889.lib.detectors.ScanForGoal;
 import com.team9889.lib.detectors.ScanForRS;
 import com.team9889.lib.detectors.ScanForWG;
@@ -18,7 +21,12 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
  * Created by MannoMation on 10/27/2018.
  */
 
+@Config
 public class Camera extends Subsystem{
+    public static double p = -0.016, i, d;
+    PID cameraY = new PID(-0.016, 0, 0);
+    public double camYPose = .7;
+
     public ScanForGoal scanForGoal = new ScanForGoal();
     ScanForWG scanForWG = new ScanForWG();
     ScanForRS scanForRS = new ScanForRS();
@@ -61,6 +69,9 @@ public class Camera extends Subsystem{
 
     @Override
     public void update() {
+        cameraY.p = p;
+        cameraY.i = i;
+        cameraY.d = d;
     }
 
     @Override
@@ -72,9 +83,9 @@ public class Camera extends Subsystem{
         AutoModeBase.Boxes box = AutoModeBase.Boxes.CLOSE;
         if (Math.abs(getPosOfTarget().y) == 0) {
             box = AutoModeBase.Boxes.CLOSE;
-        } else if (Math.abs(getPosOfTarget().y) < .25) {
+        } else if (Math.abs(getPosOfTarget().y) < .16) {
             box = AutoModeBase.Boxes.MIDDLE;
-        } else if (Math.abs(getPosOfTarget().y) >= .25) {
+        } else if (Math.abs(getPosOfTarget().y) >= .16) {
             box = AutoModeBase.Boxes.FAR;
         }
 
@@ -122,13 +133,23 @@ public class Camera extends Subsystem{
 
     public void setGoalCamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.25);
-        Robot.getInstance().yCam.setPosition(.6);
+        Robot.getInstance().xCam.setPosition(.27);
+
+//        camYPose += cameraY.update(getPosOfTarget().y, 0);
+//        CruiseLib.limitValue(camYPose, 1, 0);
+//        Robot.getInstance().yCam.setPosition(camYPose);
+        Robot.getInstance().yCam.setPosition(.7);
     }
+
+//    public void setGoalCamPos () {
+//        currentCamState = CameraStates.GOAL;
+//        Robot.getInstance().xCam.setPosition(.27);
+//        Robot.getInstance().yCam.setPosition(.7);
+//    }
 
     public void setRSCamPos () {
         currentCamState = CameraStates.RS;
         Robot.getInstance().xCam.setPosition(.37);
-        Robot.getInstance().yCam.setPosition(.85);
+        Robot.getInstance().yCam.setPosition(.895);
     }
 }

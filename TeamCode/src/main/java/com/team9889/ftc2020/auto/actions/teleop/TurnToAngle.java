@@ -61,7 +61,7 @@ public class TurnToAngle extends Action {
 
     @Override
     public boolean isFinished() {
-        if (Math.abs(orientationPID.getError()) < 1)
+        if (Math.abs(orientationPID.getError()) < 0.5)
             angleCounter++;
         else angleCounter = 0;
 

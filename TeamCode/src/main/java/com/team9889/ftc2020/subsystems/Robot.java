@@ -48,7 +48,7 @@ public class Robot{
     public boolean redAuto;
 
     public RevBulkData bulkDataMaster, bulkDataSlave;
-    private ExpansionHubEx revHubMaster, revHubSlave;
+    public ExpansionHubEx revHubMaster, revHubSlave;
 
     public HardwareMap hardwareMap;
 

@@ -2,6 +2,8 @@ package com.team9889.lib.detectors;
 
 import android.graphics.Bitmap;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -23,7 +25,13 @@ import java.util.List;
 /**
  * Created by joshua9889 on 11/25/2019.
  */
+
+@Config
 public class ScanForGoal extends OpenCvPipeline {
+
+    public static double h1 = 0, h2 = 30, s1 = 250, s2 = 255, v1 = 0, v2 = 255,
+            filterContoursMinArea = 40, filterContoursMinPerimeter = 10,
+            filterContoursMinWidth = 10, filterContoursMinHeight = 10;
 
     boolean debug = false;
     double upperPercentLimit = 0.55, lowerPercentLimit = 0.64;
@@ -37,10 +45,14 @@ public class ScanForGoal extends OpenCvPipeline {
 
     public Mat bitmap;
 
-    private Point point = new Point(1e10, 1e10);
+    private Point point = new Point(1e10, 1e10), pointInPixels = new Point(1e10, 1e10);
 
     public Point getPoint() {
         return point;
+    }
+
+    public Point getPointInPixels() {
+        return pointInPixels;
     }
 
     public ScanForGoal() {
@@ -68,15 +80,12 @@ public class ScanForGoal extends OpenCvPipeline {
 
         // Step HSV_Threshold0:
         Mat hsvThresholdInput = blurOutput;
-//        double[] hsvThresholdHue = {160, 180};
-//        double[] hsvThresholdSaturation = {20, 120};
+        double[] hsvThresholdHue = {h1, h2};
+        double[] hsvThresholdSaturation = {s1, s2};
+        double[] hsvThresholdValue = {v1, v2};
+//        double[] hsvThresholdHue = {5, 50};
+//        double[] hsvThresholdSaturation = {230, 255};
 //        double[] hsvThresholdValue = {0.0, 255.0};
-
-//        double[] hsvThresholdHue = {100, 170};
-        double[] hsvThresholdHue = {5, 50};
-//        double[] hsvThresholdSaturation = {0, 210};
-        double[] hsvThresholdSaturation = {230, 255};
-        double[] hsvThresholdValue = {0.0, 255.0};
         hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
 
         // Step Mask0:
@@ -96,11 +105,8 @@ public class ScanForGoal extends OpenCvPipeline {
 
         // Step Filter_Contours0:
         List<MatOfPoint> filterContoursContours = contours;
-        double filterContoursMinArea = 500.0;
-        double filterContoursMinPerimeter = 30;
-        double filterContoursMinWidth = 10;
+
         double filterContoursMaxWidth = 1000;
-        double filterContoursMinHeight = 20;
         double filterContoursMaxHeight = 1000;
         double[] filterContoursSolidity = {0, 100.0};
         double filterContoursMaxVertices = 1000000;
@@ -119,21 +125,38 @@ public class ScanForGoal extends OpenCvPipeline {
         for (int i = 0; i < filterContoursOutput.size(); i++) {
             mc.add(new Point(mu.get(i).m10 / mu.get(i).m00 + 1e-5, mu.get(i).m01 / mu.get(i).m00 + 1e-5));
         }
+
         Imgproc.cvtColor(blurOutput, blurOutput, Imgproc.COLOR_HSV2RGB);
 
 //        for (int i = 0; i < filterContoursContours.size(); i++) {
 //            Imgproc.drawContours(blurOutput, filterContoursContours, i, new Scalar(0, 255, 0));
 //        }
 
-        for (int i = 0; i < filterContoursOutput.size(); i++) {
-            Imgproc.drawContours(blurOutput, filterContoursOutput, i, new Scalar(0, 0, 255));
-            Imgproc.circle(blurOutput, mc.get(i), 4, new Scalar(0, 255, 0), -1);
-            point = new Point((mc.get(i).x / ((double) blurOutput.width() / 2)) - 1, (mc.get(i).y / ((double) blurOutput.height() / 2)) - 1);
+        double[] hsvThresholdHue2 = {0, 0};
+        double[] hsvThresholdSaturation2 = {0, 0};
+        double[] hsvThresholdValue2 = {0, 0};
+
+        Mat mask = blurOutput, input2 = cvResizeOutput, output = new Mat();
+        Imgproc.drawContours(mask, filterContoursOutput, 0, new Scalar(0, 0, 0), 20);
+        hsvThreshold(mask, hsvThresholdHue2, hsvThresholdSaturation2, hsvThresholdValue2, mask);
+        mask(input2, mask, output);
+
+        if (filterContoursOutput.size() == 2) {
+            Point average = new Point((mc.get(0).x + mc.get(1).x) / 2, (mc.get(0).y + mc.get(1).y) / 2);
+//            Imgproc.drawContours(blurOutput, filterContoursOutput, 0, new Scalar(0, 0, 255));
+            Imgproc.circle(blurOutput, average, 4, new Scalar(0, 255, 0), -1);
+            point = new Point((average.x / ((double) blurOutput.width() / 2)) - 1, (average.y / ((double) blurOutput.height() / 2)) - 1);
+            pointInPixels = average;
+        } else if (filterContoursOutput.size() > 0){
+//            Imgproc.drawContours(blurOutput, filterContoursOutput, 0, new Scalar(0, 0, 255));
+            Imgproc.circle(blurOutput, mc.get(0), 4, new Scalar(0, 255, 0), -1);
+            point = new Point((mc.get(0).x / ((double) blurOutput.width() / 2)) - 1, (mc.get(0).y / ((double) blurOutput.height() / 2)) - 1);
+            pointInPixels = mc.get(0);
         }
 
 //        Utils.matToBitmap(blurOutput, bitmap);
         bitmap = blurOutput;
-        return blurOutput;
+        return output;
     }
 
     public Mat getImage () {

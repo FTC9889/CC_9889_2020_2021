@@ -129,8 +129,8 @@ public class RedAuto extends AutoModeBase {
                 pose.clear();
                 break;
             case MIDDLE:
-                pose.add(new Path(new Pose2d(5, 80, 0), new Pose2d(3, 3, 3), 8, 1, 3000));
-                pose.add(new Path(new Pose2d(5.1, 80, -140), new Pose2d(10, 10, 3), 8, 1));
+                pose.add(new Path(new Pose2d(0, 80, 0), new Pose2d(3, 3, 3), 8, 1, 3000));
+                pose.add(new Path(new Pose2d(0.1, 80, -140), new Pose2d(10, 10, 3), 8, 1));
                 actions.add(new DrivePurePursuit(pose));
                 runAction(new ParallelAction(actions));
                 actions.clear();

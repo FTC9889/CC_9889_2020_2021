@@ -195,7 +195,7 @@ public class MecanumDrive extends Subsystem {
 //    }
 
     public void setFieldCentricPower(double x, double y, double rotation){
-        double angle = getAngle().getTheda(AngleUnit.RADIANS);
+        double angle = getAngle().getTheda(AngleUnit.RADIANS) + Math.toRadians(90);
 
         double angleFromAuto = Robot.getInstance().getMecanumDrive().angleFromAuton;
         double xMod = x * Math.cos(angle - angleFromAuto) - y * Math.sin(angle - angleFromAuto);

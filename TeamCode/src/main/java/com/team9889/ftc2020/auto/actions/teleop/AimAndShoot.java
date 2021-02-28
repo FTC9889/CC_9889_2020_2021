@@ -2,6 +2,7 @@ package com.team9889.ftc2020.auto.actions.teleop;
 
 import android.util.Log;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
@@ -20,7 +21,11 @@ import java.util.ArrayList;
 /**
  * Created by Eric on 8/26/2020.
  */
+
+@Config
 public class AimAndShoot extends Action {
+    public static double p = .4, i, d = 10;
+
     ArrayList<Path> paths = new ArrayList<>();
 
     Point posOfTarget = new Point(0, 65);
@@ -33,7 +38,7 @@ public class AimAndShoot extends Action {
     private PID xPID = new PID(0.05, 0, 1);
     private PID yPID = new PID(0.1, 0, 1);
     private PID orientationPID = new PID(0.04, 0, 2.5);
-    private PID camOrientationPID = new PID(1, 0, 100);
+    private PID camOrientationPID = new PID(.8, 0, 100);
 
     private int angleCounter = 0;
     private int xCounter = 0;
@@ -79,7 +84,12 @@ public class AimAndShoot extends Action {
 //        if (Math.abs(orientationPID.getError()) < 20) {
 //            Robot.getInstance().getMecanumDrive().setFieldCentricAutoPower(0, 0, rotation);
 //        } else {
-        camOrientationPID.update(Robot.getInstance().getCamera().getPosOfTarget().x, 0.2);
+        camOrientationPID.p = p;
+        camOrientationPID.i = i;
+        camOrientationPID.d = d;
+
+        camOrientationPID.update(Robot.getInstance().getCamera().getPosOfTarget().x, 0);
+//        .4
 //            if (Math.abs(camOrientationPID.getError()) > .5) {
 //                Robot.getInstance().getMecanumDrive().setFieldCentricPower(0, 0, -camOrientationPID.getOutput() * 2);
 //            } else {

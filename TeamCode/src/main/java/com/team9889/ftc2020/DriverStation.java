@@ -54,7 +54,7 @@ public class DriverStation {
     }
 
     boolean getStopIntaking() {
-        return gamepad1.b;
+        return gamepad1.b || gamepad2.left_trigger > .1;
     }
 
     boolean getStartOuttaking() {

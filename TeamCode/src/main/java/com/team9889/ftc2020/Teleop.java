@@ -25,6 +25,7 @@ import com.team9889.lib.control.controllers.PID;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.revextensions2.ExpansionHubEx;
 
 import java.util.ArrayList;
 
@@ -35,7 +36,7 @@ import java.util.ArrayList;
 @Config
 @TeleOp
 public class Teleop extends Team9889Linear {
-    public double x, y, ay;
+    public static double x = 103, y = 42, ay = 19.58, ax = 2.603092035700193;
 
     private ElapsedTime loopTimer = new ElapsedTime();
     ElapsedTime armTimer = new ElapsedTime(), wgTimer = new ElapsedTime(), wgAutoTimer = new ElapsedTime();
@@ -56,7 +57,7 @@ public class Teleop extends Team9889Linear {
 
     private PID orientationPID = new PID(1, 0, 100);
 
-    public static int rpm = 2540;
+    public static double rpm = 2540;
 
     boolean psOn = false;
     boolean wgInPos = false;
@@ -67,7 +68,7 @@ public class Teleop extends Team9889Linear {
     @Override
     public void runOpMode() {
         FtcDashboard dashboard = FtcDashboard.getInstance();
-//        telemetry = dashboard.getTelemetry();
+        telemetry = dashboard.getTelemetry();
 
         DriverStation driverStation = new DriverStation(gamepad1, gamepad2);
         waitForStart(false);
@@ -79,12 +80,19 @@ public class Teleop extends Team9889Linear {
         Robot.getFlyWheel().wantedFWSpeed = 0;
 
         while (opModeIsActive()) {
+            double dist = (0.051 * Math.pow(Robot.getCamera().scanForGoal.getPointInPixels().y, 2))
+                    - (3.0635 * Robot.getCamera().scanForGoal.getPointInPixels().y) + 117.19;
+
             if (gamepad2.right_trigger > .1) {
+                rpm = (0.0958 * Math.pow(dist, 2)) - (13.478 * dist) + 3008.7;
+
                 if (Robot.getCamera().currentCamState != Camera.CameraStates.GOAL) {
+                    Robot.getCamera().camYPose = .7;
                     Robot.getCamera().setGoalCamPos();
                     camTimer.reset();
                 }
 
+                Robot.getCamera().setGoalCamPos();
                 Robot.getCamera().setScanForGoal();
 
                 if (camTimer.milliseconds() > 700) {
@@ -123,10 +131,10 @@ public class Teleop extends Team9889Linear {
                 } else if (gamepad2.dpad_right) {
                     on = false;
                     psOn = false;
-                } else if (driverStation.getFW() && !psOn){
+                } else if (driverStation.getFW() && (!psOn || gamepad1.x)){
                     on = true;
                     psOn = false;
-                } else if (!driverStation.getFW() && !psOn) {
+                } else if (!driverStation.getFW() && (!psOn || gamepad1.x)) {
                     on = false;
                     psOn = false;
                 }
@@ -199,7 +207,7 @@ public class Teleop extends Team9889Linear {
                         Robot.wgLeft.setPosition(0.4);
                         Robot.wgRight.setPosition(0.4);
                     } else {
-                        Robot.wgGrabber.setPosition(.75);
+                        Robot.wgGrabber.setPosition(.6);
                     }
 
                     lastWGState = true;
@@ -264,9 +272,9 @@ public class Teleop extends Team9889Linear {
                     if (gamepad2.a)
                         turn = new TurnToAngle(-25);
                     if (gamepad2.b)
-                        turn = new TurnToAngle(-30);
+                        turn = new TurnToAngle(-29);
                     if (gamepad2.y)
-                        turn = new TurnToAngle(-35);
+                        turn = new TurnToAngle(-32);
                     turn.start();
                     turnFirst = false;
                 }
@@ -295,7 +303,7 @@ public class Teleop extends Team9889Linear {
                 if (!psOn)
                     Robot.flyWheel.motor.setVelocity(((double) rpm) / 2);
                 else
-                    Robot.flyWheel.motor.setVelocity(1150);
+                    Robot.flyWheel.motor.setVelocity(((double) rpm / 2) - 50);
             }
             else if (!on) {
                 Robot.flyWheel.motor.setVelocity(0);
@@ -308,10 +316,27 @@ public class Teleop extends Team9889Linear {
 
             telemetry.addData("Loop Time", loopTimer.milliseconds());
 
-            telemetry.addData("Goal", Math.atan2(y, x) - ay);
-            telemetry.addData("target height", Robot.getCamera().getPosOfTarget());
+//            telemetry.addData("current", Robot.revHubMaster.getTotalModuleCurrentDraw(ExpansionHubEx.CurrentDrawUnits.AMPS));
 
-            telemetry.addData("Fly Wheel Speed", (Robot.flyWheel.getVelocity() / 28) * 60);
+//            -0.4250891276667633
+//            Math.abs(-.5)
+
+//            double distance = y / x, height = (Robot.getCamera().getPosOfTarget().y + .5) * 152.04169725643117073448798327336;
+//            telemetry.addData("Distance", distance);
+//            telemetry.addData("AX", (Math.atan(distance) * 57.2934) - ay);
+//            telemetry.addData("Target Height", height);
+//            ay = Math.atan(height / 103) * 57.2934;
+//            telemetry.addData("ay", ay);
+//            telemetry.addData("Dis to Goal", 0.5735 * height + 71.888);
+
+            double camAngle = Robot.getCamera().camYPose;
+            telemetry.addData("Dist to Goal", (0.051 * Math.pow(Robot.getCamera().scanForGoal.getPointInPixels().y, 2))
+                    - (3.0635 * Robot.getCamera().scanForGoal.getPointInPixels().y) + 117.19);
+
+//            telemetry.addData("angle of cam", Robot.getCamera().camYPose);
+            telemetry.addData("pixels", Robot.getCamera().scanForGoal.getPointInPixels());
+
+//            telemetry.addData("Fly Wheel Speed", (Robot.flyWheel.getVelocity() / 28) * 60);
             telemetry.addData("Odometry Adjusted : ", Robot.getMecanumDrive().getAdjustedPose());
 
             Robot.outputToTelemetry(telemetry);
@@ -319,12 +344,12 @@ public class Teleop extends Team9889Linear {
 
             FtcDashboard.getInstance().startCameraStream(Robot.camera, 0);
 //
-//            TelemetryPacket packet = new TelemetryPacket();
-//            packet.fieldOverlay()
-//                    .setFill("black")
-//                    .setStrokeWidth(2)
-//                    .fillRect(Robot.getMecanumDrive().getAdjustedPose().getX() - 72, Robot.getMecanumDrive().getAdjustedPose().getY() - 72, 17, 17.5);
-//            dashboard.sendTelemetryPacket(packet);
+            TelemetryPacket packet = new TelemetryPacket();
+            packet.fieldOverlay()
+                    .setFill("black")
+                    .setStrokeWidth(2)
+                    .fillRect(Robot.getMecanumDrive().getAdjustedPose().getX() - 72, Robot.getMecanumDrive().getAdjustedPose().getY() - 72, 17, 17.5);
+            dashboard.sendTelemetryPacket(packet);
 
             Robot.getMecanumDrive().setFieldCentricPower(Robot.getMecanumDrive().xSpeed,
                     Robot.getMecanumDrive().ySpeed, Robot.getMecanumDrive().turnSpeed);

@@ -18,7 +18,6 @@ import java.util.Arrays;
  * Created by joshua9889 on 3/28/2018.
  */
 
-@Config
 public class FlyWheel extends Subsystem{
 
 //    public PID pid = new PID(.001, 0, 0.0005);
