@@ -29,7 +29,8 @@ import java.util.List;
 @Config
 public class ScanForGoal extends OpenCvPipeline {
 
-    public static double h1 = 0, h2 = 30, s1 = 250, s2 = 255, v1 = 0, v2 = 255,
+    public static double h1 = 10, h2 = 180, s1 = 250, s2 = 255, v1 = 150, v2 = 250,
+            h3 = 10, h4 = 180, s3 = 0, s4 = 255, v3 = 0, v4 = 255,
             filterContoursMinArea = 40, filterContoursMinPerimeter = 10,
             filterContoursMinWidth = 10, filterContoursMinHeight = 10;
 
@@ -117,14 +118,9 @@ public class ScanForGoal extends OpenCvPipeline {
 
         List<Moments> mu = new ArrayList<>();
 
-        for (int i = 0; i < filterContoursOutput.size(); i++) {
-            mu.add(Imgproc.moments(filterContoursOutput.get(i)));
-        }
-
-        List<Point> mc = new ArrayList<>();
-        for (int i = 0; i < filterContoursOutput.size(); i++) {
-            mc.add(new Point(mu.get(i).m10 / mu.get(i).m00 + 1e-5, mu.get(i).m01 / mu.get(i).m00 + 1e-5));
-        }
+        ArrayList<MatOfPoint> convexHullsOutput = new ArrayList<>();
+        ArrayList<MatOfPoint> convexHullsContours = filterContoursOutput;
+        convexHulls(convexHullsContours, convexHullsOutput);
 
         Imgproc.cvtColor(blurOutput, blurOutput, Imgproc.COLOR_HSV2RGB);
 
@@ -136,26 +132,63 @@ public class ScanForGoal extends OpenCvPipeline {
         double[] hsvThresholdSaturation2 = {0, 0};
         double[] hsvThresholdValue2 = {0, 0};
 
-        Mat mask = blurOutput, input2 = cvResizeOutput, output = new Mat();
-        Imgproc.drawContours(mask, filterContoursOutput, 0, new Scalar(0, 0, 0), 20);
+        Mat mask = blurOutput, input2 = cvResizeOutput, maskOutput = new Mat();
+        for (int i = 0; i < convexHullsOutput.size(); i++) {
+            Imgproc.drawContours(mask, convexHullsOutput, i, new Scalar(0, 0, 0), -20);
+        }
         hsvThreshold(mask, hsvThresholdHue2, hsvThresholdSaturation2, hsvThresholdValue2, mask);
-        mask(input2, mask, output);
+        mask(input2, mask, maskOutput);
+
+
+        double[] hsvThresholdHue3 = {h3, h4};
+        double[] hsvThresholdSaturation3 = {s3, s4};
+        double[] hsvThresholdValue3 = {v3, v4};
+
+        Mat mask2 = maskOutput, input3 = cvResizeOutput, hsvOutput = new Mat();
+        hsvThreshold(mask2, hsvThresholdHue3, hsvThresholdSaturation3, hsvThresholdValue3, mask2);
+        mask(input3, mask2, hsvOutput);
+
+
+        Imgproc.cvtColor(hsvOutput, contourInput, Imgproc.COLOR_HSV2RGB);
+        Imgproc.cvtColor(contourInput, contourInput, Imgproc.COLOR_RGB2GRAY);
+
+        contours = new ArrayList<>();
+        hierachy = new Mat();
+        Imgproc.findContours(contourInput, contours, hierachy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        // Step Filter_Contours0:
+        filterContoursContours = contours;
+        filterContours(filterContoursContours, filterContoursMinArea, filterContoursMinPerimeter, filterContoursMinWidth, filterContoursMaxWidth, filterContoursMinHeight, filterContoursMaxHeight, filterContoursSolidity, filterContoursMaxVertices, filterContoursMinVertices, filterContoursMinRatio, filterContoursMaxRatio, filterContoursOutput);
+
+
+        for (int i = 0; i < filterContoursOutput.size(); i++) {
+            mu.add(Imgproc.moments(filterContoursOutput.get(i)));
+        }
+
+        List<Point> mc = new ArrayList<>();
+        for (int i = 0; i < filterContoursOutput.size(); i++) {
+            mc.add(new Point(mu.get(i).m10 / mu.get(i).m00 + 1e-5, mu.get(i).m01 / mu.get(i).m00 + 1e-5));
+        }
+
+        Mat output = cvResizeOutput;
+        Imgproc.cvtColor(output, output, Imgproc.COLOR_HSV2RGB);
 
         if (filterContoursOutput.size() == 2) {
             Point average = new Point((mc.get(0).x + mc.get(1).x) / 2, (mc.get(0).y + mc.get(1).y) / 2);
 //            Imgproc.drawContours(blurOutput, filterContoursOutput, 0, new Scalar(0, 0, 255));
-            Imgproc.circle(blurOutput, average, 4, new Scalar(0, 255, 0), -1);
-            point = new Point((average.x / ((double) blurOutput.width() / 2)) - 1, (average.y / ((double) blurOutput.height() / 2)) - 1);
+            Imgproc.circle(output, average, 4, new Scalar(0, 255, 0), -1);
+            point = new Point((average.x / ((double) output.width() / 2)) - 1, (average.y / ((double) output.height() / 2)) - 1);
             pointInPixels = average;
         } else if (filterContoursOutput.size() > 0){
 //            Imgproc.drawContours(blurOutput, filterContoursOutput, 0, new Scalar(0, 0, 255));
-            Imgproc.circle(blurOutput, mc.get(0), 4, new Scalar(0, 255, 0), -1);
-            point = new Point((mc.get(0).x / ((double) blurOutput.width() / 2)) - 1, (mc.get(0).y / ((double) blurOutput.height() / 2)) - 1);
+            Imgproc.circle(output, mc.get(0), 4, new Scalar(0, 255, 0), -1);
+            point = new Point((mc.get(0).x / ((double) output.width() / 2)) - 1, (mc.get(0).y / ((double) output.height() / 2)) - 1);
             pointInPixels = mc.get(0);
         }
 
 //        Utils.matToBitmap(blurOutput, bitmap);
-        bitmap = blurOutput;
+        bitmap = output;
+//        output = maskOutput;
         return output;
     }
 
@@ -317,6 +350,24 @@ public class ScanForGoal extends OpenCvPipeline {
             final double ratio = bb.width / (double)bb.height;
             if (ratio < minRatio || ratio > maxRatio) continue;
             output.add(contour);
+        }
+    }
+
+    private void convexHulls(List<MatOfPoint> inputContours,
+                             ArrayList<MatOfPoint> outputContours) {
+        final MatOfInt hull = new MatOfInt();
+        outputContours.clear();
+        for (int i = 0; i < inputContours.size(); i++) {
+            final MatOfPoint contour = inputContours.get(i);
+            final MatOfPoint mopHull = new MatOfPoint();
+            Imgproc.convexHull(contour, hull);
+            mopHull.create((int) hull.size().height, 1, CvType.CV_32SC2);
+            for (int j = 0; j < hull.size().height; j++) {
+                int index = (int) hull.get(j, 0)[0];
+                double[] point = new double[] {contour.get(index, 0)[0], contour.get(index, 0)[1]};
+                mopHull.put(j, 0, point);
+            }
+            outputContours.add(mopHull);
         }
     }
 }

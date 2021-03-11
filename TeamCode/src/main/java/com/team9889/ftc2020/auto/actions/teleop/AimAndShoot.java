@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 @Config
 public class AimAndShoot extends Action {
-    public static double p = .4, i, d = 10;
+    public static double p = 0.5, i, d = 0;
 
     ArrayList<Path> paths = new ArrayList<>();
 
@@ -93,7 +93,7 @@ public class AimAndShoot extends Action {
 //            if (Math.abs(camOrientationPID.getError()) > .5) {
 //                Robot.getInstance().getMecanumDrive().setFieldCentricPower(0, 0, -camOrientationPID.getOutput() * 2);
 //            } else {
-        Robot.getInstance().getMecanumDrive().turnSpeed -= camOrientationPID.getOutput() / 1.5;
+        Robot.getInstance().getMecanumDrive().turnSpeed -= (CruiseLib.limitValue(camOrientationPID.getOutput(), -.05, -.3, .05, .3));
 //            }
 //        }
     }
