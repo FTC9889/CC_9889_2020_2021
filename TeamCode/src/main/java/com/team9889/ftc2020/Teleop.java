@@ -3,31 +3,15 @@ package com.team9889.ftc2020;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
-import com.team9889.ftc2020.auto.actions.drive.DrivePurePursuit;
-import com.team9889.ftc2020.auto.actions.drive.DrivePurePursuitTeleOp;
 import com.team9889.ftc2020.auto.actions.teleop.AimAndShoot;
-import com.team9889.ftc2020.auto.actions.teleop.DriveAndShoot;
-import com.team9889.ftc2020.auto.actions.teleop.TurnToAngle;
-import com.team9889.ftc2020.auto.actions.utl.ParallelAction;
 import com.team9889.ftc2020.subsystems.Camera;
-import com.team9889.ftc2020.subsystems.Robot;
-import com.team9889.lib.android.FileReader;
-import com.team9889.lib.android.FileWriter;
-import com.team9889.lib.control.Path;
-import com.team9889.lib.control.PurePursuit;
 import com.team9889.lib.control.controllers.PID;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.revextensions2.ExpansionHubEx;
-
-import java.util.ArrayList;
 
 /**
  * Created by MannoMation on 1/14/2019.
@@ -53,8 +37,6 @@ public class Teleop extends Team9889Linear {
 
     ElapsedTime camTimer = new ElapsedTime();
 
-    boolean resetPressed = false;
-
     private PID orientationPID = new PID(1, 0, 100);
 
     public static double rpm = 2540;
@@ -64,8 +46,6 @@ public class Teleop extends Team9889Linear {
     boolean wgFirst = true;
     boolean autoAimreleased = false;
     int readyCount = 0;
-
-    ArrayList<Action> actions = new ArrayList<>();
 
     @Override
     public void runOpMode() {
@@ -77,9 +57,7 @@ public class Teleop extends Team9889Linear {
 
         wgTimer.reset();
         Robot.flyWheel.resetEncoder();
-        Robot.getFlyWheel().counter = 0;
-        Robot.getFlyWheel().lastMotorPos = 0;
-        Robot.getFlyWheel().wantedFWSpeed = 0;
+        Robot.getFlyWheel().turnOffFlyWheel();
 
         while (opModeIsActive()) {
             double dist = (0.051 * Math.pow(Robot.getCamera().scanForGoal.getPointInPixels().y, 2))
@@ -122,9 +100,9 @@ public class Teleop extends Team9889Linear {
 
                 if (Math.abs(Robot.getCamera().getPosOfTarget().x) < .1) {
                     if (readyCount >= 3) {
-                        Robot.wgGrabber.setPosition(.75);
+                        Robot.getWobbleGoal().open();
                     } else {
-                        Robot.wgGrabber.setPosition(.25);
+                        Robot.getWobbleGoal().close();
                     }
                     readyCount++;
                 } else {
@@ -133,7 +111,7 @@ public class Teleop extends Team9889Linear {
 
                 autoAimreleased = true;
             } else if (autoAimreleased) {
-                Robot.wgGrabber.setPosition(.25);
+                Robot.getWobbleGoal().close();
                 autoAimreleased = false;
             }
 //            else if (gamepad2.a || gamepad2.b || gamepad2.y) {
@@ -169,7 +147,8 @@ public class Teleop extends Team9889Linear {
 
 
             // If not resetting imu, normal operation
-            if(!driverStation.resetIMU()) {
+            if(!driverStation.resetIMU() && !driverStation.resetRobotPose()) {
+
                 // Drive
                 if (Math.abs(gamepad1.left_stick_x) > .1 || Math.abs(gamepad1.left_stick_y) > .1 ||
                         Math.abs(gamepad1.right_stick_x) > .1 && gamepad1.right_trigger <= .5) {
@@ -200,14 +179,15 @@ public class Teleop extends Team9889Linear {
                     psOn = false;
                 }
 
+                // Fire control
                 if (!driveToPos) {
                     if (gamepad2.x) {
                         if (armTimer.milliseconds() > 135) {
                             if (extend) {
-                                Robot.fwArm.setPosition(.45);
+                                Robot.getFlyWheel().extend();
                                 extend = false;
                             } else {
-                                Robot.fwArm.setPosition(1);
+                                Robot.getFlyWheel().retract();
                                 extend = true;
                             }
 
@@ -216,17 +196,17 @@ public class Teleop extends Team9889Linear {
                     } else if (gamepad1.right_bumper && on) {
                         if (armTimer.milliseconds() > 135) {
                             if (extend) {
-                                Robot.fwArm.setPosition(0.45);
+                                Robot.getFlyWheel().extend();
                                 extend = false;
                             } else {
-                                Robot.fwArm.setPosition(1);
+                                Robot.getFlyWheel().retract();
                                 extend = true;
                             }
 
                             armTimer.reset();
                         }
                     } else if (armTimer.milliseconds() > 135) {
-                        Robot.fwArm.setPosition(.45);
+                        Robot.getFlyWheel().extend();
                         extend = false;
                     }
                 }
@@ -242,42 +222,37 @@ public class Teleop extends Team9889Linear {
                 }
 
                 if (autoDrive && !wgInPos) {
-                    Robot.wgLeft.setPosition(.2);
-                    Robot.wgRight.setPosition(.2);
+                    Robot.getWobbleGoal().inBetween();
                 } else if (wgInPos) {
                     if (wgAutoTimer.milliseconds() < 500) {
-                        Robot.wgLeft.setPosition(.4);
-                        Robot.wgRight.setPosition(.4);
+                        Robot.getWobbleGoal().down();
                     } else if (wgAutoTimer.milliseconds() > 500 && wgAutoTimer.milliseconds() < 1000) {
-                        Robot.wgGrabber.setPosition(0.25);
+                        Robot.getWobbleGoal().close();
                     } else {
-                        Robot.wgLeft.setPosition(.8);
-                        Robot.wgRight.setPosition(.8);
+                        Robot.getWobbleGoal().up();
                     }
                 } else if (!driverStation.getWG()) {
                     if (wgTimer.milliseconds() < 500) {
-                        Robot.wgGrabber.setPosition(0.25);
+                        Robot.getWobbleGoal().close();
                     } else {
-                        Robot.wgLeft.setPosition(.8);
-                        Robot.wgRight.setPosition(.8);
+                        Robot.getWobbleGoal().up();
                     }
 
                     lastWGState = false;
                 } else if (driverStation.getWG()) {
                     if (wgTimer.milliseconds() < 500) {
-                        Robot.wgLeft.setPosition(0.4);
-                        Robot.wgRight.setPosition(0.4);
+                        Robot.getWobbleGoal().down();
                     } else {
-                        Robot.wgGrabber.setPosition(.6);
+                        Robot.getWobbleGoal().open();
                     }
 
                     lastWGState = true;
                 }
 
                 if (gamepad1.dpad_right || gamepad2.right_bumper){
-//                    Robot.wgLeft.setPosition(.5);
-//                    Robot.wgRight.setPosition(.5);
-                    Robot.wgGrabber.setPosition(.75);
+                    // Robot.wgLeft.setPosition(.5);
+                    // Robot.wgRight.setPosition(.5);
+                    Robot.getWobbleGoal().open();
                 }
 
                 if (gamepad1.left_trigger > .5 && !wgInPos) {
@@ -312,7 +287,7 @@ public class Teleop extends Team9889Linear {
                         }
                     }
 
-                    if (Robot.wgDetector.getDistance(DistanceUnit.INCH) < 3.5) {
+                    if (Robot.wobbleGoalRangeFinder.getDistance(DistanceUnit.INCH) < 3.5) {
                         wgInPos = true;
                         wgTimer.reset();
                     }
@@ -349,30 +324,21 @@ public class Teleop extends Team9889Linear {
 //                turnFirst = true;
 //            }
 
-            if (gamepad2.left_stick_button && gamepad2.right_stick_button && !resetPressed) {
+            if(driverStation.resetRobotPose()) // IDK if this works or not
                 Robot.getMecanumDrive().setCurrentPose(new Pose2d(0, 0, 0));
-                resetPressed = true;
-            } else if (!gamepad2.left_stick_button && !gamepad2.right_stick_button) {
-                resetPressed = false;
-            }
 
             while (loopTimer.milliseconds() < 20) {
-
+                idle();
             }
 
             if (on) {
                 if (!psOn)
-                    Robot.flyWheel.motor.setVelocity(((double) rpm) / 2);
+                    Robot.getFlyWheel().setRPM(rpm / 2);
                 else
-                    Robot.flyWheel.motor.setVelocity(((double) rpm / 2) - 50);
+                    Robot.getFlyWheel().setRPM((rpm / 2) - 50);
             }
             else if (!on) {
-                Robot.flyWheel.motor.setVelocity(0);
-                Robot.getFlyWheel().wantedFWSpeed = 0;
-                Robot.getFlyWheel().counter = 0;
-                Robot.getFlyWheel().lastMotorPos = Robot.flyWheel.getPosition();
-                Robot.getFlyWheel().pid.error_prior = 0;
-                Robot.getFlyWheel().pid.first = true;
+                Robot.getFlyWheel().turnOffFlyWheel();
             }
 
             telemetry.addData("Loop Time", loopTimer.milliseconds());

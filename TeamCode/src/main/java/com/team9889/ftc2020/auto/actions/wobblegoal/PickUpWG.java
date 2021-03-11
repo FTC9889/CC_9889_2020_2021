@@ -17,7 +17,7 @@ public class PickUpWG extends Action {
     @Override
     public void update() {
         if (timer.milliseconds() < 500) {
-            Robot.getInstance().wgGrabber.setPosition(0.25);
+            Robot.getInstance().getWobbleGoal().close();
         } else {
             Robot.getInstance().wgLeft.setPosition(.8);
             Robot.getInstance().wgRight.setPosition(.8);

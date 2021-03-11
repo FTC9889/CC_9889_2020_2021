@@ -13,7 +13,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvInternalCamera2;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.RevBulkData;
 
@@ -38,10 +37,10 @@ public class Robot{
     public Motor intakeLeft, intakeRight, centerOdometry;
 
     public Motor flyWheel;
-    public Servo fwArm;
+    public Servo flyWheelHammer;
 
-    public Servo wgGrabber, wgLeft, wgRight;
-    public DistanceSensor wgDetector;
+    public Servo wobbleGoalFinger, wgLeft, wgRight;
+    public DistanceSensor wobbleGoalRangeFinder;
 
     public Servo xCam, yCam;
 
@@ -108,14 +107,14 @@ public class Robot{
         flyWheel = new Motor(hardwareMap, Constants.LiftConstants.kFlyWheel, 1,
                 DcMotorSimple.Direction.REVERSE, false, false, true);
 
-        fwArm = hardwareMap.get(Servo.class, Constants.LiftConstants.kFWArm);
+        flyWheelHammer = hardwareMap.get(Servo.class, Constants.LiftConstants.kFWArm);
 
-        wgGrabber = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGGrabber);
+        wobbleGoalFinger = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGGrabber);
         wgLeft = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGLeft);
         wgLeft.setDirection(Servo.Direction.REVERSE);
         wgRight = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGRight);
 
-        wgDetector = hardwareMap.get(DistanceSensor.class, Constants.WobbleGoalConstants.kWGDetector);
+        wobbleGoalRangeFinder = hardwareMap.get(DistanceSensor.class, Constants.WobbleGoalConstants.kWGDetector);
 
         xCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraXId);
         yCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraYId);

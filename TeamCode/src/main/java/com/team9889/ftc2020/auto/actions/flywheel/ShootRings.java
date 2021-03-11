@@ -2,9 +2,7 @@ package com.team9889.ftc2020.auto.actions.flywheel;
 
 import android.util.Log;
 
-import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.RobotLog;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.Robot;
 
@@ -43,11 +41,11 @@ public class ShootRings extends Action {
     public void update() {
         if (totalTimer.milliseconds() > time && shootTimer.milliseconds() > 500) {
             if (extend) {
-                Robot.getInstance().fwArm.setPosition(0.45);
+                Robot.getInstance().flyWheelHammer.setPosition(0.45);
                 extend = false;
                 ringsShot++;
             } else {
-                Robot.getInstance().fwArm.setPosition(1);
+                Robot.getInstance().flyWheelHammer.setPosition(1);
                 extend = true;
             }
 

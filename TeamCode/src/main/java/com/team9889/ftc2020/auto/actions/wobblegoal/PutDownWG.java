@@ -20,7 +20,7 @@ public class PutDownWG extends Action {
             Robot.getInstance().wgLeft.setPosition(0.4);
             Robot.getInstance().wgRight.setPosition(0.4);
         } else {
-            Robot.getInstance().wgGrabber.setPosition(.75);
+            Robot.getInstance().wobbleGoalFinger.setPosition(.75);
         }
     }
 

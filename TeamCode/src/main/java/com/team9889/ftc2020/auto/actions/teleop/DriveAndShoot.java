@@ -111,11 +111,11 @@ public class DriveAndShoot extends Action {
                 if (armTimer.milliseconds() > 300) {
                     Log.i("timer", "");
                     if (extend) {
-                        Robot.getInstance().fwArm.setPosition(0.7);
+                        Robot.getInstance().flyWheelHammer.setPosition(0.7);
                         extend = false;
                         ringsShot++;
                     } else {
-                        Robot.getInstance().fwArm.setPosition(0);
+                        Robot.getInstance().flyWheelHammer.setPosition(0);
                         extend = true;
                     }
                     Log.i("extend", "");

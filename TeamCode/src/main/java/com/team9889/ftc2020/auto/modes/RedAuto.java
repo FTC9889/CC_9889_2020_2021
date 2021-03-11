@@ -4,25 +4,19 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.team9889.ftc2020.auto.AutoModeBase;
-import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.auto.actions.drive.DrivePurePursuit;
-import com.team9889.ftc2020.auto.actions.drive.MecanumDriveSimpleAction;
-import com.team9889.ftc2020.auto.actions.flywheel.RunFlyWheel;
 import com.team9889.ftc2020.auto.actions.flywheel.ShootRings;
 import com.team9889.ftc2020.auto.actions.utl.ParallelAction;
-import com.team9889.ftc2020.auto.actions.utl.RobotUpdate;
 import com.team9889.ftc2020.auto.actions.utl.Wait;
 import com.team9889.ftc2020.auto.actions.wobblegoal.PickUpWG;
 import com.team9889.ftc2020.auto.actions.wobblegoal.PutDownWG;
 import com.team9889.ftc2020.auto.actions.wobblegoal.WGDown;
-import com.team9889.ftc2020.auto.actions.wobblegoal.WGUp;
 import com.team9889.lib.control.Path;
-import com.team9889.lib.control.PurePursuit;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * Created by Eric on 11/26/2019.
@@ -30,139 +24,126 @@ import java.util.List;
 
 @Autonomous
 public class RedAuto extends AutoModeBase {
-    ArrayList<Action> actions = new ArrayList<>();
-    ArrayList<Path> pose = new ArrayList<>();
+    Pose2d defaultTolerance = new Pose2d(1, 1, 2);
 
     @Override
     public void run(Side side, Boxes box) {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
-        actions.add(new ShootRings(1, 3000, dashboardTelemetry));
+        // I found https://www.geeksforgeeks.org/initialize-an-arraylist-in-java/
+        // It seems easier to understand what is going on with the DrivePurePursuit
 
-        pose.add(new Path(new Pose2d(1, 60, 0), new Pose2d(1, 1, 2), 8, 1));
-
-        actions.add(new DrivePurePursuit(pose));
-
-        runAction(new ParallelAction(actions));
-        pose.clear();
-        actions.clear();
-
-
-        runAction(new Wait(500));
-
-
-        actions.add(new ShootRings(1, 1500, dashboardTelemetry));
-
-        pose.add(new Path(new Pose2d(-6, 60, 0), new Pose2d(1, 1, 2), 8, 1));
-        actions.add(new DrivePurePursuit(pose));
-
-        runAction(new ParallelAction(actions));
-        pose.clear();
-        actions.clear();
-
+        // We also don't need a make a new list each time we want to add a new parallelaction, we
+        // can add in right in with Arrays.asList
+        runAction(new ParallelAction(Arrays.asList(
+                new ShootRings(1, 3000, dashboardTelemetry),
+                new DrivePurePursuit(new ArrayList<Path>(){{
+                    add(new Path(new Pose2d(1, 60, 0),
+                            defaultTolerance, 8, 1));
+                }})
+        )));
 
         runAction(new Wait(500));
 
-
-        actions.add(new ShootRings(1, 1500, dashboardTelemetry));
-
-        pose.add(new Path(new Pose2d(-14, 60, 0), new Pose2d(1, 1, 2), 8, 1));
-        actions.add(new DrivePurePursuit(pose));
-
-        runAction(new ParallelAction(actions));
-        pose.clear();
-        actions.clear();
-
+        runAction(new ParallelAction(Arrays.asList(
+                new ShootRings(1, 1500, dashboardTelemetry),
+                new DrivePurePursuit(new ArrayList<Path>(){{
+                    add(new Path(new Pose2d(-6, 60, 0),
+                            defaultTolerance, 8, 1));
+                }})
+        )));
 
         runAction(new Wait(500));
 
+        runAction(new ParallelAction(Arrays.asList(
+                new ShootRings(1, 1500, dashboardTelemetry),
+                new DrivePurePursuit(new ArrayList<Path>(){{
+                    add(new Path(new Pose2d(-14, 60, 0),
+                            defaultTolerance, 8, 1));
+                }})
+        )));
 
+        runAction(new Wait(500));
+
+        // We still need a arraylist for the pose for this section
+        ArrayList<Path> firstBoxPose = new ArrayList<>();
         switch (box) {
             case CLOSE:
-                pose.add(new Path(new Pose2d(35, 75, 0), new Pose2d(1, 1, 2), 8, 1));
+                firstBoxPose.add(new Path(new Pose2d(35, 75, 0),
+                        defaultTolerance, 8, 1));
                 break;
             case MIDDLE:
-                pose.add(new Path(new Pose2d(10, 95, 0), new Pose2d(1, 1, 2), 8, 1));
+                firstBoxPose.add(new Path(new Pose2d(10, 95, 0),
+                        defaultTolerance, 8, 1));
                 break;
             case FAR:
-                pose.add(new Path(new Pose2d(35, 120, 0), new Pose2d(1, 1, 2), 8, 1));
+                firstBoxPose.add(new Path(new Pose2d(35, 120, 0),
+                        defaultTolerance, 8, 1));
                 break;
         }
 
-        actions.add(new DrivePurePursuit(pose));
-        runAction(new ParallelAction(actions));
-        actions.clear();
-        pose.clear();
+        runAction(new DrivePurePursuit(firstBoxPose));
 
-
+        // TODO: IDK but maybe we can just increase the timer in WGDown, and remove the Wait?
         runAction(new WGDown());
         runAction(new Wait(500));
 
-        pose.add(new Path(new Pose2d(30, 60, 0), new Pose2d(1, 1, 2), 8, 1));
-        pose.add(new Path(new Pose2d(30.1, 30, 0), new Pose2d(1, 1, 2), 8, 1));
-        actions.add(new DrivePurePursuit(pose));
-        runAction(new ParallelAction(actions));
-        actions.clear();
-        pose.clear();
-
+        runAction(new DrivePurePursuit(new ArrayList<Path>(){{
+            add(new Path(new Pose2d(30, 60, 0),
+                    defaultTolerance, 8, 1));
+            add(new Path(new Pose2d(30.1, 30, 0),
+                    defaultTolerance, 8, 1));
+        }}));
 
         runAction(new PickUpWG());
 
-
         switch (box) {
             case CLOSE:
-                pose.add(new Path(new Pose2d(30, 65, 0), new Pose2d(3, 3, 3), 8, 1, 3000));
-                pose.add(new Path(new Pose2d(30.1, 65, -140), new Pose2d(10, 10, 3), 8, 1));
-                actions.add(new DrivePurePursuit(pose));
-                runAction(new ParallelAction(actions));
-                actions.clear();
-                pose.clear();
+                runAction(new DrivePurePursuit(new ArrayList<Path>(){{
+                    add(new Path(new Pose2d(30, 65, 0),
+                            new Pose2d(3, 3, 3), 8, 1, 3000));
+                    add(new Path(new Pose2d(30.1, 65, -140), new
+                            Pose2d(10, 10, 3), 8, 1));
+                }}));
 
 
                 runAction(new PutDownWG());
 
-                pose.add(new Path(new Pose2d(20, 65, 0), new Pose2d(2, 2, 2), 8, 1));
-                actions.add(new DrivePurePursuit(pose));
-                runAction(new ParallelAction(actions));
-                actions.clear();
-                pose.clear();
+                runAction(new DrivePurePursuit(new ArrayList<Path>(){{
+                    add(new Path(new Pose2d(20, 65, 0),
+                            new Pose2d(2, 2, 2), 8, 1));
+                }}));
                 break;
             case MIDDLE:
-                pose.add(new Path(new Pose2d(0, 80, 0), new Pose2d(3, 3, 3), 8, 1, 3000));
-                pose.add(new Path(new Pose2d(0.1, 80, -140), new Pose2d(10, 10, 3), 8, 1));
-                actions.add(new DrivePurePursuit(pose));
-                runAction(new ParallelAction(actions));
-                actions.clear();
-                pose.clear();
-
+                runAction(new DrivePurePursuit(new ArrayList<Path>(){{
+                    add(new Path(new Pose2d(0, 80, 0),
+                            new Pose2d(3, 3, 3), 8, 1, 3000));
+                    add(new Path(new Pose2d(0.1, 80, -140),
+                            new Pose2d(10, 10, 3), 8, 1));
+                }}));
 
                 runAction(new PutDownWG());
 
-
-                pose.add(new Path(new Pose2d(0, 70, 0), new Pose2d(2, 2, 2), 8, 1));
-                actions.add(new DrivePurePursuit(pose));
-                runAction(new ParallelAction(actions));
-                actions.clear();
-                pose.clear();
+                runAction(new DrivePurePursuit(new ArrayList<Path>(){{
+                    add(new Path(new Pose2d(0, 70, 0),
+                            new Pose2d(2, 2, 2), 8, 1));
+                }}));
                 break;
             case FAR:
-                pose.add(new Path(new Pose2d(30, 110, 0), new Pose2d(3, 3, 3), 8, 1, 3000));
-                pose.add(new Path(new Pose2d(30.1, 110, -140), new Pose2d(10, 10, 3), 8, 1));
-                actions.add(new DrivePurePursuit(pose));
-                runAction(new ParallelAction(actions));
-                actions.clear();
-                pose.clear();
-
+                runAction(new DrivePurePursuit(new ArrayList<Path>(){{
+                    add(new Path(new Pose2d(30, 110, 0),
+                            new Pose2d(3, 3, 3), 8, 1, 3000));
+                    add(new Path(new Pose2d(30.1, 110, -140),
+                            new Pose2d(10, 10, 3), 8, 1));
+                }}));
 
                 runAction(new PutDownWG());
 
-
-                pose.add(new Path(new Pose2d(25.1, 80, 0), new Pose2d(2, 2, 2), 8, 1));
-                actions.add(new DrivePurePursuit(pose));
-                runAction(new ParallelAction(actions));
-                actions.clear();
-                pose.clear();
+                runAction(new DrivePurePursuit(new ArrayList<Path>(){{
+                    add(new Path(new Pose2d(25.1, 80, 0),
+                            new Pose2d(2, 2, 2), 8, 1));
+                }}));
                 break;
         }
 

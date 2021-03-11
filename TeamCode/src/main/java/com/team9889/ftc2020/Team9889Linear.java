@@ -73,27 +73,6 @@ public abstract class Team9889Linear extends LinearOpMode {
         return !isStarted() && !isStopRequested();
     }
 
-//    ArrayList<Action> actions = new ArrayList<>();
-//    public void runAction(Action action){
-//        if(opModeIsActive())
-//            action.start();
-//
-//        actions.add(action);
-//    }
-//
-//    public void UpdateActions() {
-//        if (actions.size() > 0) {
-//            for (int i = 0; i < actions.size(); i++) {
-//                actions.get(i).update();
-//
-//                if (actions.get(i).isFinished()) {
-//                    actions.get(i).done();
-//                    actions.remove(actions.get(i));
-//                }
-//            }
-//        }
-//    }
-
     public void runAction(Action action){
         if(opModeIsActive() && !isStopRequested())
             action.start();

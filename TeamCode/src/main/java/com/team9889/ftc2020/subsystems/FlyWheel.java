@@ -20,6 +20,9 @@ import java.util.Arrays;
 
 public class FlyWheel extends Subsystem{
 
+    enum Mode {
+        OFF, POWERSHOT, DEFAULT
+    }
 //    public PID pid = new PID(.001, 0, 0.0005);
     public static double P = 200, I = 0, D = 10, F = .15;
 
@@ -83,5 +86,44 @@ public class FlyWheel extends Subsystem{
         lastMotorPos = Robot.getInstance().flyWheel.getPosition();
 
         counter++;
+    }
+
+    public void turnOffFlyWheel(){
+        Robot.getInstance().flyWheel.motor.setVelocity(0);
+        this.wantedFWSpeed = 0;
+        this.counter = 0;
+        this.lastMotorPos = Robot.getInstance().flyWheel.getPosition();
+        this.pid.error_prior = 0;
+        this.pid.first = true;
+    }
+
+    public void setMode(Mode mode) {
+        switch (mode) {
+            case OFF:
+
+                break;
+            case DEFAULT:
+
+                break;
+            case POWERSHOT:
+
+                break;
+        }
+    }
+
+    public void setRPM(double rpm) {
+        Robot.getInstance().flyWheel.motor.setVelocity(rpm);
+    }
+
+    public void fire() {
+
+    }
+
+    public void extend() {
+        Robot.getInstance().flyWheelHammer.setPosition(0.45);
+    }
+
+    public void retract() {
+        Robot.getInstance().flyWheelHammer.setPosition(1.0);
     }
 }
