@@ -58,7 +58,7 @@ public class ShootRings extends Action {
 
 //        RobotLog.a("Loops Time: " + String.valueOf(loopTimer.milliseconds()) + " | Velocity: " + String.valueOf(Robot.getInstance().flyWheel.getVelocity()));
 
-        Robot.getInstance().flyWheel.motor.setVelocity(1150);
+        Robot.getInstance().flyWheel.motor.setVelocity(1125);
 
 //        2950
         telemetry.addData("Speed", Robot.getInstance().getFlyWheel().flySpeed);

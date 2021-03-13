@@ -105,7 +105,8 @@ public class MecanumDrive extends Subsystem {
 
     public void adjustEncoder (double value, double lastValue) {
         double velocityValue;
-        double adjustValue = 0.00012;
+//        double adjustValue = 0.00012;
+        double adjustValue = 0;
         if(timer.milliseconds() > 0)
             velocityValue = ((value - lastValue) / timer.seconds()) * adjustValue;
         else

@@ -1,5 +1,7 @@
 package com.team9889.ftc2020.subsystems;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -44,6 +46,8 @@ public class Robot{
     public DistanceSensor wgDetector;
 
     public Servo xCam, yCam;
+
+    public Servo arm;
 
     public boolean redAuto;
 
@@ -119,6 +123,8 @@ public class Robot{
 
         xCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraXId);
         yCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraYId);
+
+        arm = hardwareMap.get(Servo.class, Constants.IntakeConstants.kArm);
 
         imu = new RevIMU("imu1", hardwareMap);
 

@@ -29,10 +29,10 @@ import java.util.List;
 @Config
 public class ScanForGoal extends OpenCvPipeline {
 
-    public static double h1 = 10, h2 = 180, s1 = 250, s2 = 255, v1 = 150, v2 = 250,
-            h3 = 10, h4 = 180, s3 = 0, s4 = 255, v3 = 0, v4 = 255,
-            filterContoursMinArea = 40, filterContoursMinPerimeter = 10,
-            filterContoursMinWidth = 10, filterContoursMinHeight = 10;
+    public static double h1 = 50, h2 = 130, s1 = 50, s2 = 130, v1 = 150, v2 = 240,
+            h3 = 200, h4 = 255, s3 = 0, s4 = 255, v3 = 0, v4 = 255,
+            filterContoursMinArea = 0, filterContoursMinPerimeter = 50,
+            filterContoursMinWidth = 0, filterContoursMinHeight = 0;
 
     boolean debug = false;
     double upperPercentLimit = 0.55, lowerPercentLimit = 0.64;
@@ -62,9 +62,7 @@ public class ScanForGoal extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-//        Log.i("Color1", Arrays.toString(input.get((int) input.width()/2, (int) input.height()/2)));
-        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
-//        Log.i("Color2", Arrays.toString(input.get((int) input.width()/2, (int) input.height()/2)));
+//        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
         Mat cvResizeSrc = input;
         Size cvResizeDsize = new Size(0, 0);
@@ -87,7 +85,7 @@ public class ScanForGoal extends OpenCvPipeline {
 //        double[] hsvThresholdHue = {5, 50};
 //        double[] hsvThresholdSaturation = {230, 255};
 //        double[] hsvThresholdValue = {0.0, 255.0};
-        hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
+        rgbThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
 
         // Step Mask0:
         Mat maskInput = blurOutput;
@@ -97,8 +95,8 @@ public class ScanForGoal extends OpenCvPipeline {
         // Step Find Contours
         Mat contourInput = new Mat();
 
-        Imgproc.cvtColor(maskOutput, contourInput, Imgproc.COLOR_HSV2RGB);
-        Imgproc.cvtColor(contourInput, contourInput, Imgproc.COLOR_RGB2GRAY);
+//        Imgproc.cvtColor(maskOutput, contourInput, Imgproc.COLOR_HSV2RGB);
+        Imgproc.cvtColor(maskOutput, contourInput, Imgproc.COLOR_RGB2GRAY);
 
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierachy = new Mat();
@@ -122,7 +120,7 @@ public class ScanForGoal extends OpenCvPipeline {
         ArrayList<MatOfPoint> convexHullsContours = filterContoursOutput;
         convexHulls(convexHullsContours, convexHullsOutput);
 
-        Imgproc.cvtColor(blurOutput, blurOutput, Imgproc.COLOR_HSV2RGB);
+//        Imgproc.cvtColor(blurOutput, blurOutput, Imgproc.COLOR_HSV2RGB);
 
 //        for (int i = 0; i < filterContoursContours.size(); i++) {
 //            Imgproc.drawContours(blurOutput, filterContoursContours, i, new Scalar(0, 255, 0));
@@ -139,22 +137,28 @@ public class ScanForGoal extends OpenCvPipeline {
         hsvThreshold(mask, hsvThresholdHue2, hsvThresholdSaturation2, hsvThresholdValue2, mask);
         mask(input2, mask, maskOutput);
 
+//        return maskOutput;
+
 
         double[] hsvThresholdHue3 = {h3, h4};
         double[] hsvThresholdSaturation3 = {s3, s4};
         double[] hsvThresholdValue3 = {v3, v4};
 
         Mat mask2 = maskOutput, input3 = cvResizeOutput, hsvOutput = new Mat();
-        hsvThreshold(mask2, hsvThresholdHue3, hsvThresholdSaturation3, hsvThresholdValue3, mask2);
+        rgbThreshold(mask2, hsvThresholdHue3, hsvThresholdSaturation3, hsvThresholdValue3, mask2);
         mask(input3, mask2, hsvOutput);
 
+//        return hsvOutput;
 
-        Imgproc.cvtColor(hsvOutput, contourInput, Imgproc.COLOR_HSV2RGB);
-        Imgproc.cvtColor(contourInput, contourInput, Imgproc.COLOR_RGB2GRAY);
+        Imgproc.cvtColor(hsvOutput, contourInput, Imgproc.COLOR_RGB2GRAY);
 
         contours = new ArrayList<>();
         hierachy = new Mat();
         Imgproc.findContours(contourInput, contours, hierachy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        ArrayList<MatOfPoint> convexHullsOutput2 = new ArrayList<>();
+        ArrayList<MatOfPoint> convexHullsContours2 = filterContoursOutput;
+        convexHulls(convexHullsContours2, convexHullsOutput2);
 
         // Step Filter_Contours0:
         filterContoursContours = contours;
@@ -171,7 +175,7 @@ public class ScanForGoal extends OpenCvPipeline {
         }
 
         Mat output = cvResizeOutput;
-        Imgproc.cvtColor(output, output, Imgproc.COLOR_HSV2RGB);
+//        Imgproc.cvtColor(output, output, Imgproc.COLOR_HSV2RGB);
 
         if (filterContoursOutput.size() == 2) {
             Point average = new Point((mc.get(0).x + mc.get(1).x) / 2, (mc.get(0).y + mc.get(1).y) / 2);
@@ -184,6 +188,9 @@ public class ScanForGoal extends OpenCvPipeline {
             Imgproc.circle(output, mc.get(0), 4, new Scalar(0, 255, 0), -1);
             point = new Point((mc.get(0).x / ((double) output.width() / 2)) - 1, (mc.get(0).y / ((double) output.height() / 2)) - 1);
             pointInPixels = mc.get(0);
+        } else {
+            point = new Point(1e10, 1e10);
+            pointInPixels = new Point(1e10, 1e10);
         }
 
 //        Utils.matToBitmap(blurOutput, bitmap);
@@ -369,5 +376,12 @@ public class ScanForGoal extends OpenCvPipeline {
             }
             outputContours.add(mopHull);
         }
+    }
+
+    private void rgbThreshold(Mat input, double[] red, double[] green, double[] blue,
+                              Mat out) {
+        Imgproc.cvtColor(input, out, Imgproc.COLOR_BGR2RGB);
+        Core.inRange(out, new Scalar(red[0], green[0], blue[0]),
+                new Scalar(red[1], green[1], blue[1]), out);
     }
 }

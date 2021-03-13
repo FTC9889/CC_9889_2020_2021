@@ -1,5 +1,7 @@
 package com.team9889.lib.hardware;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -84,8 +86,12 @@ public class Motor {
     }
 
     public void update(RevBulkData bulkData){
-        position = bulkData.getMotorCurrentPosition(motor);
-        velocity = bulkData.getMotorVelocity(motor);
+        if (bulkData != null) {
+            position = bulkData.getMotorCurrentPosition(motor);
+            velocity = bulkData.getMotorVelocity(motor);
+        } else {
+            Log.i("Bulk Data = Null", "");
+        }
     }
 
     public void resetEncoder(){

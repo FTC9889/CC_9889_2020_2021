@@ -155,7 +155,7 @@ public class Camera extends Subsystem{
 
     public void setPS3CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.36);
+        Robot.getInstance().xCam.setPosition(.37);
         Robot.getInstance().yCam.setPosition(.7);
     }
 

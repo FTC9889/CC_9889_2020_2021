@@ -65,6 +65,8 @@ public class Teleop extends Team9889Linear {
     boolean autoAimreleased = false;
     int readyCount = 0;
 
+    double dist = 0;
+
     ArrayList<Action> actions = new ArrayList<>();
 
     @Override
@@ -82,8 +84,10 @@ public class Teleop extends Team9889Linear {
         Robot.getFlyWheel().wantedFWSpeed = 0;
 
         while (opModeIsActive()) {
-            double dist = (0.051 * Math.pow(Robot.getCamera().scanForGoal.getPointInPixels().y, 2))
-                    - (3.0635 * Robot.getCamera().scanForGoal.getPointInPixels().y) + 117.19;
+            if (Robot.getCamera().getPosOfTarget().x != 1e10) {
+                 dist = (0.051 * Math.pow(Robot.getCamera().scanForGoal.getPointInPixels().y, 2))
+                        - (3.0635 * Robot.getCamera().scanForGoal.getPointInPixels().y) + 117.19;
+            }
 
             if (gamepad2.right_trigger > .1 || gamepad2.a || gamepad2.b || gamepad2.y) {
                 rpm = (0.0958 * Math.pow(dist, 2)) - (13.478 * dist) + 3008.7;
@@ -186,10 +190,11 @@ public class Teleop extends Team9889Linear {
                     Robot.getIntake().Outtake();
                 }
 
-                if (gamepad2.dpad_up) {
-                    on = true;
-                    psOn = true;
-                } else if (gamepad2.dpad_right) {
+//                if (gamepad2.dpad_up) {
+//                    on = true;
+//                    psOn = true;
+//                } else
+                    if (gamepad2.dpad_right) {
                     on = false;
                     psOn = false;
                 } else if (driverStation.getFW() && (!psOn || gamepad1.x)){
@@ -356,6 +361,12 @@ public class Teleop extends Team9889Linear {
                 resetPressed = false;
             }
 
+            if (gamepad2.dpad_left) {
+                Robot.arm.setPosition(1);
+            } else if (gamepad2.dpad_down) {
+                Robot.arm.setPosition(0);
+            }
+
             while (loopTimer.milliseconds() < 20) {
 
             }
@@ -391,6 +402,7 @@ public class Teleop extends Team9889Linear {
 //            telemetry.addData("Dis to Goal", 0.5735 * height + 71.888);
 
             double camAngle = Robot.getCamera().camYPose;
+            telemetry.addData("Power Shot Power", psOn);
             telemetry.addData("Dist to Goal", (0.051 * Math.pow(Robot.getCamera().scanForGoal.getPointInPixels().y, 2))
                     - (3.0635 * Robot.getCamera().scanForGoal.getPointInPixels().y) + 117.19);
 

@@ -40,7 +40,7 @@ public class RedAuto extends AutoModeBase {
 
         actions.add(new ShootRings(1, 3000, dashboardTelemetry));
 
-        pose.add(new Path(new Pose2d(1, 60, 0), new Pose2d(1, 1, 2), 8, 1));
+        pose.add(new Path(new Pose2d(1, 60, 0), new Pose2d(1, 1, 1), 8, 1));
 
         actions.add(new DrivePurePursuit(pose));
 
@@ -54,7 +54,7 @@ public class RedAuto extends AutoModeBase {
 
         actions.add(new ShootRings(1, 1500, dashboardTelemetry));
 
-        pose.add(new Path(new Pose2d(-6, 60, 0), new Pose2d(1, 1, 2), 8, 1));
+        pose.add(new Path(new Pose2d(-6, 60, 0), new Pose2d(1, 1, 1), 8, 1));
         actions.add(new DrivePurePursuit(pose));
 
         runAction(new ParallelAction(actions));
@@ -67,7 +67,7 @@ public class RedAuto extends AutoModeBase {
 
         actions.add(new ShootRings(1, 1500, dashboardTelemetry));
 
-        pose.add(new Path(new Pose2d(-14, 60, 0), new Pose2d(1, 1, 2), 8, 1));
+        pose.add(new Path(new Pose2d(-14, 60, 0), new Pose2d(1, 1, 1), 8, 1));
         actions.add(new DrivePurePursuit(pose));
 
         runAction(new ParallelAction(actions));
