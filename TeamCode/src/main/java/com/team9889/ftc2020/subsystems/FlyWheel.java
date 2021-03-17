@@ -28,6 +28,8 @@ public class FlyWheel extends Subsystem{
 //    1.5, 0, 10, .4
 //    .000008, 0, 0
 
+    public boolean psPower = false;
+
     @Override
     public void init(boolean auto) {
         Robot.getInstance().flyWheel.motor.setVelocityPIDFCoefficients(P, I, D, F);

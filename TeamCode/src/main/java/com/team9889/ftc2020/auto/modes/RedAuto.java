@@ -9,6 +9,7 @@ import com.team9889.ftc2020.auto.actions.drive.DrivePurePursuit;
 import com.team9889.ftc2020.auto.actions.drive.MecanumDriveSimpleAction;
 import com.team9889.ftc2020.auto.actions.flywheel.RunFlyWheel;
 import com.team9889.ftc2020.auto.actions.flywheel.ShootRings;
+import com.team9889.ftc2020.auto.actions.teleop.AimAndShoot;
 import com.team9889.ftc2020.auto.actions.utl.ParallelAction;
 import com.team9889.ftc2020.auto.actions.utl.RobotUpdate;
 import com.team9889.ftc2020.auto.actions.utl.Wait;
@@ -40,7 +41,7 @@ public class RedAuto extends AutoModeBase {
 
         actions.add(new ShootRings(1, 3000, dashboardTelemetry));
 
-        pose.add(new Path(new Pose2d(1, 60, 0), new Pose2d(1, 1, 1), 8, 1));
+        pose.add(new Path(new Pose2d(1, 60, 0), new Pose2d(.5, .5, 1), 8, 1));
 
         actions.add(new DrivePurePursuit(pose));
 
@@ -54,7 +55,7 @@ public class RedAuto extends AutoModeBase {
 
         actions.add(new ShootRings(1, 1500, dashboardTelemetry));
 
-        pose.add(new Path(new Pose2d(-6, 60, 0), new Pose2d(1, 1, 1), 8, 1));
+        pose.add(new Path(new Pose2d(-6, 60, 0), new Pose2d(.5, .5, 1), 8, .4));
         actions.add(new DrivePurePursuit(pose));
 
         runAction(new ParallelAction(actions));
@@ -67,7 +68,7 @@ public class RedAuto extends AutoModeBase {
 
         actions.add(new ShootRings(1, 1500, dashboardTelemetry));
 
-        pose.add(new Path(new Pose2d(-14, 60, 0), new Pose2d(1, 1, 1), 8, 1));
+        pose.add(new Path(new Pose2d(-14, 60, 0), new Pose2d(.5, .5, 1), 8, 1));
         actions.add(new DrivePurePursuit(pose));
 
         runAction(new ParallelAction(actions));
@@ -76,7 +77,56 @@ public class RedAuto extends AutoModeBase {
 
 
         runAction(new Wait(500));
-
+//        Robot.getFlyWheel().psPower = true;
+//        Robot.getCamera().setPS1CamPos();
+//
+//        pose.add(new Path(new Pose2d(1, 60, 0), new Pose2d(1, 1, 1), 8, 1));
+//
+//        actions.add(new DrivePurePursuit(pose));
+//
+//        runAction(new ParallelAction(actions));
+//        pose.clear();
+//        actions.clear();
+//
+//        actions.add(new AimAndShoot());
+//        actions.add(new ShootRings(1, 1000, dashboardTelemetry));
+//
+//        runAction(new ParallelAction(actions));
+//        pose.clear();
+//        actions.clear();
+//
+//        Robot.getCamera().setPS2CamPos();
+//        runAction(new Wait(500));
+//
+//        actions.add(new AimAndShoot());
+//        actions.add(new ShootRings(1, 1500, dashboardTelemetry));
+//
+////        pose.add(new Path(new Pose2d(-6, 60, 0), new Pose2d(1, 1, 1), 8, 1));
+////        actions.add(new DrivePurePursuit(pose));
+//
+//        runAction(new ParallelAction(actions));
+//        pose.clear();
+//        actions.clear();
+//
+//
+//        Robot.getCamera().setPS2CamPos();
+//        runAction(new Wait(500));
+//
+//        actions.add(new AimAndShoot());
+//        actions.add(new ShootRings(1, 1500, dashboardTelemetry));
+//
+////        pose.add(new Path(new Pose2d(-14, 60, 0), new Pose2d(1, 1, 1), 8, 1));
+////        actions.add(new DrivePurePursuit(pose));
+//
+//        runAction(new ParallelAction(actions));
+//        pose.clear();
+//        actions.clear();
+//
+//
+//        runAction(new Wait(500));
+//
+//        Robot.getFlyWheel().psPower = false;
+//
 
         switch (box) {
             case CLOSE:
@@ -112,7 +162,7 @@ public class RedAuto extends AutoModeBase {
 
         switch (box) {
             case CLOSE:
-                pose.add(new Path(new Pose2d(30, 65, 0), new Pose2d(3, 3, 3), 8, 1, 3000));
+                pose.add(new Path(new Pose2d(25, 58, 0), new Pose2d(3, 3, 3), 8, 1, 3000));
                 pose.add(new Path(new Pose2d(30.1, 65, -140), new Pose2d(10, 10, 3), 8, 1));
                 actions.add(new DrivePurePursuit(pose));
                 runAction(new ParallelAction(actions));

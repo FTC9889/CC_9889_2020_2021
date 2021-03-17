@@ -59,7 +59,6 @@ public class Teleop extends Team9889Linear {
 
     public static double rpm = 2540;
 
-    boolean psOn = false;
     boolean wgInPos = false;
     boolean wgFirst = true;
     boolean autoAimreleased = false;
@@ -124,16 +123,16 @@ public class Teleop extends Team9889Linear {
                     drive.update();
                 }
 
-                if (Math.abs(Robot.getCamera().getPosOfTarget().x) < .1) {
-                    if (readyCount >= 3) {
-                        Robot.wgGrabber.setPosition(.75);
-                    } else {
-                        Robot.wgGrabber.setPosition(.25);
-                    }
-                    readyCount++;
-                } else {
-                    readyCount = 0;
-                }
+//                if (Math.abs(Robot.getCamera().getPosOfTarget().x) < .1) {
+//                    if (readyCount >= 3) {
+//                        Robot.wgGrabber.setPosition(.75);
+//                    } else {
+//                        Robot.wgGrabber.setPosition(.25);
+//                    }
+//                    readyCount++;
+//                } else {
+//                    readyCount = 0;
+//                }
 
                 autoAimreleased = true;
             } else if (autoAimreleased) {
@@ -190,23 +189,23 @@ public class Teleop extends Team9889Linear {
                     Robot.getIntake().Outtake();
                 }
 
-//                if (gamepad2.dpad_up) {
-//                    on = true;
-//                    psOn = true;
-//                } else
-                    if (gamepad2.dpad_right) {
-                    on = false;
-                    psOn = false;
-                } else if (driverStation.getFW() && (!psOn || gamepad1.x)){
+                if (gamepad2.dpad_up) {
                     on = true;
-                    psOn = false;
-                } else if (!driverStation.getFW() && (!psOn || gamepad1.x)) {
+                    Robot.getFlyWheel().psPower = true;
+                } else if (gamepad2.dpad_right) {
                     on = false;
-                    psOn = false;
+                    Robot.getFlyWheel().psPower = false;
+                    Robot.arm.setPosition(1);
+                } else if (driverStation.getFW() && (!Robot.getFlyWheel().psPower || gamepad1.x)){
+                    on = true;
+                    Robot.getFlyWheel().psPower = false;
+                } else if (!driverStation.getFW() && (!Robot.getFlyWheel().psPower || gamepad1.x)) {
+                    on = false;
+                    Robot.getFlyWheel().psPower = false;
                 }
 
                 if (!driveToPos) {
-                    if (gamepad2.x) {
+                    if (false) {
                         if (armTimer.milliseconds() > 135) {
                             if (extend) {
                                 Robot.fwArm.setPosition(.45);
@@ -246,43 +245,53 @@ public class Teleop extends Team9889Linear {
                     driverStation.codePress = true;
                 }
 
-                if (autoDrive && !wgInPos) {
-                    Robot.wgLeft.setPosition(.2);
-                    Robot.wgRight.setPosition(.2);
-                } else if (wgInPos) {
-                    if (wgAutoTimer.milliseconds() < 500) {
-                        Robot.wgLeft.setPosition(.4);
-                        Robot.wgRight.setPosition(.4);
-                    } else if (wgAutoTimer.milliseconds() > 500 && wgAutoTimer.milliseconds() < 1000) {
-                        Robot.wgGrabber.setPosition(0.25);
-                    } else {
-                        Robot.wgLeft.setPosition(.8);
-                        Robot.wgRight.setPosition(.8);
-                    }
-                } else if (!driverStation.getWG()) {
-                    if (wgTimer.milliseconds() < 500) {
-                        Robot.wgGrabber.setPosition(0.25);
-                    } else {
-                        Robot.wgLeft.setPosition(.8);
-                        Robot.wgRight.setPosition(.8);
-                    }
+                if (gamepad2.left_bumper) {
+                    Robot.wgLeft.setPosition(.3);
+                    Robot.wgRight.setPosition(.3);
+                    Robot.wgGrabber.setPosition(.52);
+                } else {
+                    if (autoDrive && !wgInPos) {
+                        Robot.wgLeft.setPosition(.2);
+                        Robot.wgRight.setPosition(.2);
+                    } else if (wgInPos) {
+                        if (wgAutoTimer.milliseconds() < 500) {
+                            Robot.wgLeft.setPosition(.4);
+                            Robot.wgRight.setPosition(.4);
+                        } else if (wgAutoTimer.milliseconds() > 500 && wgAutoTimer.milliseconds() < 1000) {
+                            Robot.wgGrabber.setPosition(0.25);
+                            Robot.wgLeft.setPosition(.4);
+                            Robot.wgRight.setPosition(.4);
+                        } else {
+                            Robot.wgLeft.setPosition(.8);
+                            Robot.wgRight.setPosition(.8);
+                        }
+                    } else if (!driverStation.getWG()) {
+                        if (wgTimer.milliseconds() < 500) {
+                            Robot.wgGrabber.setPosition(0.25);
+                        } else {
+                            Robot.wgLeft.setPosition(.8);
+                            Robot.wgRight.setPosition(.8);
+                        }
 
-                    lastWGState = false;
-                } else if (driverStation.getWG()) {
-                    if (wgTimer.milliseconds() < 500) {
-                        Robot.wgLeft.setPosition(0.4);
-                        Robot.wgRight.setPosition(0.4);
-                    } else {
-                        Robot.wgGrabber.setPosition(.6);
-                    }
+                        lastWGState = false;
+                    } else if (driverStation.getWG()) {
+                        if (wgTimer.milliseconds() < 500) {
+                            Robot.wgLeft.setPosition(0.4);
+                            Robot.wgRight.setPosition(0.4);
+                        } else {
+                            Robot.wgGrabber.setPosition(.52);
+                            Robot.wgLeft.setPosition(0.4);
+                            Robot.wgRight.setPosition(0.4);
+                        }
 
-                    lastWGState = true;
+                        lastWGState = true;
+                    }
                 }
 
                 if (gamepad1.dpad_right || gamepad2.right_bumper){
 //                    Robot.wgLeft.setPosition(.5);
 //                    Robot.wgRight.setPosition(.5);
-                    Robot.wgGrabber.setPosition(.75);
+                    Robot.wgGrabber.setPosition(.52);
                 }
 
                 if (gamepad1.left_trigger > .5 && !wgInPos) {
@@ -361,10 +370,14 @@ public class Teleop extends Team9889Linear {
                 resetPressed = false;
             }
 
-            if (gamepad2.dpad_left) {
-                Robot.arm.setPosition(1);
-            } else if (gamepad2.dpad_down) {
-                Robot.arm.setPosition(0);
+            if (Robot.getFlyWheel().psPower) {
+                Robot.arm.setPosition(0.65);
+            } else {
+                if (gamepad2.dpad_left) {
+                    Robot.arm.setPosition(1);
+                } else if (gamepad2.dpad_down) {
+                    Robot.arm.setPosition(0);
+                }
             }
 
             while (loopTimer.milliseconds() < 20) {
@@ -372,10 +385,10 @@ public class Teleop extends Team9889Linear {
             }
 
             if (on) {
-                if (!psOn)
+                if (!Robot.getFlyWheel().psPower)
                     Robot.flyWheel.motor.setVelocity(((double) rpm) / 2);
                 else
-                    Robot.flyWheel.motor.setVelocity(((double) rpm / 2) - 50);
+                    Robot.flyWheel.motor.setVelocity(((double) rpm / 2) - 40);
             }
             else if (!on) {
                 Robot.flyWheel.motor.setVelocity(0);
@@ -402,7 +415,7 @@ public class Teleop extends Team9889Linear {
 //            telemetry.addData("Dis to Goal", 0.5735 * height + 71.888);
 
             double camAngle = Robot.getCamera().camYPose;
-            telemetry.addData("Power Shot Power", psOn);
+            telemetry.addData("Power Shot Power", Robot.getFlyWheel().psPower);
             telemetry.addData("Dist to Goal", (0.051 * Math.pow(Robot.getCamera().scanForGoal.getPointInPixels().y, 2))
                     - (3.0635 * Robot.getCamera().scanForGoal.getPointInPixels().y) + 117.19);
 
