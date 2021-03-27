@@ -10,7 +10,9 @@ public class Intake extends Subsystem {
 
     @Override
     public void init(boolean auto) {
-
+        if (auto) {
+            Robot.getInstance().arm.setPosition(1);
+        }
     }
 
     @Override
@@ -33,6 +35,7 @@ public class Intake extends Subsystem {
         Robot.getInstance().intakeRight.setPower(power);
     }
     public void Intake(){
+        Robot.getInstance().flicker.setPower(1);
         SetIntakePower(-1);
 //        SetIntakePower(-1);
     }
@@ -41,5 +44,6 @@ public class Intake extends Subsystem {
     }
     public void Stop(){
         SetIntakePower(0);
+        Robot.getInstance().flicker.setPower(0);
     }
 }

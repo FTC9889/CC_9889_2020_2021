@@ -204,9 +204,14 @@ public class Teleop extends Team9889Linear {
                     Robot.getFlyWheel().psPower = false;
                 }
 
+                int timeToWait = 70;
+                if (Robot.getFlyWheel().psPower) {
+                    timeToWait = 200;
+                }
+
                 if (!driveToPos) {
                     if (false) {
-                        if (armTimer.milliseconds() > 135) {
+                        if (armTimer.milliseconds() > timeToWait) {
                             if (extend) {
                                 Robot.fwArm.setPosition(.45);
                                 extend = false;
@@ -218,7 +223,7 @@ public class Teleop extends Team9889Linear {
                             armTimer.reset();
                         }
                     } else if (gamepad1.right_bumper && on) {
-                        if (armTimer.milliseconds() > 135) {
+                        if (armTimer.milliseconds() > timeToWait) {
                             if (extend) {
                                 Robot.fwArm.setPosition(0.45);
                                 extend = false;
@@ -229,7 +234,7 @@ public class Teleop extends Team9889Linear {
 
                             armTimer.reset();
                         }
-                    } else if (armTimer.milliseconds() > 135) {
+                    } else if (armTimer.milliseconds() > timeToWait) {
                         Robot.fwArm.setPosition(.45);
                         extend = false;
                     }
@@ -387,8 +392,10 @@ public class Teleop extends Team9889Linear {
             if (on) {
                 if (!Robot.getFlyWheel().psPower)
                     Robot.flyWheel.motor.setVelocity(((double) rpm) / 2);
-                else
-                    Robot.flyWheel.motor.setVelocity(((double) rpm / 2) - 40);
+                else {
+                    Robot.flyWheel.motor.setVelocity(1180);
+//                    Robot.flyWheel.motor.setVelocity(((double) rpm / 2) - 40);
+                }
             }
             else if (!on) {
                 Robot.flyWheel.motor.setVelocity(0);
@@ -416,13 +423,13 @@ public class Teleop extends Team9889Linear {
 
             double camAngle = Robot.getCamera().camYPose;
             telemetry.addData("Power Shot Power", Robot.getFlyWheel().psPower);
-            telemetry.addData("Dist to Goal", (0.051 * Math.pow(Robot.getCamera().scanForGoal.getPointInPixels().y, 2))
-                    - (3.0635 * Robot.getCamera().scanForGoal.getPointInPixels().y) + 117.19);
+//            telemetry.addData("Flywheel Power", (0.051 * Math.pow(Robot.getCamera().scanForGoal.getPointInPixels().y, 2))
+//                    - (3.0635 * Robot.getCamera().scanForGoal.getPointInPixels().y) + 117.19);
 
 //            telemetry.addData("angle of cam", Robot.getCamera().camYPose);
             telemetry.addData("pixels", Robot.getCamera().scanForGoal.getPointInPixels());
 
-//            telemetry.addData("Fly Wheel Speed", (Robot.flyWheel.getVelocity() / 28) * 60);
+            telemetry.addData("Fly Wheel Speed", (Robot.flyWheel.getVelocity() / 28) * 60);
             telemetry.addData("Odometry Adjusted : ", Robot.getMecanumDrive().getAdjustedPose());
 
             Robot.outputToTelemetry(telemetry);

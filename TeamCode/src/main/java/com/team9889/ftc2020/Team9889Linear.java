@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
@@ -45,6 +46,8 @@ public abstract class Team9889Linear extends LinearOpMode {
                 telemetry.addData("Waiting for Start","");
                 Robot.outputToTelemetry(telemetry);
                 telemetry.update();
+
+                FtcDashboard.getInstance().startCameraStream(Robot.camera, 0);
             }
         } else {
             // Teleop Init Loop code

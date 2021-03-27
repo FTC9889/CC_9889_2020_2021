@@ -2,6 +2,7 @@ package com.team9889.ftc2020.subsystems;
 
 import android.util.Log;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -38,6 +39,7 @@ public class Robot{
     public RevIMU imu = null;
 
     public Motor intakeLeft, intakeRight, centerOdometry;
+    public CRServo flicker;
 
     public Motor flyWheel;
     public Servo fwArm;
@@ -107,6 +109,8 @@ public class Robot{
                 DcMotorSimple.Direction.FORWARD, false, true, true);
         centerOdometry = new Motor(hardwareMap, Constants.IntakeConstants.kCenterOdometryId, 1,
                 DcMotorSimple.Direction.FORWARD, false, true, true);
+
+        flicker = hardwareMap.crservo.get(Constants.IntakeConstants.kIntakeFlicker);
 
         //FlyWheel
         flyWheel = new Motor(hardwareMap, Constants.LiftConstants.kFlyWheel, 1,

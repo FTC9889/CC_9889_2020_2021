@@ -18,7 +18,8 @@ public class ShootRings extends Action {
     private ElapsedTime shootTimer = new ElapsedTime();
     private ElapsedTime loopTimer = new ElapsedTime();
     private ElapsedTime totalTimer = new ElapsedTime();
-    int stage = 0, ringsShot = 0, rings, time;
+    int stage = 0, ringsShot = 0, rings, time, power = 1145;
+//    1135
     boolean extend = false;
 
     Telemetry telemetry;
@@ -27,6 +28,13 @@ public class ShootRings extends Action {
         this.rings = rings;
         this.time = time;
         this.telemetry = telemetry;
+    }
+
+    public ShootRings (int rings, int time, Telemetry telemetry, int power) {
+        this.rings = rings;
+        this.time = time;
+        this.telemetry = telemetry;
+        this.power = power;
     }
 
     @Override
@@ -41,7 +49,7 @@ public class ShootRings extends Action {
 
     @Override
     public void update() {
-        if (totalTimer.milliseconds() > time && shootTimer.milliseconds() > 500) {
+        if (totalTimer.milliseconds() > time && shootTimer.milliseconds() > 80) {
             if (extend) {
                 Robot.getInstance().fwArm.setPosition(0.45);
                 extend = false;
@@ -58,7 +66,7 @@ public class ShootRings extends Action {
 
 //        RobotLog.a("Loops Time: " + String.valueOf(loopTimer.milliseconds()) + " | Velocity: " + String.valueOf(Robot.getInstance().flyWheel.getVelocity()));
 
-        Robot.getInstance().flyWheel.motor.setVelocity(1135);
+        Robot.getInstance().flyWheel.motor.setVelocity(power);
 
 //        2950
         telemetry.addData("Speed", Robot.getInstance().getFlyWheel().flySpeed);

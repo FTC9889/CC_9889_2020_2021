@@ -83,9 +83,9 @@ public class Camera extends Subsystem{
         AutoModeBase.Boxes box = AutoModeBase.Boxes.CLOSE;
         if (Math.abs(getPosOfTarget().y) == 0) {
             box = AutoModeBase.Boxes.CLOSE;
-        } else if (Math.abs(getPosOfTarget().y) < .16) {
+        } else if (Math.abs(getPosOfTarget().y) < .2) {
             box = AutoModeBase.Boxes.MIDDLE;
-        } else if (Math.abs(getPosOfTarget().y) >= .16) {
+        } else if (Math.abs(getPosOfTarget().y) >= .2) {
             box = AutoModeBase.Boxes.FAR;
         }
 
@@ -143,7 +143,7 @@ public class Camera extends Subsystem{
 
     public void setPS1CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.32);
+        Robot.getInstance().xCam.setPosition(.33);
         Robot.getInstance().yCam.setPosition(.7);
     }
 

@@ -36,15 +36,24 @@ public class Intake extends Action {
 
     @Override
     public void update() {
-        if(timer.milliseconds() > 100 && timer.milliseconds() < 200) {
-            if(intake) Robot.getInstance().getIntake().SetIntakePower(fullSpeed ? 1.0 : 0.5);
-            else Robot.getInstance().getIntake().SetIntakePower(0);
+        if (intake) {
+            if (timer.milliseconds() > 300) {
+                Robot.getInstance().getIntake().SetIntakePower(0);
+                intake = false;
+                timer.reset();
+            }
+        } else {
+            if (timer.milliseconds() > 100) {
+                Robot.getInstance().getIntake().SetIntakePower(-1);
+                intake = true;
+                timer.reset();
+            }
         }
     }
 
     @Override
     public boolean isFinished() {
-        return timer.milliseconds() > 300;
+        return false;
     }
 
     @Override

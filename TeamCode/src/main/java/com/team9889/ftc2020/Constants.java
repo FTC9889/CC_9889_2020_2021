@@ -67,6 +67,7 @@ public class Constants {
         public final static String kIntakeLeftMotorId = "li";
         public final static String kIntakeRightMotorId = "ri";
         public final static String kCenterOdometryId = "co";
+        public final static String kIntakeFlicker = "flicker";
         public final static String kArm = "arm";
     }
 
