@@ -29,7 +29,7 @@ public class PID extends FeedBackController {
     private double integral;
     private double lastTime = 0;
     double output;
-    private double maxIntegral = 0;
+    public double maxIntegral = 0;
 
     public boolean first = true;
 

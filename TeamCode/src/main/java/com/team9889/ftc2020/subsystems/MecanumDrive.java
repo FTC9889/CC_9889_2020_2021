@@ -56,9 +56,9 @@ public class MecanumDrive extends Subsystem {
 
     @Override
     public void outputToTelemetry(Telemetry telemetry) {
-//        telemetry.addData("Left Encoder", "" + Robot.getInstance().leftLift.getPosition());
-//        telemetry.addData("Right Encoder", "" + Robot.getInstance().intakeLeft.getPosition());
-//        telemetry.addData("Side Encoder", "" + Robot.getInstance().intakeRight.getPosition());
+        telemetry.addData("Left Encoder", "" + Robot.getInstance().passThrough.getPosition());
+        telemetry.addData("Right Encoder", "" + Robot.getInstance().frontIntake.getPosition());
+        telemetry.addData("Side Encoder", "" + Robot.getInstance().backIntake.getPosition());
 
         telemetry.addData("Pos : ", getCurrentPose() + "");
         Log.i("Pos", getCurrentPose() + "");
@@ -103,25 +103,6 @@ public class MecanumDrive extends Subsystem {
         turnSpeed = 0;
     }
 
-    public void adjustEncoder (double value, double lastValue) {
-        double velocityValue;
-//        double adjustValue = 0.00012;
-        double adjustValue = 0;
-        if(timer.milliseconds() > 0)
-            velocityValue = ((value - lastValue) / timer.seconds()) * adjustValue;
-        else
-            velocityValue = ((value - lastValue) / (20/1000)) * adjustValue;
-        lastPoseOfRobotBeforeDriftCalc = currentPose;
-        timer.reset();
-        driftCalc = driftCalc.plus(velocityPose);
-
-        if (updated) {
-            setCurrentPose(new Pose2d(odometry.getPoseEstimate().getX(),
-                    odometry.getPoseEstimate().getY(),
-                    -gyroAngle.getTheda(AngleUnit.RADIANS)));
-        }
-    }
-
     @Override
     public void stop() {
         Robot.getInstance().fLDrive.setPower(0);
@@ -137,15 +118,15 @@ public class MecanumDrive extends Subsystem {
     }
 
     public double Right_OdometryPosition() {
-        return (Robot.getInstance().intakeRight.getPosition() * Constants.OdometryConstants.ENCODER_TO_DISTANCE_RATIO) - Right_Position_Offset;
+        return (-Robot.getInstance().frontIntake.getPosition() * Constants.OdometryConstants.ENCODER_TO_DISTANCE_RATIO) - Right_Position_Offset;
     }
 
     public double Left_OdometryPosition() {
-        return (Robot.getInstance().intakeLeft.getPosition() * Constants.OdometryConstants.ENCODER_TO_DISTANCE_RATIO) - Left_Position_Offset;
+        return (-Robot.getInstance().passThrough.getPosition() * Constants.OdometryConstants.ENCODER_TO_DISTANCE_RATIO) - Left_Position_Offset;
     }
 
     public double Y_OdometryPosition() {
-        return (Robot.getInstance().centerOdometry.getPosition() * Constants.OdometryConstants.ENCODER_TO_DISTANCE_RATIO) - Y_Position_Offset;
+        return (Robot.getInstance().backIntake.getPosition() * Constants.OdometryConstants.ENCODER_TO_DISTANCE_RATIO) - Y_Position_Offset;
     }
 
     public Pose2d getCurrentPose() {

@@ -64,11 +64,12 @@ public class Constants {
 
     //Settings for Intake
     public static class IntakeConstants {
-        public final static String kIntakeLeftMotorId = "li";
-        public final static String kIntakeRightMotorId = "ri";
-        public final static String kCenterOdometryId = "co";
-        public final static String kIntakeFlicker = "flicker";
-        public final static String kArm = "arm";
+        public final static String kFrontIntakeMotorId = "fi";
+        public final static String kBackIntakeMotorId = "bi";
+        public final static String kPassThroughId = "pass";
+        public final static String kRingDetector = "frontring";
+        public final static String kLeftArm = "leftarm";
+        public final static String kRightArm = "rightarm";
     }
 
     /*---------------------
@@ -81,6 +82,7 @@ public class Constants {
     public static class LiftConstants {
         public final static String kFlyWheel = "fw";
         public final static String kFWArm = "fwarm";
+        public final static String kFWLock = "lock";
     }
 
     /*---------------------

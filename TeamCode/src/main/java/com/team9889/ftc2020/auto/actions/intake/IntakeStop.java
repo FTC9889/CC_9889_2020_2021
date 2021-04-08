@@ -9,7 +9,8 @@ import com.team9889.ftc2020.subsystems.Robot;
 public class IntakeStop extends Action {
     @Override
     public void start() {
-        Robot.getInstance().getIntake().Stop();
+        Robot.getInstance().getIntake().SetFrontIntakePower(0);
+        Robot.getInstance().getIntake().SetBackIntakePower(0);
     }
 
     @Override

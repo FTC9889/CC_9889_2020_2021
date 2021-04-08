@@ -11,6 +11,7 @@ import com.team9889.lib.CruiseLib;
 import com.team9889.lib.control.Path;
 import com.team9889.lib.control.PurePursuit;
 import com.team9889.lib.control.controllers.PID;
+import com.team9889.lib.control.controllers.PIDF;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.internal.android.dx.command.Main;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 
 @Config
 public class AimAndShoot extends Action {
-    public static double p = 1.5, i = 0, d = 100;
+    public static double p = .08, i = 0, d = 2, f = 0;
 //    public static double p = .5, i, d = 0;
 
     ArrayList<Path> paths = new ArrayList<>();
@@ -39,7 +40,7 @@ public class AimAndShoot extends Action {
     private PID xPID = new PID(0.05, 0, 1);
     private PID yPID = new PID(0.1, 0, 1);
     private PID orientationPID = new PID(0.04, 0, 2.5);
-    private PID camOrientationPID = new PID(.8, 0, 100);
+    private PID camOrientationPID = new PID(0.4, 0.0000001, 0.7, 1);
 
     private int angleCounter = 0;
     private int xCounter = 0;
@@ -56,13 +57,13 @@ public class AimAndShoot extends Action {
     boolean driveDone = false;
     @Override
     public void update() {
-        if (Robot.getInstance().getFlyWheel().psPower) {
-            camOrientationPID.d = 100;
-            camOrientationPID.p = 11;
-        } else {
+//        if (Robot.getInstance().getFlyWheel().psPower) {
+//            camOrientationPID.d = 100;
+//            camOrientationPID.p = 11;
+//        } else {
             camOrientationPID.d = d;
-            camOrientationPID.p = p;
-        }
+        camOrientationPID.p = p;
+//        }
 
 //        Point robotPos = new Point(Robot.getInstance().getMecanumDrive().getAdjustedPose().getX(),
 //                Robot.getInstance().getMecanumDrive().getAdjustedPose().getY());
@@ -73,22 +74,27 @@ public class AimAndShoot extends Action {
         double turn = Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES) -
                 Math.toDegrees(Robot.getInstance().getMecanumDrive().angleFromAuton);
 
-        if (turn > 180) {
-            turn = turn - 360;
-        } else if (turn < -180) {
-            turn = turn + 360;
-        }
-        if (turn > 180) {
-            turn = turn - 360;
-        } else if (turn < -180) {
-            turn = turn + 360;
-        }
-        if (turn > 180) {
-            turn = turn - 360;
-        } else if (turn < -180) {
-            turn = turn + 360;
-        }
-        turn *= -1;
+        double sign = Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES) -
+                Math.toDegrees(Robot.getInstance().getMecanumDrive().angleFromAuton) / turn;
+
+        Log.v("Angle", turn + "");
+
+//        if (turn > 180) {
+//            turn = turn - 360;
+//        } else if (turn < -180) {
+//            turn = turn + 360;
+//        }
+//        if (turn > 180) {
+//            turn = turn - 360;
+//        } else if (turn < -180) {
+//            turn = turn + 360;
+//        }
+//        if (turn > 180) {
+//            turn = turn - 360;
+//        } else if (turn < -180) {
+//            turn = turn + 360;
+//        }
+//        turn *= -1;
 //
 //        double rotation = orientationPID.update(turn, 0);
 //        rotation = CruiseLib.limitValue(rotation, .8);
@@ -98,29 +104,42 @@ public class AimAndShoot extends Action {
 //        } else {
 //        camOrientationPID.p = p;
         camOrientationPID.i = i;
+        camOrientationPID.maxIntegral = f;
 //        camOrientationPID.d = d;
 
         double speed = 0;
-        if (Robot.getInstance().getCamera().getPosOfTarget().x == 1e10) {
-            camOrientationPID.update(turn, 0);
-            speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.05, -.6, .05, .6);
-        } else {
-            camOrientationPID.update(Robot.getInstance().getCamera().getPosOfTarget().x, -.1);
-            if (Robot.getInstance().getFlyWheel().psPower) {
-                speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.95, -1.5, .95, 1.5);
+//        if (Robot.getInstance().getCamera().getPosOfTarget().x == 1e10) {
+        if (Math.abs(turn) > 14) {
+            if (!Robot.getInstance().getFlyWheel().psPower) {
+                camOrientationPID.update(turn, 0);
             } else {
-                speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.05, -.15, .05, .15);
+                camOrientationPID.update(turn, 20);
             }
+            speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.05, -.6, .05, .6);
+        } else if (Robot.getInstance().getCamera().getPosOfTarget().x != 1e10) {
+            camOrientationPID.update(Robot.getInstance().getCamera().getPosOfTarget().x * 8, 0);
+            double camera = Math.abs(Robot.getInstance().getCamera().getPosOfTarget().x);
+//            speed = Math.pow((0.3686 * camera), 0.3996);
+//
+//            speed = 0.4266 * Math.pow(camera, 0.6031);
+//            speed = speed * (Robot.getInstance().getCamera().getPosOfTarget().x / camera);
+
+
+//            if (Robot.getInstance().getFlyWheel().psPower) {
+//                speed = CruiseLib.limitValue(camOrientationPIDF.getOutput(), -1, -10, 1, 10);
+//            } else {
+                speed = CruiseLib.limitValue(-camOrientationPID.getOutput(), -.05, -.6, .05, .6);
+//            }
         }
 //        .4
 //            if (Math.abs(camOrientationPID.getError()) > .5) {
 //                Robot.getInstance().getMecanumDrive().setFieldCentricPower(0, 0, -camOrientationPID.getOutput() * 2);
 //            } else {
-        if (Robot.getInstance().getFlyWheel().psPower) {
-            Robot.getInstance().getMecanumDrive().turnSpeed -= (speed / 10);
-        } else {
-            Robot.getInstance().getMecanumDrive().turnSpeed -= (speed);
-        }
+//        if (Robot.getInstance().getFlyWheel().psPower) {
+//            Robot.getInstance().getMecanumDrive().turnSpeed -= (speed / 10);
+//        } else {
+            Robot.getInstance().getMecanumDrive().turnSpeed += (speed);
+//        }
 //            }
 //        }
     }

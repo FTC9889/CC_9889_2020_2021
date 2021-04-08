@@ -131,7 +131,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @SuppressWarnings("WeakerAccess")
 public class FtcRobotControllerActivity extends Activity
   {
-  public static final String TAG = "RCActivity";
+//  ------------------------------------------
+    public boolean FTCDashboardDisable = false;
+//  ------------------------------------------
+
+    public static final String TAG = "RCActivity";
   public String getTag() { return TAG; }
 
   private static final int REQUEST_CONFIG_WIFI_CHANNEL = 1;
@@ -383,7 +387,7 @@ public class FtcRobotControllerActivity extends Activity
 
     FtcAboutActivity.setBuildTimeFromBuildConfig(BuildConfig.BUILD_TIME);
 
-    FtcDashboard.start();
+    FtcDashboard.start(FTCDashboardDisable);
   }
 
   protected UpdateUI createUpdateUI() {

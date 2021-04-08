@@ -83,9 +83,9 @@ public class Camera extends Subsystem{
         AutoModeBase.Boxes box = AutoModeBase.Boxes.CLOSE;
         if (Math.abs(getPosOfTarget().y) == 0) {
             box = AutoModeBase.Boxes.CLOSE;
-        } else if (Math.abs(getPosOfTarget().y) < .2) {
+        } else if (Math.abs(getPosOfTarget().y) < -.03) {
             box = AutoModeBase.Boxes.MIDDLE;
-        } else if (Math.abs(getPosOfTarget().y) >= .2) {
+        } else if (Math.abs(getPosOfTarget().y) >= -.03) {
             box = AutoModeBase.Boxes.FAR;
         }
 
@@ -133,7 +133,7 @@ public class Camera extends Subsystem{
 
     public void setGoalCamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.285);
+        Robot.getInstance().xCam.setPosition(.48);
 
 //        camYPose += cameraY.update(getPosOfTarget().y, 0);
 //        CruiseLib.limitValue(camYPose, 1, 0);
@@ -143,25 +143,25 @@ public class Camera extends Subsystem{
 
     public void setPS1CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.33);
+        Robot.getInstance().xCam.setPosition(.53);
         Robot.getInstance().yCam.setPosition(.7);
     }
 
     public void setPS2CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.35);
+        Robot.getInstance().xCam.setPosition(.56);
         Robot.getInstance().yCam.setPosition(.7);
     }
 
     public void setPS3CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.37);
+        Robot.getInstance().xCam.setPosition(.58);
         Robot.getInstance().yCam.setPosition(.7);
     }
 
     public void setRSCamPos () {
         currentCamState = CameraStates.RS;
-        Robot.getInstance().xCam.setPosition(.37);
-        Robot.getInstance().yCam.setPosition(.895);
+        Robot.getInstance().xCam.setPosition(.64);
+        Robot.getInstance().yCam.setPosition(.9);
     }
 }

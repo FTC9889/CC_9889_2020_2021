@@ -38,20 +38,16 @@ public class Robot{
     public Motor fLDrive, fRDrive, bLDrive, bRDrive;
     public RevIMU imu = null;
 
-    public Motor intakeLeft, intakeRight, centerOdometry;
-    public CRServo flicker;
+    public Motor frontIntake, backIntake, passThrough;
+    public Servo leftArm, rightArm;
+    public DistanceSensor ringDetector;
 
     public Motor flyWheel;
-    public Servo fwArm;
+    public Servo fwArm, fwLock;
 
     public Servo wgGrabber, wgLeft, wgRight;
-    public DistanceSensor wgDetector;
 
     public Servo xCam, yCam;
-
-    public Servo arm;
-
-    public boolean redAuto;
 
     public RevBulkData bulkDataMaster, bulkDataSlave;
     public ExpansionHubEx revHubMaster, revHubSlave;
@@ -103,32 +99,32 @@ public class Robot{
                 DcMotorSimple.Direction.REVERSE, true, true, true);
 
         //Intake
-        intakeLeft = new Motor(hardwareMap, Constants.IntakeConstants.kIntakeLeftMotorId, 1,
-                DcMotorSimple.Direction.REVERSE, false, false, true);
-        intakeRight = new Motor(hardwareMap, Constants.IntakeConstants.kIntakeRightMotorId, 1,
-                DcMotorSimple.Direction.FORWARD, false, true, true);
-        centerOdometry = new Motor(hardwareMap, Constants.IntakeConstants.kCenterOdometryId, 1,
-                DcMotorSimple.Direction.FORWARD, false, true, true);
+        frontIntake = new Motor(hardwareMap, Constants.IntakeConstants.kFrontIntakeMotorId, 1,
+                DcMotorSimple.Direction.FORWARD, false, false, true);
+        backIntake = new Motor(hardwareMap, Constants.IntakeConstants.kBackIntakeMotorId, 1,
+                DcMotorSimple.Direction.REVERSE, false, true, true);
+        passThrough = new Motor(hardwareMap, Constants.IntakeConstants.kPassThroughId, 1,
+                DcMotorSimple.Direction.REVERSE, false, true, true);
 
-        flicker = hardwareMap.crservo.get(Constants.IntakeConstants.kIntakeFlicker);
+        leftArm = hardwareMap.get(Servo.class, Constants.IntakeConstants.kLeftArm);
+        rightArm = hardwareMap.get(Servo.class, Constants.IntakeConstants.kRightArm);
+
+        ringDetector = hardwareMap.get(DistanceSensor.class, Constants.IntakeConstants.kRingDetector);
 
         //FlyWheel
         flyWheel = new Motor(hardwareMap, Constants.LiftConstants.kFlyWheel, 1,
                 DcMotorSimple.Direction.REVERSE, false, false, true);
 
         fwArm = hardwareMap.get(Servo.class, Constants.LiftConstants.kFWArm);
+        fwLock = hardwareMap.get(Servo.class, Constants.LiftConstants.kFWLock);
 
         wgGrabber = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGGrabber);
         wgLeft = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGLeft);
         wgLeft.setDirection(Servo.Direction.REVERSE);
         wgRight = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGRight);
 
-        wgDetector = hardwareMap.get(DistanceSensor.class, Constants.WobbleGoalConstants.kWGDetector);
-
         xCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraXId);
         yCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraYId);
-
-        arm = hardwareMap.get(Servo.class, Constants.IntakeConstants.kArm);
 
         imu = new RevIMU("imu1", hardwareMap);
 
@@ -146,11 +142,9 @@ public class Robot{
 
         // Update Motors
         flyWheel.update(bulkDataSlave);
-
-
-        intakeLeft.update(bulkDataSlave);
-        intakeRight.update(bulkDataSlave);
-        centerOdometry.update(bulkDataSlave);
+        frontIntake.update(bulkDataSlave);
+        backIntake.update(bulkDataSlave);
+        passThrough.update(bulkDataSlave);
 
         // Update Subsystems
         for (Subsystem subsystem : subsystems)

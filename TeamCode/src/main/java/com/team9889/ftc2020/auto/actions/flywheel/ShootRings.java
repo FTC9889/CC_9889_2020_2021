@@ -43,7 +43,6 @@ public class ShootRings extends Action {
         loopTimer.reset();
         totalTimer.reset();
 
-        Robot.getInstance().getFlyWheel().lastMotorPos = 0;
         Robot.getInstance().flyWheel.resetEncoder();
     }
 
@@ -67,9 +66,6 @@ public class ShootRings extends Action {
 //        RobotLog.a("Loops Time: " + String.valueOf(loopTimer.milliseconds()) + " | Velocity: " + String.valueOf(Robot.getInstance().flyWheel.getVelocity()));
 
         Robot.getInstance().flyWheel.motor.setVelocity(power);
-
-//        2950
-        telemetry.addData("Speed", Robot.getInstance().getFlyWheel().flySpeed);
         telemetry.update();
 
         Robot.getInstance().update();

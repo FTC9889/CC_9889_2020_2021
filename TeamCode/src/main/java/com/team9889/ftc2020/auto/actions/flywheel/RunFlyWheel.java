@@ -30,7 +30,7 @@ public class RunFlyWheel extends Action {
         while (loopTimer.milliseconds() < 20) {
         }
 
-        Robot.getInstance().getFlyWheel().setFlyWheelSpeed(3100, loopTimer.milliseconds());
+//        Robot.getInstance().getFlyWheel().setFlyWheelSpeed(3100, loopTimer.milliseconds());
 
 //        Robot.getInstance().update();
         loopTimer.reset();

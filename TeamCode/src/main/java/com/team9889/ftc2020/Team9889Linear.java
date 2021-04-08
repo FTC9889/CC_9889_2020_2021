@@ -1,23 +1,10 @@
 package com.team9889.ftc2020;
 
-import android.app.Activity;
-import android.graphics.Color;
-import android.util.Log;
-import android.view.View;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.Robot;
-import com.team9889.lib.detectors.ScanForSkyStonesPipeline;
-import com.team9889.lib.detectors.TeleOpStonePipeline;
-
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by joshua9889 on 3/28/2018.
@@ -28,17 +15,21 @@ import java.util.List;
  */
 
 public abstract class Team9889Linear extends LinearOpMode {
-
     // Robot Object
     protected Robot Robot = com.team9889.ftc2020.subsystems.Robot.getInstance();
 
     // Match Timer
     protected ElapsedTime matchTime = new ElapsedTime();
 
+    // Dashboard
+    public FtcDashboard dashboard = FtcDashboard.getInstance();
+
     public void waitForStart(boolean autonomous) {
         Robot.init(hardwareMap, autonomous);
 
         telemetry.setMsTransmissionInterval(autonomous ? 50:1000);
+
+        telemetry = dashboard.getTelemetry();
 
         if(autonomous){
             // Autonomous Init Loop code

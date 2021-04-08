@@ -11,7 +11,8 @@ public class Intake extends Subsystem {
     @Override
     public void init(boolean auto) {
         if (auto) {
-            Robot.getInstance().arm.setPosition(1);
+            Robot.getInstance().leftArm.setPosition(1);
+            Robot.getInstance().rightArm.setPosition(1);
         }
     }
 
@@ -27,23 +28,15 @@ public class Intake extends Subsystem {
 
     @Override
     public void stop() {
-        Stop();
+        SetFrontIntakePower(0);
+        SetBackIntakePower(0);
     }
 
-    public void SetIntakePower(double power){
-        Robot.getInstance().intakeLeft.setPower(power);
-        Robot.getInstance().intakeRight.setPower(power);
+    public void SetFrontIntakePower(double power){
+        Robot.getInstance().frontIntake.setPower(power);
     }
-    public void Intake(){
-        Robot.getInstance().flicker.setPower(1);
-        SetIntakePower(-1);
-//        SetIntakePower(-1);
-    }
-    public void Outtake(){
-        SetIntakePower(0.8);
-    }
-    public void Stop(){
-        SetIntakePower(0);
-        Robot.getInstance().flicker.setPower(0);
+
+    public void SetBackIntakePower(double power){
+        Robot.getInstance().backIntake.setPower(power);
     }
 }

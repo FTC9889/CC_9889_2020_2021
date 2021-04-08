@@ -41,7 +41,6 @@ public class ParallelAction extends Action {
                 isFinished[actionIndex] = true;
             }
         }
-        Robot.getInstance().update();
     }
 
     @Override

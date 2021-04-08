@@ -29,7 +29,7 @@ import java.util.List;
 @Config
 public class ScanForGoal extends OpenCvPipeline {
 
-    public static double h1 = 50, h2 = 130, s1 = 50, s2 = 130, v1 = 150, v2 = 240,
+    public static double h1 = 50, h2 = 130, s1 = 50, s2 = 130, v1 = 150, v2 = 255,
             h3 = 200, h4 = 255, s3 = 0, s4 = 255, v3 = 0, v4 = 255,
             filterContoursMinArea = 0, filterContoursMinPerimeter = 50,
             filterContoursMinWidth = 0, filterContoursMinHeight = 0;
@@ -73,7 +73,7 @@ public class ScanForGoal extends OpenCvPipeline {
 
         // Step Blur0:
         Mat blurInput = cvResizeOutput;
-        TeleOpStonePipeline.BlurType blurType = TeleOpStonePipeline.BlurType.get("Box Blur");
+        ScanForRS.BlurType blurType = ScanForRS.BlurType.get("Box Blur");
         double blurRadius = 0.0;
         blur(blurInput, blurType, blurRadius, blurOutput);
 
@@ -262,7 +262,7 @@ public class ScanForGoal extends OpenCvPipeline {
      * @param doubleRadius The radius for the blur.
      * @param output The image in which to store the output.
      */
-    private void blur(Mat input, TeleOpStonePipeline.BlurType type, double doubleRadius,
+    private void blur(Mat input, ScanForRS.BlurType type, double doubleRadius,
                       Mat output) {
         int radius = (int)(doubleRadius + 0.5);
         int kernelSize;
