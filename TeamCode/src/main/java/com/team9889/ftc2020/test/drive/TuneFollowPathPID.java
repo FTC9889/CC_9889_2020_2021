@@ -1,6 +1,7 @@
 package com.team9889.ftc2020.test.drive;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.team9889.ftc2020.Team9889Linear;
 //import com.team9889.ftc2020.auto.actions.drive.DriveFollowPath;
@@ -17,6 +18,7 @@ import java.util.List;
  */
 
 @TeleOp
+@Disabled
 public class TuneFollowPathPID extends Team9889Linear {
     ArrayList<Path> path = new ArrayList<>();
     double p = 0, i = 0, d = 0.008;

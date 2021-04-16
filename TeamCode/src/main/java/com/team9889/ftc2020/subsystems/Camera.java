@@ -21,7 +21,6 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
  * Created by MannoMation on 10/27/2018.
  */
 
-@Config
 public class Camera extends Subsystem{
     public static double p = -0.016, i, d;
     PID cameraY = new PID(-0.016, 0, 0);
@@ -83,9 +82,9 @@ public class Camera extends Subsystem{
         AutoModeBase.Boxes box = AutoModeBase.Boxes.CLOSE;
         if (Math.abs(getPosOfTarget().y) == 0) {
             box = AutoModeBase.Boxes.CLOSE;
-        } else if (Math.abs(getPosOfTarget().y) < -.03) {
+        } else if (Math.abs(getPosOfTarget().y) >= .1) {
             box = AutoModeBase.Boxes.MIDDLE;
-        } else if (Math.abs(getPosOfTarget().y) >= -.03) {
+        } else if (Math.abs(getPosOfTarget().y) < .1) {
             box = AutoModeBase.Boxes.FAR;
         }
 
@@ -133,7 +132,7 @@ public class Camera extends Subsystem{
 
     public void setGoalCamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.48);
+        Robot.getInstance().xCam.setPosition(.485);
 
 //        camYPose += cameraY.update(getPosOfTarget().y, 0);
 //        CruiseLib.limitValue(camYPose, 1, 0);
@@ -143,7 +142,7 @@ public class Camera extends Subsystem{
 
     public void setPS1CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.53);
+        Robot.getInstance().xCam.setPosition(.54);
         Robot.getInstance().yCam.setPosition(.7);
     }
 
@@ -155,7 +154,25 @@ public class Camera extends Subsystem{
 
     public void setPS3CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.58);
+        Robot.getInstance().xCam.setPosition(.585);
+        Robot.getInstance().yCam.setPosition(.7);
+    }
+
+    public void setPS1CamPosAuto () {
+        currentCamState = CameraStates.GOAL;
+        Robot.getInstance().xCam.setPosition(.51);
+        Robot.getInstance().yCam.setPosition(.7);
+    }
+
+    public void setPS2CamPosAuto () {
+        currentCamState = CameraStates.GOAL;
+        Robot.getInstance().xCam.setPosition(.535);
+        Robot.getInstance().yCam.setPosition(.7);
+    }
+
+    public void setPS3CamPosAuto () {
+        currentCamState = CameraStates.GOAL;
+        Robot.getInstance().xCam.setPosition(.548);
         Robot.getInstance().yCam.setPosition(.7);
     }
 

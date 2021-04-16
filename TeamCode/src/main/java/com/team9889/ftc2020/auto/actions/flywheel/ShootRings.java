@@ -43,12 +43,13 @@ public class ShootRings extends Action {
         loopTimer.reset();
         totalTimer.reset();
 
+        Robot.getInstance().fwLock.setPosition(.4);
         Robot.getInstance().flyWheel.resetEncoder();
     }
 
     @Override
     public void update() {
-        if (totalTimer.milliseconds() > time && shootTimer.milliseconds() > 80) {
+        if (totalTimer.milliseconds() > time && shootTimer.milliseconds() > 150) {
             if (extend) {
                 Robot.getInstance().fwArm.setPosition(0.45);
                 extend = false;
@@ -80,6 +81,7 @@ public class ShootRings extends Action {
     @Override
     public void done() {
         Robot.getInstance().flyWheel.setPower(0);
+        Robot.getInstance().fwLock.setPosition(1);
         Log.i("Shot", "");
     }
 }

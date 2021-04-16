@@ -225,7 +225,8 @@ class Odometry extends ThreeTrackingWheelLocalizer {
                 new Pose2d(FORWARD_OFFSET, -LATERAL_DISTANCE, Math.toRadians(0)),
                 new Pose2d(FORWARD_OFFSET, LATERAL_DISTANCE, Math.toRadians(0)),
 //                new Pose2d(-0.1875, 0.09375, Math.toRadians(90))
-                new Pose2d(-0.375, -1.125, Math.toRadians(90))
+//                new Pose2d(-0.375, -1.125, Math.toRadians(90))
+                new Pose2d(.65, -0.5, Math.toRadians(90))
         ));
     }
 

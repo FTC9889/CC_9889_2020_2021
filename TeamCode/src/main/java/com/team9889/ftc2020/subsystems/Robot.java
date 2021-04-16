@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.team9889.ftc2020.Constants;
+import com.team9889.ftc2020.auto.actions.ActionVariables;
 import com.team9889.lib.hardware.Motor;
 import com.team9889.lib.hardware.RevIMU;
 
@@ -45,7 +46,7 @@ public class Robot{
     public Motor flyWheel;
     public Servo fwArm, fwLock;
 
-    public Servo wgGrabber, wgLeft, wgRight;
+    public Servo wgGrabber, wgLeft, wgRight, autoWG;
 
     public Servo xCam, yCam;
 
@@ -53,6 +54,8 @@ public class Robot{
     public ExpansionHubEx revHubMaster, revHubSlave;
 
     public HardwareMap hardwareMap;
+
+    public ActionVariables actionVariables = new ActionVariables();
 
     private static Robot mInstance = null;
 
@@ -100,7 +103,7 @@ public class Robot{
 
         //Intake
         frontIntake = new Motor(hardwareMap, Constants.IntakeConstants.kFrontIntakeMotorId, 1,
-                DcMotorSimple.Direction.FORWARD, false, false, true);
+                DcMotorSimple.Direction.FORWARD, false, true, true);
         backIntake = new Motor(hardwareMap, Constants.IntakeConstants.kBackIntakeMotorId, 1,
                 DcMotorSimple.Direction.REVERSE, false, true, true);
         passThrough = new Motor(hardwareMap, Constants.IntakeConstants.kPassThroughId, 1,
@@ -122,6 +125,7 @@ public class Robot{
         wgLeft = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGLeft);
         wgLeft.setDirection(Servo.Direction.REVERSE);
         wgRight = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGRight);
+        autoWG = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kAutoWG);
 
         xCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraXId);
         yCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraYId);

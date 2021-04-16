@@ -132,7 +132,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class FtcRobotControllerActivity extends Activity
   {
 //  ------------------------------------------
-    public boolean FTCDashboardDisable = false;
+    public boolean FTCDashboardDisable = true;
 //  ------------------------------------------
 
     public static final String TAG = "RCActivity";

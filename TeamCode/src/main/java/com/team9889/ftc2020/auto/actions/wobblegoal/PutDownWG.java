@@ -17,8 +17,8 @@ public class PutDownWG extends Action {
     @Override
     public void update() {
         if (timer.milliseconds() < 500) {
-            Robot.getInstance().wgLeft.setPosition(0.4);
-            Robot.getInstance().wgRight.setPosition(0.4);
+            Robot.getInstance().wgLeft.setPosition(0.85);
+            Robot.getInstance().wgRight.setPosition(0.85);
         } else {
             Robot.getInstance().wgGrabber.setPosition(.75);
         }

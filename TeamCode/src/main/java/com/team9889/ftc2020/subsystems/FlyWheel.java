@@ -21,11 +21,14 @@ import java.util.Arrays;
 @Config
 public class FlyWheel extends Subsystem{
     public enum Mode {
-        OFF, POWERSHOT1, POWERSHOT2, DEFAULT
+        OFF, POWERSHOT1, POWERSHOT2, POWERSHOT3, POWERSHOTAUTO1, POWERSHOTAUTO2, DEFAULT
     }
 
-    public static double P = 200, I = 0, D = 11, F = .15;
+    public static double P = 125, I = 0, D = 10.5, F = .15;
+    public static int ps1 = 1180, ps2 = 1185, ps3 = 1190;
     public PIDF pid = new PIDF(0.0008, 0, 0.04, .15);
+
+    public boolean done = false;
 
     public boolean psPower = false;
 
@@ -65,15 +68,24 @@ public class FlyWheel extends Subsystem{
                 setRPM(2540);
                 break;
             case POWERSHOT1:
-                setRPM(1130);
+                setRPM(ps1);
                 break;
             case POWERSHOT2:
-                setRPM(1150);
+                setRPM(ps2);
                 break;
+            case POWERSHOT3:
+                setRPM(ps3);
+                break;
+            case POWERSHOTAUTO1:
+                setRPM(ps1 + 70);
+            case POWERSHOTAUTO2:
+                setRPM(ps1 + 50);
         }
     }
 
     public void setRPM(double rpm) {
+//        pid.update(Robot.getInstance().flyWheel.getVelocity(), rpm);
+//
         Robot.getInstance().flyWheel.motor.setVelocity(rpm);
     }
 

@@ -1,5 +1,6 @@
-package com.team9889.ftc2020.auto.actions.flywheel;
+package com.team9889.ftc2020.auto.actions.teleop;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.FlyWheel;
@@ -12,10 +13,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 /**
  * Created by Eric on 4/5/2021.
  */
-public class PowerShots extends Action {
-    public static double p = 1, i = 0, d = 8, f = 50;
 
-    private PIDF camOrientationPIDF = new PIDF(1, 0, 8, 100);
+@Config
+public class PowerShots extends Action {
+    public static double p = .65, i = 0, d = 10, max = 0;
+
+    private PIDF camOrientationPID = new PIDF(1, 0, 8, 100);
 
     boolean first = true;
     int num = 1, ready = 0;
@@ -24,6 +27,7 @@ public class PowerShots extends Action {
     @Override
     public void start() {
         Robot.getInstance().getCamera().setPS1CamPos();
+        Robot.getInstance().getCamera().setScanForGoal();
         Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOT1);
         Robot.getInstance().getFlyWheel().psPower = true;
         Robot.getInstance().fwLock.setPosition(.4);
@@ -33,8 +37,10 @@ public class PowerShots extends Action {
 
     @Override
     public void update() {
-        if (first && beginning.milliseconds() > 400) {
-            if (ready < 3) {
+//        Robot.getInstance().update();
+
+        if (first && beginning.milliseconds() > 600) {
+            if (ready < 5) {
                 turn(1);
                 timer.reset();
 
@@ -55,7 +61,7 @@ public class PowerShots extends Action {
                 }
             }
         } else if (num == 2 && !first) {
-            if (ready < 4) {
+            if (ready < 6) {
                 turn(1.2);
                 timer.reset();
 
@@ -67,7 +73,7 @@ public class PowerShots extends Action {
             } else {
                 if (timer.milliseconds() < 200) {
                     Robot.getInstance().getCamera().setPS3CamPos();
-                    Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOT2);
+                    Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOT3);
                     Robot.getInstance().fwArm.setPosition(1);
                 } else {
                     num = 3;
@@ -76,7 +82,7 @@ public class PowerShots extends Action {
                 }
             }
         } else if (!first) {
-            if (ready < 4) {
+            if (ready < 6) {
                 turn(1.1);
                 timer.reset();
 
@@ -98,39 +104,22 @@ public class PowerShots extends Action {
     }
 
     void turn (double speedMultiplier) {
-        camOrientationPIDF.p = p;
-        camOrientationPIDF.i = i;
-        camOrientationPIDF.d = d;
-        camOrientationPIDF.kFF = f;
+        camOrientationPID.p = p;
+        camOrientationPID.i = i;
+        camOrientationPID.d = d;
+        camOrientationPID.maxIntegral = max;
 
         double turn = Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES) -
                 Math.toDegrees(Robot.getInstance().getMecanumDrive().angleFromAuton);
 
-        if (turn > 180) {
-            turn = turn - 360;
-        } else if (turn < -180) {
-            turn = turn + 360;
-        }
-        if (turn > 180) {
-            turn = turn - 360;
-        } else if (turn < -180) {
-            turn = turn + 360;
-        }
-        if (turn > 180) {
-            turn = turn - 360;
-        } else if (turn < -180) {
-            turn = turn + 360;
-        }
-        turn *= -1;
-
         double speed = 0;
-        if (Robot.getInstance().getCamera().getPosOfTarget().x == 1e10) {
-            camOrientationPIDF.update(turn, 20);
-            speed = CruiseLib.limitValue(camOrientationPIDF.getOutput(), -.05, -.6, .05, .6);
-        } else {
-            double camera = Math.abs(Robot.getInstance().getCamera().getPosOfTarget().x);
-            speed = 0.4266 * Math.pow(camera, 0.6031);
-            speed = speed * (Robot.getInstance().getCamera().getPosOfTarget().x / camera);
+        if (Robot.getInstance().getCamera().getPosOfTarget().x != 1e10) {
+            double camera = Robot.getInstance().getCamera().getPosOfTarget().x;
+            camOrientationPID.update(camera, 0);
+            speed = -CruiseLib.limitValue(camOrientationPID.getOutput(), -.12, -.6, .12, .6);
+        } else if (Math.abs(turn) > 25) {
+            camOrientationPID.update(turn, 20);
+            speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.05, -.6, .05, .6);
         }
 
         Robot.getInstance().getMecanumDrive().turnSpeed += (speed * speedMultiplier);
@@ -143,7 +132,7 @@ public class PowerShots extends Action {
 
     @Override
     public void done() {
-        Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.OFF);
+//        Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.DEFAULT);
         Robot.getInstance().getFlyWheel().psPower = false;
         Robot.getInstance().fwLock.setPosition(1);
     }

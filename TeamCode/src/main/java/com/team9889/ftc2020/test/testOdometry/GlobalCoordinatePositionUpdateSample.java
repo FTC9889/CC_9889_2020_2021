@@ -2,6 +2,7 @@ package com.team9889.ftc2020.test.testOdometry;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +16,7 @@ import com.team9889.ftc2020.subsystems.Robot;
  * Example OpMode that runs the GlobalCoordinatePosition thread and accesses the (x, y, theta) coordinate values
  */
 @TeleOp(name = "Global Coordinate Position Test", group = "Calibration")
+@Disabled
 public class GlobalCoordinatePositionUpdateSample extends LinearOpMode {
 
     DcMotor right_front, right_back, left_front, left_back;

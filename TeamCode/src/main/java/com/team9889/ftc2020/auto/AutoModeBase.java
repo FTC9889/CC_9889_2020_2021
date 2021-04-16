@@ -17,6 +17,7 @@ public abstract class AutoModeBase extends Team9889Linear {
 
     // Timer for autonomous
     protected ElapsedTime autoTimer = new ElapsedTime();
+    double lastLoop = 0;
 
     protected enum Side {
         RED, BLUE;
@@ -81,8 +82,15 @@ public abstract class AutoModeBase extends Team9889Linear {
 
         while (!action.isFinished() && opModeIsActive() && !isStopRequested()) {
             action.update();
+//            Robot.getMecanumDrive().setFieldCentricAutoPower(Robot.getMecanumDrive().xSpeed,
+//                    Robot.getMecanumDrive().ySpeed, Robot.getMecanumDrive().turnSpeed);
+            Robot.update();
             Robot.outputToTelemetry(telemetry);
             telemetry.update();
+            while (autoTimer.milliseconds() - lastLoop < 10) {
+
+            }
+            lastLoop = autoTimer.milliseconds();
         }
 
         if(opModeIsActive() && !isStopRequested()) {

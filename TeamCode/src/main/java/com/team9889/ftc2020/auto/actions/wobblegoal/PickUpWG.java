@@ -19,8 +19,8 @@ public class PickUpWG extends Action {
         if (timer.milliseconds() < 500) {
             Robot.getInstance().wgGrabber.setPosition(0.25);
         } else {
-            Robot.getInstance().wgLeft.setPosition(.8);
-            Robot.getInstance().wgRight.setPosition(.8);
+            Robot.getInstance().wgLeft.setPosition(.4);
+            Robot.getInstance().wgRight.setPosition(.4);
         }
     }
 

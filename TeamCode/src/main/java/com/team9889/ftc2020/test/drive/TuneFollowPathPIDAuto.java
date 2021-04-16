@@ -2,6 +2,7 @@ package com.team9889.ftc2020.test.drive;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.team9889.ftc2020.auto.AutoModeBase;
 //import com.team9889.ftc2020.auto.actions.drive.DriveFollowPath;
 import com.team9889.lib.control.Path;
@@ -15,6 +16,7 @@ import java.util.List;
  */
 
 @Autonomous
+@Disabled
 public class TuneFollowPathPIDAuto extends AutoModeBase {
     List<Path> path = new ArrayList<>();
     double p = -0.2, i = 0, d = -16;

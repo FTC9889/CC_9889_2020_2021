@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.team9889.ftc2020.auto.actions.Action;
+import com.team9889.ftc2020.auto.actions.ActionVariables;
 import com.team9889.ftc2020.subsystems.Robot;
 import com.team9889.lib.CruiseLib;
 import com.team9889.lib.control.Path;
@@ -24,8 +25,8 @@ public class DrivePurePursuit extends Action {
     int lineNum = 0;
 
     PurePursuit pp = new PurePursuit();
-    private PID xPID = new PID(0.05, 0, 1);
-    private PID yPID = new PID(0.1, 0, 1);
+    private PID xPID = new PID(0.1, 0, 1);
+    private PID yPID = new PID(0.2, 0, 1);
     private PID orientationPID = new PID(0.04, 0, 2.5);
 
     private int angleCounter = 0;
@@ -91,7 +92,7 @@ public class DrivePurePursuit extends Action {
                     point.y);
 //        }
 
-        Log.i("Line Number : ", "" + lineNum);
+        Robot.getInstance().actionVariables.driveNum = lineNum + 1;
 
         double wantedAngle;
         if (paths.get(lineNum + 1).getPose().getHeading() > 180){
@@ -113,7 +114,7 @@ public class DrivePurePursuit extends Action {
         double rotation = orientationPID.update(turn, 0);
 
         double maxPower = paths.get(lineNum + 1).getMaxVelocity();
-        Log.i("PID", "" + xPID.getError());
+        Log.i("PID", "" + xPID.getOutput());
         if (Math.abs(xPID.getError()) > paths.get(lineNum + 1).getTolerancePose().getX()) {
             xPower = CruiseLib.limitValue(xPower, -.25, -maxPower, .25, maxPower);
         } else {
@@ -134,7 +135,14 @@ public class DrivePurePursuit extends Action {
         lastPoint = point;
 
         Log.i("Powers : ", xPower + ", " + yPower + ", "+ rotation);
-        Robot.getInstance().getMecanumDrive().setFieldCentricAutoPower(-xPower, -yPower, rotation);
+        Robot.getInstance().getMecanumDrive().setFieldCentricAutoPower(-yPower, xPower, rotation);
+
+//        Robot.getInstance().getMecanumDrive().xSpeed += -yPower;
+//        Robot.getInstance().getMecanumDrive().ySpeed += xPower;
+
+//        if (paths.get(lineNum + 1).getPose().getHeading() != 1000) {
+//            Robot.getInstance().getMecanumDrive().turnSpeed += rotation;
+//        }
 
         Log.i("Pos", Robot.getInstance().getMecanumDrive().getCurrentPose() + "");
         Log.i("Adj Pos", Robot.getInstance().getMecanumDrive().getAdjustedPose() + "");

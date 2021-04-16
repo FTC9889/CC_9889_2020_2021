@@ -52,7 +52,7 @@ public class ScanForRS extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat input) {
-        Imgproc.rectangle(input, new Point(0, ((double) input.rows() / 4) * 3), new Point(input.cols(), input.rows()), new Scalar(0, 0, 0), -1);
+        Imgproc.rectangle(input, new Point(0, ((double) input.rows() / 5) * 4), new Point(input.cols(), input.rows()), new Scalar(0, 0, 0), -1);
         Imgproc.rectangle(input, new Point(0, 0), new Point(input.cols(), ((double) input.rows() / 3)), new Scalar(0, 0, 0), -1);
         Imgproc.rectangle(input, new Point(((double) input.cols() / 2), 0), new Point(input.cols(), input.rows()), new Scalar(0, 0, 0), -1);
 

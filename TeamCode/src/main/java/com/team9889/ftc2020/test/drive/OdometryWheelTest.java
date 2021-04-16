@@ -1,6 +1,7 @@
 package com.team9889.ftc2020.test.drive;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.team9889.ftc2020.auto.AutoModeBase;
 import com.team9889.lib.control.Path;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * Created by joshua9889 on 12/24/2019.
  */
 @Autonomous(group = "Test")
-//@Disabled
+@Disabled
 public class OdometryWheelTest extends AutoModeBase {
     @Override
     public void run(Side side, Boxes box) {

@@ -11,7 +11,7 @@ public class Intake extends Subsystem {
     @Override
     public void init(boolean auto) {
         if (auto) {
-            Robot.getInstance().leftArm.setPosition(1);
+            Robot.getInstance().leftArm.setPosition(0);
             Robot.getInstance().rightArm.setPosition(1);
         }
     }
