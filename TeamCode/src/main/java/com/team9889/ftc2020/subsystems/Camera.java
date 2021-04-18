@@ -132,7 +132,7 @@ public class Camera extends Subsystem{
 
     public void setGoalCamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.485);
+        Robot.getInstance().xCam.setPosition(.478);
 
 //        camYPose += cameraY.update(getPosOfTarget().y, 0);
 //        CruiseLib.limitValue(camYPose, 1, 0);
@@ -142,7 +142,7 @@ public class Camera extends Subsystem{
 
     public void setPS1CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.54);
+        Robot.getInstance().xCam.setPosition(.538);
         Robot.getInstance().yCam.setPosition(.7);
     }
 
@@ -160,7 +160,7 @@ public class Camera extends Subsystem{
 
     public void setPS1CamPosAuto () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.51);
+        Robot.getInstance().xCam.setPosition(.534);
         Robot.getInstance().yCam.setPosition(.7);
     }
 

@@ -24,9 +24,9 @@ public class FlyWheel extends Subsystem{
         OFF, POWERSHOT1, POWERSHOT2, POWERSHOT3, POWERSHOTAUTO1, POWERSHOTAUTO2, DEFAULT
     }
 
-    public static double P = 125, I = 0, D = 10.5, F = .15;
-    public static int ps1 = 1180, ps2 = 1185, ps3 = 1190;
-    public PIDF pid = new PIDF(0.0008, 0, 0.04, .15);
+    public static double P = 81, I = 0, D = 1, F = 0;
+    public static int ps1 = 1260, ps2 = 1260, ps3 = 1260;
+    public PIDF pid = new PIDF(81, 0, 1, 0);
 
     public boolean done = false;
 
@@ -62,7 +62,7 @@ public class FlyWheel extends Subsystem{
     public void setMode(Mode mode) {
         switch (mode) {
             case OFF:
-                setRPM(0);
+                Robot.getInstance().flyWheel.motor.setVelocity(0);
                 break;
             case DEFAULT:
                 setRPM(2540);
@@ -84,8 +84,8 @@ public class FlyWheel extends Subsystem{
     }
 
     public void setRPM(double rpm) {
-//        pid.update(Robot.getInstance().flyWheel.getVelocity(), rpm);
-//
+        pid.update(Robot.getInstance().flyWheel.getVelocity(), rpm);
+
         Robot.getInstance().flyWheel.motor.setVelocity(rpm);
     }
 

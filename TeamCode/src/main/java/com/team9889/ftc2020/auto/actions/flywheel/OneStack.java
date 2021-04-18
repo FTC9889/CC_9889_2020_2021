@@ -33,17 +33,17 @@ public class OneStack extends Action {
             double dist = 37.852 * Math.exp(0.0192 * Robot.getInstance().getCamera().scanForGoal.getPointInPixels().y);
             double rpm = (3.06 * dist) + 1041;
 
-            Robot.getInstance().getFlyWheel().setRPM(1320);
+            Robot.getInstance().getFlyWheel().setRPM(1410);
         }
 
         if (totalTimer.milliseconds() > 2000) {
             Robot.getInstance().update();
             if (shootTimer.milliseconds() > 500) {
                 if (extend) {
-                    Robot.getInstance().fwArm.setPosition(0.45);
+                    Robot.getInstance().fwArm.setPosition(0.5);
                     extend = false;
                 } else {
-                    Robot.getInstance().fwArm.setPosition(1);
+                    Robot.getInstance().fwArm.setPosition(.65);
                     extend = true;
                 }
 

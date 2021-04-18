@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.team9889.ftc2020.Constants;
 import com.team9889.ftc2020.auto.actions.ActionVariables;
@@ -56,6 +57,8 @@ public class Robot{
     public HardwareMap hardwareMap;
 
     public ActionVariables actionVariables = new ActionVariables();
+
+    public double result = Double.POSITIVE_INFINITY;
 
     private static Robot mInstance = null;
 
@@ -154,6 +157,13 @@ public class Robot{
         for (Subsystem subsystem : subsystems)
             subsystem.update();
 
+        result = Double.POSITIVE_INFINITY;
+        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+            double voltage = sensor.getVoltage();
+            if (voltage > 0){
+                result = Math.min(result, voltage);
+            }
+        }
     }
 
     // Output Telemetry for all subsystems

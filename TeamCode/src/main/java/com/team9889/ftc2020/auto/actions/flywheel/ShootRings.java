@@ -51,11 +51,11 @@ public class ShootRings extends Action {
     public void update() {
         if (totalTimer.milliseconds() > time && shootTimer.milliseconds() > 150) {
             if (extend) {
-                Robot.getInstance().fwArm.setPosition(0.45);
+                Robot.getInstance().fwArm.setPosition(0.5);
                 extend = false;
                 ringsShot++;
             } else {
-                Robot.getInstance().fwArm.setPosition(1);
+                Robot.getInstance().fwArm.setPosition(.65);
                 extend = true;
             }
 

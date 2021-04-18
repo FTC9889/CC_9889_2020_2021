@@ -183,6 +183,7 @@ public class MecanumDrive extends Subsystem {
         double xMod = x * Math.cos(angle - angleFromAuto) - y * Math.sin(angle - angleFromAuto);
         double yMod = x * Math.sin(angle - angleFromAuto) + y * Math.cos(angle - angleFromAuto);
 
+        Log.v("Drive", "X:" + xMod + "Y:" + yMod + "Rotation:" + rotation);
         setPower(xMod, yMod, rotation);
     }
 

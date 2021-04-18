@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
 public class PowerShots extends Action {
-    public static double p = .65, i = 0, d = 10, max = 0;
+    public static double p = .75, i = 0, d = 10, max = 0;
 
     private PIDF camOrientationPID = new PIDF(1, 0, 8, 100);
 
@@ -41,18 +41,18 @@ public class PowerShots extends Action {
 
         if (first && beginning.milliseconds() > 600) {
             if (ready < 5) {
-                turn(1);
                 timer.reset();
 
                 if (Math.abs(Robot.getInstance().getCamera().getPosOfTarget().x) < 0.05) {
                     ready++;
                 } else {
+                    turn(1);
                     ready = 0;
                 }
             } else {
                 if (timer.milliseconds() < 200) {
                     Robot.getInstance().getCamera().setPS2CamPos();
-                    Robot.getInstance().fwArm.setPosition(1);
+                    Robot.getInstance().fwArm.setPosition(.65);
                 } else {
                     num = 2;
                     ready = 0;
@@ -62,19 +62,19 @@ public class PowerShots extends Action {
             }
         } else if (num == 2 && !first) {
             if (ready < 6) {
-                turn(1.2);
                 timer.reset();
 
                 if (Math.abs(Robot.getInstance().getCamera().getPosOfTarget().x) < 0.05) {
                     ready++;
                 } else {
+                    turn(1.2);
                     ready = 0;
                 }
             } else {
                 if (timer.milliseconds() < 200) {
                     Robot.getInstance().getCamera().setPS3CamPos();
                     Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOT3);
-                    Robot.getInstance().fwArm.setPosition(1);
+                    Robot.getInstance().fwArm.setPosition(.65);
                 } else {
                     num = 3;
                     ready = 0;
@@ -83,17 +83,17 @@ public class PowerShots extends Action {
             }
         } else if (!first) {
             if (ready < 6) {
-                turn(1.1);
                 timer.reset();
 
                 if (Math.abs(Robot.getInstance().getCamera().getPosOfTarget().x) < 0.05) {
                     ready++;
                 } else {
+                    turn(1.1);
                     ready = 0;
                 }
             } else {
                 if (timer.milliseconds() < 200) {
-                    Robot.getInstance().fwArm.setPosition(1);
+                    Robot.getInstance().fwArm.setPosition(.65);
                 } else {
                     num = 4;
                     ready = 0;
@@ -116,7 +116,7 @@ public class PowerShots extends Action {
         if (Robot.getInstance().getCamera().getPosOfTarget().x != 1e10) {
             double camera = Robot.getInstance().getCamera().getPosOfTarget().x;
             camOrientationPID.update(camera, 0);
-            speed = -CruiseLib.limitValue(camOrientationPID.getOutput(), -.12, -.6, .12, .6);
+            speed = -CruiseLib.limitValue(camOrientationPID.getOutput() / 1.2, -.12, -.6, .12, .6);
         } else if (Math.abs(turn) > 25) {
             camOrientationPID.update(turn, 20);
             speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.05, -.6, .05, .6);

@@ -35,7 +35,7 @@ public class Stack extends Action {
             double dist = 37.852 * Math.exp(0.0192 * Robot.getInstance().getCamera().scanForGoal.getPointInPixels().y);
             double rpm = (3.06 * dist) + 1041;
 
-            Robot.getInstance().getFlyWheel().setRPM(rpm * 1.025);
+            Robot.getInstance().getFlyWheel().setRPM(rpm * 1.09);
         }
 
         if (totalTimer.milliseconds() > 2000) {

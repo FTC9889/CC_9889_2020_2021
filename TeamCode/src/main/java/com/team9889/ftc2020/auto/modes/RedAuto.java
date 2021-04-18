@@ -48,9 +48,9 @@ public class RedAuto extends AutoModeBase {
 //        ThreadAction(new PowerShotsAuto(3));
 
         runAction(new DrivePurePursuit(new ArrayList<Path>(){{
-            add(new Path(new Pose2d(51, 0, 0),
+            add(new Path(new Pose2d(49, 0, 0),
                     defaultTolerance, 8, 1));
-            add(new Path(new Pose2d(52, -5, 0),
+            add(new Path(new Pose2d(50, -5, 0),
                     defaultTolerance, 8, 1));
 //            add(new Path(new Pose2d(20, 0, 0),
 //                    defaultTolerance, 8, 1));
@@ -81,7 +81,7 @@ public class RedAuto extends AutoModeBase {
                 runAction(new DrivePurePursuit(new ArrayList<Path>(){{
                     add(new Path(new Pose2d(60, -22, 0),
                             defaultTolerance, 8, 1));
-                    add(new Path(new Pose2d(40, -22, -3),
+                    add(new Path(new Pose2d(40, -22, -1),
                             new Pose2d(2, 2, 3), 8, .8));
                 }}));
 
@@ -101,7 +101,7 @@ public class RedAuto extends AutoModeBase {
                 runAction(new DrivePurePursuit(new ArrayList<Path>(){{
                     add(new Path(new Pose2d(65, -20, 0),
                             defaultTolerance, 8, 1));
-                    add(new Path(new Pose2d(30, -20, -4),
+                    add(new Path(new Pose2d(30, -20, -1),
                             new Pose2d(2, 2, 3), 8, .18));
                 }}));
 
@@ -110,7 +110,7 @@ public class RedAuto extends AutoModeBase {
                 }
 
                 runAction(new DrivePurePursuit(new ArrayList<Path>(){{
-                    add(new Path(new Pose2d(108, -38, 0),
+                    add(new Path(new Pose2d(110, -38, 0),
                             defaultTolerance, 8, 1));
                 }}));
                 break;
@@ -120,16 +120,16 @@ public class RedAuto extends AutoModeBase {
         Robot.getIntake().SetFrontIntakePower(0);
 
         Robot.autoWG.setPosition(.75);
-        runAction(new Wait(1000));
+        runAction(new Wait(500));
 
         ThreadAction(new PutDownWG());
 
         runAction(new DrivePurePursuit(new ArrayList<Path>(){{
-            add(new Path(new Pose2d(35, -32, 0),
-                    defaultTolerance, 8, 1));
+            add(new Path(new Pose2d(40, -32, 0),
+                    defaultTolerance, 20, 1));
         }}));
         runAction(new DrivePurePursuit(new ArrayList<Path>(){{
-            add(new Path(new Pose2d(29, -32, 0),
+            add(new Path(new Pose2d(29.5, -33, 0),
                 defaultTolerance, 8, .3));
         }}));
 
@@ -138,7 +138,7 @@ public class RedAuto extends AutoModeBase {
         switch (box) {
             case CLOSE:
                 runAction(new DrivePurePursuit(new ArrayList<Path>() {{
-                    add(new Path(new Pose2d(50, -30, -150),
+                    add(new Path(new Pose2d(52, -30, -150),
                             defaultTolerance, 8, 1));
                 }}));
 
@@ -157,12 +157,12 @@ public class RedAuto extends AutoModeBase {
                             defaultTolerance, 8, 1));
                     add(new Path(new Pose2d(90, -10, 0),
                             defaultTolerance, 8, 1));
-                    add(new Path(new Pose2d(110, -38, 0),
+                    add(new Path(new Pose2d(110, -20, 0),
                             defaultTolerance, 8, 1));
                 }}));
 
                 runAction(new DrivePurePursuit(new ArrayList<Path>(){{
-                    add(new Path(new Pose2d(118, 10, -60),
+                    add(new Path(new Pose2d(119, 10, -60),
                             defaultTolerance, 8, 1));
                 }}));
 
@@ -173,7 +173,7 @@ public class RedAuto extends AutoModeBase {
                             defaultTolerance, 8, .8));
                 }}));
 
-                runAction(new ShootRings(4, 800, telemetry, 1250));
+                runAction(new ShootRings(2, 800, telemetry, 1360));
                 break;
 
             case MIDDLE:
@@ -198,7 +198,7 @@ public class RedAuto extends AutoModeBase {
                             new Pose2d(5, 5, 5), 8, 1));
                 }}));
                 runAction(new DrivePurePursuit(new ArrayList<Path>() {{
-                    add(new Path(new Pose2d(100, -30, -150),
+                    add(new Path(new Pose2d(100, -25, -150),
                             defaultTolerance, 8, 1));
                 }}));
 
@@ -214,6 +214,7 @@ public class RedAuto extends AutoModeBase {
         }
 
         Robot.leftArm.setPosition(1);
+        Robot.rightArm.setPosition(0);
 
 
 //        runAction(new Wait(500));
