@@ -70,7 +70,7 @@ public class DriverStation {
     private boolean fwToggle = true;
     private boolean fwOn = false;
     boolean getFW() {
-        if(gamepad1.right_trigger > 0.1 && fwToggle) {
+        if(gamepad1.right_trigger > 0.3 && fwToggle) {
             fwOn = !fwOn;
             fwToggle = false;
         } else if(gamepad1.right_trigger <= 0.1)

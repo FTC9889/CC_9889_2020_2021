@@ -26,7 +26,7 @@ public class PID extends FeedBackController {
     public double p, i, d;
 
     public double error_prior;
-    private double integral;
+    private double integral = 0;
     private double lastTime = 0;
     double output;
     public double maxIntegral = 0;
@@ -60,7 +60,7 @@ public class PID extends FeedBackController {
             Log.i("Time", currentTime + "");
 
             integral = integral + (error *currentTime);
-            if (integral > maxIntegral)
+            if (integral > maxIntegral || i == 0)
                 integral = 0;
             if (currentTime != 0)
                 derivative = (error - error_prior)/currentTime;

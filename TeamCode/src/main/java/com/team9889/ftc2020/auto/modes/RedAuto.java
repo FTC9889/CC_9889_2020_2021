@@ -101,11 +101,11 @@ public class RedAuto extends AutoModeBase {
                 runAction(new DrivePurePursuit(new ArrayList<Path>(){{
                     add(new Path(new Pose2d(65, -20, 0),
                             defaultTolerance, 8, 1));
-                    add(new Path(new Pose2d(30, -20, -1),
+                    add(new Path(new Pose2d(30, -20, 0),
                             new Pose2d(2, 2, 3), 8, .18));
                 }}));
 
-                while (!Robot.getFlyWheel().done) {
+                while (!Robot.getFlyWheel().done && opModeIsActive()) {
 
                 }
 
@@ -126,7 +126,7 @@ public class RedAuto extends AutoModeBase {
 
         runAction(new DrivePurePursuit(new ArrayList<Path>(){{
             add(new Path(new Pose2d(40, -32, 0),
-                    defaultTolerance, 20, 1));
+                    new Pose2d(3, 3, 3), 20, 1));
         }}));
         runAction(new DrivePurePursuit(new ArrayList<Path>(){{
             add(new Path(new Pose2d(29.5, -33, 0),

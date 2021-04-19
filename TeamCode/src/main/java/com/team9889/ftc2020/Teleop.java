@@ -28,7 +28,7 @@ import java.util.ArrayList;
 @Config
 public class Teleop extends Team9889Linear {
     public static double x = 103, y = 42, ay = 19.58, ax = 2.603092035700193, multiplier = 1.03;
-    public static int timeToWait = 150;
+    public static int timeToWait = 250;
 
     double setRpm = 0;
 
@@ -51,7 +51,7 @@ public class Teleop extends Team9889Linear {
 
     private PID orientationPID = new PID(1, 0, 100);
 
-    public static double rpm = 1240, rpm12 = 1350, rpm11 = 1370, rpm10 = 1380;
+    public static double rpm = 1240, rpm12 = 1370, rpm11 = 1380, rpm10 = 1390;
 
     boolean wgInPos = false;
     boolean wgFirst = true;
@@ -90,7 +90,7 @@ public class Teleop extends Team9889Linear {
                 dist = 37.852 * Math.exp(0.0192 * Robot.getCamera().scanForGoal.getPointInPixels().y);
             }
 
-            if (gamepad2.right_trigger > .1 && !shooting) {
+            if (gamepad2.left_bumper && !shooting) {
 //                rpm = ((3.06 * dist) + 1041) * multiplier;
 
                 if (Robot.getCamera().currentCamState != Camera.CameraStates.GOAL) {
@@ -126,16 +126,16 @@ public class Teleop extends Team9889Linear {
                     drive.update();
                 }
 
-                if (Math.abs(Robot.getCamera().getPosOfTarget().x) < .1) {
-                    if (readyCount >= 3) {
-                        Robot.wgGrabber.setPosition(.75);
-                    } else {
-                        Robot.wgGrabber.setPosition(.25);
-                    }
-                    readyCount++;
-                } else {
-                    readyCount = 0;
-                }
+//                if (Math.abs(Robot.getCamera().getPosOfTarget().x) < .1) {
+//                    if (readyCount >= 3) {
+//                        Robot.wgGrabber.setPosition(.75);
+//                    } else {
+//                        Robot.wgGrabber.setPosition(.25);
+//                    }
+//                    readyCount++;
+//                } else {
+//                    readyCount = 0;
+//                }
 
                 autoAimreleased = true;
             } else if (autoAimreleased) {
@@ -152,7 +152,7 @@ public class Teleop extends Team9889Linear {
 
                 if (gamepad1.dpad_right) {
                     if (psFirst) {
-                        ps = new PowerShots();
+                        ps = new PowerShots(telemetry);
                         ps.start();
 
                         psFirst = false;
@@ -196,9 +196,9 @@ public class Teleop extends Team9889Linear {
                     Robot.getFlyWheel().psPower = false;
                 }
 
-                if (Robot.getFlyWheel().psPower) {
-                    timeToWait = 200;
-                }
+//                if (Robot.getFlyWheel().psPower) {
+//                    timeToWait = 200;
+//                }
 
                 if (Math.abs(Robot.getCamera().getPosOfTarget().x) < 0.1) {
                     ready++;
@@ -220,7 +220,7 @@ public class Teleop extends Team9889Linear {
 
                             armTimer.reset();
                         }
-                    } else if ((gamepad1.right_bumper || (gamepad2.right_trigger > .1 &&
+                    } else if ((gamepad1.right_bumper || (gamepad2.left_bumper &&
                             ready > 5)) && on) {
                         Robot.fwLock.setPosition(.4);
                         if (armTimer.milliseconds() > timeToWait) {

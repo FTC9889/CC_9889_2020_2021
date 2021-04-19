@@ -8,6 +8,7 @@ import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.FlyWheel;
 import com.team9889.ftc2020.subsystems.Robot;
 import com.team9889.lib.CruiseLib;
+import com.team9889.lib.control.controllers.PID;
 import com.team9889.lib.control.controllers.PIDF;
 import com.vuforia.ar.pl.DebugLog;
 
@@ -20,9 +21,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @Config
 public class PowerShotsAuto extends Action {
 
-    public static double p = .75, i = 0, d = 10, max = 0;
+    public static double p = 1.4, i = 0.0001, d = 100, max = 1000;
 
-    private PIDF camOrientationPID = new PIDF(1, 0, 8, 100);
+    private PID camOrientationPID = new PID(1, 0, 8, 100);
 
     boolean first = true;
     int num = 1, ready = 0;
@@ -51,7 +52,7 @@ public class PowerShotsAuto extends Action {
                     Robot.getInstance().getMecanumDrive().setFieldCentricAutoPower(0, 0, 0);
                     ready++;
                 } else {
-                    turn(1.2);
+                    turn(1);
                     ready = 0;
                 }
             } else {
@@ -62,6 +63,7 @@ public class PowerShotsAuto extends Action {
                     num = 2;
                     ready = 0;
                     first = false;
+                    PID camOrientationPID = new PID(0, 0, 0, 0);
                     Robot.getInstance().fwArm.setPosition(0.5);
                 }
             }
@@ -84,6 +86,7 @@ public class PowerShotsAuto extends Action {
                 } else {
                     num = 3;
                     ready = 0;
+                    PID camOrientationPID = new PID(0, 0, 0, 0);
                     Robot.getInstance().fwArm.setPosition(0.5);
                 }
             }
@@ -95,7 +98,7 @@ public class PowerShotsAuto extends Action {
                     Robot.getInstance().getMecanumDrive().setFieldCentricAutoPower(0, 0, 0);
                     ready++;
                 } else {
-                    turn(1.2);
+                    turn(1.1);
                     ready = 0;
                 }
             } else {
@@ -104,6 +107,7 @@ public class PowerShotsAuto extends Action {
                 } else {
                     num = 4;
                     ready = 0;
+                    PID camOrientationPID = new PID(0, 0, 0, 0);
                     Robot.getInstance().fwArm.setPosition(0.5);
                 }
             }
@@ -123,7 +127,7 @@ public class PowerShotsAuto extends Action {
         if (Robot.getInstance().getCamera().getPosOfTarget().x != 1e10) {
             double camera = Robot.getInstance().getCamera().getPosOfTarget().x;
             camOrientationPID.update(camera, 0);
-            speed = -CruiseLib.limitValue(camOrientationPID.getOutput() / 1.2, -.1, -.6, .1, .6);
+            speed = -CruiseLib.limitValue(camOrientationPID.getOutput() / 1.2, -0.1, -.18, 0.1, .18);
         } if (Math.abs(turn) > 25) {
             camOrientationPID.update(turn, 20);
             speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.05, -.6, .05, .6);
