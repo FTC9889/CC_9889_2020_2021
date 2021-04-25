@@ -21,11 +21,11 @@ import java.util.Arrays;
 @Config
 public class FlyWheel extends Subsystem{
     public enum Mode {
-        OFF, POWERSHOT1, POWERSHOT2, POWERSHOT3, POWERSHOTAUTO1, POWERSHOTAUTO2, DEFAULT
+        OFF, POWERSHOT1, POWERSHOT2, POWERSHOT3, POWERSHOTAUTO1, POWERSHOTAUTO2, POWERSHOTAUTO3, DEFAULT
     }
 
-    public static double P = 81, I = 0, D = 1.5, F = 0;
-    public static int ps1 = 1260, ps2 = 1260, ps3 = 1260;
+    public static double P = 115, I = 0, D = 1.5, F = 0;
+    public static int ps1 = 1215, ps2 = 1160, ps3 = 1120;
     public PIDF pid = new PIDF(81, 0, 1, 0);
 
     public boolean done = false;
@@ -77,9 +77,11 @@ public class FlyWheel extends Subsystem{
                 setRPM(ps3);
                 break;
             case POWERSHOTAUTO1:
-                setRPM(ps1 + 70);
+                setRPM(ps1 + 100);
             case POWERSHOTAUTO2:
-                setRPM(ps1 + 50);
+                setRPM(ps2 + 65);
+            case POWERSHOTAUTO3:
+                setRPM(ps3 + 80);
         }
     }
 

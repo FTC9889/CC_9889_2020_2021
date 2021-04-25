@@ -31,16 +31,33 @@ public class Stack extends Action {
     public void update() {
 //        Robot.getInstance().getFlyWheel().setRPM((-12 * Robot.getInstance().getMecanumDrive().getAdjustedPose().getX()) + 1660);
 
-        if (shootTimer.milliseconds() > 380 && shootTimer.milliseconds() < 450) {
-            double dist = 37.852 * Math.exp(0.0192 * Robot.getInstance().getCamera().scanForGoal.getPointInPixels().y);
-            double rpm = (3.06 * dist) + 1041;
+//        if (shootTimer.milliseconds() > 380 && shootTimer.milliseconds() < 450) {
+//            double dist = 37.852 * Math.exp(0.0192 * Robot.getInstance().getCamera().scanForGoal.getPointInPixels().y);
+//            double rpm = (3.06 * dist) + 1041;
+//
+//            Robot.getInstance().getFlyWheel().setRPM(rpm * 1.1);
+//        }
 
-            Robot.getInstance().getFlyWheel().setRPM(rpm * 1.1);
+        double rpm;
+        if (Robot.getInstance().getMecanumDrive().x > 45) {
+            rpm = 1305;
+        } else if (Robot.getInstance().getMecanumDrive().x <= 45 && Robot.getInstance().getMecanumDrive().x > 40) {
+            rpm = 1315;
+        } else if (Robot.getInstance().getMecanumDrive().x <= 40 && Robot.getInstance().getMecanumDrive().x > 35) {
+            rpm = 1330;
+        } else if (Robot.getInstance().getMecanumDrive().x <= 35 && Robot.getInstance().getMecanumDrive().x > 30) {
+            rpm = 1360;
+        } else if (Robot.getInstance().getMecanumDrive().x <= 35 && Robot.getInstance().getMecanumDrive().x > 30) {
+            rpm = 1365;
+        } else {
+            rpm = 1365;
         }
+
+        Robot.getInstance().getFlyWheel().setRPM(rpm);
 
         if (totalTimer.milliseconds() > 2000) {
             Robot.getInstance().update();
-            if (shootTimer.milliseconds() > 500) {
+            if (shootTimer.milliseconds() > 200) {
                 if (extend) {
                     Robot.getInstance().fwArm.setPosition(0.45);
                     extend = false;

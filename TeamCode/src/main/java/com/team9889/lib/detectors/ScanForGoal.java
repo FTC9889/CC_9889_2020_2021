@@ -31,7 +31,7 @@ public class ScanForGoal extends OpenCvPipeline {
 
     public static double h1 = 50, h2 = 130, s1 = 50, s2 = 130, v1 = 150, v2 = 255,
             h3 = 200, h4 = 255, s3 = 0, s4 = 255, v3 = 0, v4 = 255,
-            filterContoursMinArea = 0, filterContoursMinPerimeter = 20,
+            filterContoursMinArea = 0, filterContoursMinPerimeter = 50,
             filterContoursMinWidth = 0, filterContoursMinHeight = 0;
 
     boolean debug = false;

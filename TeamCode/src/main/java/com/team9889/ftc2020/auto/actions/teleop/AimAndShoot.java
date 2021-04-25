@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 @Config
 public class AimAndShoot extends Action {
-    public static double p = .7, i = 0, d = 40, f = 0;
+    public static double p = .6, i = 0, d = 60, f = 0;
     public static double multiplier, multiplier12 = .95, multiplier11 = 1, multiplier10 = 1.05;
 //    public static double p = .5, i, d = 0;
 
@@ -67,8 +67,8 @@ public class AimAndShoot extends Action {
         camOrientationPID.d = d;
         camOrientationPID.maxIntegral = f;
 
-        double turn = Robot.getInstance().getMecanumDrive().getAdjustedPose().getHeading() -
-                Math.toDegrees(Robot.getInstance().getMecanumDrive().angleFromAuton);
+        double turn = Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.RADIANS) -
+                Robot.getInstance().getMecanumDrive().angleFromAuton;
 
         double camera = Robot.getInstance().getCamera().getPosOfTarget().x;
         double speed = 0;
@@ -80,9 +80,10 @@ public class AimAndShoot extends Action {
 //            } else {
 //                speed = (camera / Math.abs(camera)) * .25;
 //            }
-        } else if (Math.abs(turn) > 5) {
-            camOrientationPID.update(turn / 20, 0);
-            speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.05, -.6, .05, .6);
+        } else if (Math.abs(turn) > Math.toRadians(5)) {
+            camOrientationPID.update(turn * 1.3, 0);
+            Log.v("Turn", turn + "");
+            speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.05, -1, .05, 1);
         }
 
         Robot.getInstance().getMecanumDrive().turnSpeed += (speed);

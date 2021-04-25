@@ -21,7 +21,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @Config
 public class PowerShotsAuto extends Action {
 
-    public static double p = 1.4, i = 0.0001, d = 100, max = 1000;
+    public static double p = 1.6, i = 0.0001, d = 100, max = 1000;
 
     private PID camOrientationPID = new PID(1, 0, 8, 100);
 
@@ -33,7 +33,7 @@ public class PowerShotsAuto extends Action {
     public void start() {
         Robot.getInstance().getCamera().setPS1CamPos();
         Robot.getInstance().getCamera().setScanForGoal();
-        Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOT1);
+        Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOTAUTO1);
         Robot.getInstance().getFlyWheel().psPower = true;
         Robot.getInstance().fwLock.setPosition(.4);
 
@@ -64,6 +64,7 @@ public class PowerShotsAuto extends Action {
                     ready = 0;
                     first = false;
                     PID camOrientationPID = new PID(0, 0, 0, 0);
+                    Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOTAUTO2);
                     Robot.getInstance().fwArm.setPosition(0.5);
                 }
             }
@@ -81,12 +82,12 @@ public class PowerShotsAuto extends Action {
             } else {
                 if (timer.milliseconds() < 200) {
                     Robot.getInstance().getCamera().setPS3CamPos();
-                    Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOT3);
                     Robot.getInstance().fwArm.setPosition(.65);
                 } else {
                     num = 3;
                     ready = 0;
                     PID camOrientationPID = new PID(0, 0, 0, 0);
+                    Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOTAUTO3);
                     Robot.getInstance().fwArm.setPosition(0.5);
                 }
             }

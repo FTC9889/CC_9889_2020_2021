@@ -125,13 +125,15 @@ public class RedAuto extends AutoModeBase {
         ThreadAction(new PutDownWG());
 
         runAction(new DrivePurePursuit(new ArrayList<Path>(){{
-            add(new Path(new Pose2d(40, -32, 0),
-                    new Pose2d(3, 3, 3), 20, 1));
+            add(new Path(new Pose2d(40, -38, 0),
+                    new Pose2d(4, 4, 3), 8, 1));
+            add(new Path(new Pose2d(33, -34, 0),
+                    new Pose2d(4, 4, 3), 20, .7));
         }}));
-        runAction(new DrivePurePursuit(new ArrayList<Path>(){{
-            add(new Path(new Pose2d(29.5, -33, 0),
-                defaultTolerance, 8, .3));
-        }}));
+//        runAction(new DrivePurePursuit(new ArrayList<Path>(){{
+//            add(new Path(new Pose2d(29.5, -33, 0),
+//                defaultTolerance, 8, .3));
+//        }}));
 
         runAction(new PickUpWG());
 
@@ -198,7 +200,7 @@ public class RedAuto extends AutoModeBase {
                             new Pose2d(5, 5, 5), 8, 1));
                 }}));
                 runAction(new DrivePurePursuit(new ArrayList<Path>() {{
-                    add(new Path(new Pose2d(100, -25, -150),
+                    add(new Path(new Pose2d(100, -30, -150),
                             defaultTolerance, 8, 1));
                 }}));
 
