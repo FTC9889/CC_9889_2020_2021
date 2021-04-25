@@ -1,8 +1,5 @@
 package com.team9889.ftc2020.subsystems;
 
-import android.util.Log;
-
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -18,7 +15,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvInternalCamera2;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.RevBulkData;
 
@@ -58,7 +54,7 @@ public class Robot{
 
     public ActionVariables actionVariables = new ActionVariables();
 
-    public double result = Double.POSITIVE_INFINITY;
+    public double minCurrentVoltage = Double.POSITIVE_INFINITY;
 
     private static Robot mInstance = null;
 
@@ -94,6 +90,10 @@ public class Robot{
         webcam = hardwareMap.get(WebcamName.class, Constants.kWebcam);
         camera = OpenCvCameraFactory.getInstance().createWebcam(webcam);
 
+        // Camera servos
+        xCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraXId);
+        yCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraYId);
+
         // Drive
         fLDrive = new Motor(hardwareMap, Constants.DriveConstants.kLeftDriveMasterId, 1,
                 DcMotorSimple.Direction.FORWARD, true, true, true);
@@ -114,6 +114,7 @@ public class Robot{
 
         leftArm = hardwareMap.get(Servo.class, Constants.IntakeConstants.kLeftArm);
         rightArm = hardwareMap.get(Servo.class, Constants.IntakeConstants.kRightArm);
+        leftArm.setDirection(Servo.Direction.REVERSE);
 
         ringDetector = hardwareMap.get(DistanceSensor.class, Constants.IntakeConstants.kRingDetector);
 
@@ -124,15 +125,14 @@ public class Robot{
         fwArm = hardwareMap.get(Servo.class, Constants.LiftConstants.kFWArm);
         fwLock = hardwareMap.get(Servo.class, Constants.LiftConstants.kFWLock);
 
+        // Wobble Goal Grabber
         wgGrabber = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGGrabber);
         wgLeft = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGLeft);
         wgLeft.setDirection(Servo.Direction.REVERSE);
         wgRight = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGRight);
         autoWG = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kAutoWG);
 
-        xCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraXId);
-        yCam = hardwareMap.get(Servo.class, Constants.CameraConstants.kCameraYId);
-
+        // IMU
         imu = new RevIMU("imu1", hardwareMap);
 
         // Init all subsystems
@@ -157,11 +157,12 @@ public class Robot{
         for (Subsystem subsystem : subsystems)
             subsystem.update();
 
-        result = Double.POSITIVE_INFINITY;
+        // TODO: Perhaps only read one voltage sensor, less read time
+        minCurrentVoltage = Double.POSITIVE_INFINITY;
         for (VoltageSensor sensor : hardwareMap.voltageSensor) {
             double voltage = sensor.getVoltage();
             if (voltage > 0){
-                result = Math.min(result, voltage);
+                minCurrentVoltage = Math.min(minCurrentVoltage, voltage);
             }
         }
     }
@@ -170,7 +171,6 @@ public class Robot{
     public void outputToTelemetry(Telemetry telemetry) {
         for (Subsystem subsystem : subsystems)
             subsystem.outputToTelemetry(telemetry);
-
     }
 
     // Stop all subsystems

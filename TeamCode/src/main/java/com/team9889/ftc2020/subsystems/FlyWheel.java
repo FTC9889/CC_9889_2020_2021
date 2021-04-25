@@ -3,6 +3,7 @@ package com.team9889.ftc2020.subsystems;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.lib.CruiseLib;
 import com.team9889.lib.android.FileReader;
 import com.team9889.lib.android.FileWriter;
@@ -24,6 +25,10 @@ public class FlyWheel extends Subsystem{
         OFF, POWERSHOT1, POWERSHOT2, POWERSHOT3, POWERSHOTAUTO1, POWERSHOTAUTO2, POWERSHOTAUTO3, DEFAULT
     }
 
+    public enum RingStop {
+        Closed, Open
+    }
+
     public static double P = 115, I = 0, D = 1.5, F = 0;
     public static int ps1 = 1215, ps2 = 1160, ps3 = 1120;
     public PIDF pid = new PIDF(81, 0, 1, 0);
@@ -32,12 +37,14 @@ public class FlyWheel extends Subsystem{
 
     public boolean psPower = false;
 
+    private double targetVelocity = 0;
+
     @Override
     public void init(boolean auto) {
-        Robot.getInstance().flyWheel.motor.setVelocityPIDFCoefficients(P, I, D, F);
+        updatePIDF(P, I, D, F);
 
         if (auto) {
-            Robot.getInstance().fwLock.setPosition(1);
+            setLockState(RingStop.Closed);
         }
     }
 
@@ -51,18 +58,18 @@ public class FlyWheel extends Subsystem{
         pid.d = D;
         pid.kFF = F;
 
-        Robot.getInstance().flyWheel.motor.setVelocityPIDFCoefficients(P, I, D, F);
+        updatePIDF(P, I, D, F);
     }
 
     @Override
     public void stop() {
-        Robot.getInstance().flyWheel.setPower(0);
+        setMode(Mode.OFF);
     }
 
     public void setMode(Mode mode) {
         switch (mode) {
             case OFF:
-                Robot.getInstance().flyWheel.motor.setVelocity(0);
+                setRPM(0);
                 break;
             case DEFAULT:
                 setRPM(2540);
@@ -87,19 +94,49 @@ public class FlyWheel extends Subsystem{
 
     public void setRPM(double rpm) {
 //        pid.update(Robot.getInstance().flyWheel.getVelocity(), rpm);
-
+        targetVelocity = rpm;
         Robot.getInstance().flyWheel.motor.setVelocity(rpm);
     }
 
-    public void fire() {
-
+    // Set the pidf constants easier
+    public void updatePIDF(double p, double i, double d, double f) {
+        Robot.getInstance().flyWheel.motor.setVelocityPIDFCoefficients(p, i, d, f);
     }
 
+    // Calculate the percent error
+    // determine if it is within a percent tolerance of the wanted rpm
+    public boolean isRPMInTolerance(double percent) {
+        return percent > 50 * (Robot.getInstance().flyWheel.getVelocity() - targetVelocity);
+    }
+
+    // IDK if this will work or not
+    private ElapsedTime fireTimer = new ElapsedTime();
+    public void fire() {
+        if(fireTimer.milliseconds() > 120) {
+            retract();
+            fireTimer.reset();
+        } else {
+            extend();
+        }
+    }
+
+    // TODO: Fix these values so we don't make direct calls to hardware in teleop thread
     public void extend() {
         Robot.getInstance().fwArm.setPosition(0.45);
     }
 
     public void retract() {
         Robot.getInstance().fwArm.setPosition(1.0);
+    }
+
+    public void setLockState(RingStop state) {
+        switch (state) {
+            case Open:
+                Robot.getInstance().fwLock.setPosition(.4);
+                break;
+            case Closed:
+                Robot.getInstance().fwLock.setPosition(1);
+                break;
+        }
     }
 }

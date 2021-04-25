@@ -3,6 +3,7 @@ package com.team9889.ftc2020.auto.actions.flywheel;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.FlyWheel;
+import com.team9889.ftc2020.subsystems.Intake;
 import com.team9889.ftc2020.subsystems.Robot;
 
 /**
@@ -21,8 +22,7 @@ public class OneStack extends Action {
 
         Robot.getInstance().fwLock.setPosition(0.4);
 
-        Robot.getInstance().getIntake().SetBackIntakePower(1);
-        Robot.getInstance().passThrough.setPower(1);
+        Robot.getInstance().getIntake().setIntakeState(Intake.IntakeState.Back);
 
         Robot.getInstance().getCamera().setGoalCamPos();
     }
@@ -60,7 +60,7 @@ public class OneStack extends Action {
     @Override
     public void done() {
         Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.OFF);
-        Robot.getInstance().getIntake().SetBackIntakePower(0);
+        Robot.getInstance().getIntake().setBackIntakePower(0);
         Robot.getInstance().passThrough.setPower(0);
         Robot.getInstance().getFlyWheel().done = true;
         Robot.getInstance().fwArm.setPosition(0.5);

@@ -126,59 +126,58 @@ public class Camera extends Subsystem{
 
     public void setWGCamPos () {
         currentCamState = CameraStates.WG;
-        Robot.getInstance().xCam.setPosition(1);
-        Robot.getInstance().yCam.setPosition(.85);
+        setCamPositions(1, 0.85);
     }
 
     public void setGoalCamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.475);
 
+//        Robot.getInstance().xCam.setPosition(.475);
 //        camYPose += cameraY.update(getPosOfTarget().y, 0);
 //        CruiseLib.limitValue(camYPose, 1, 0);
 //        Robot.getInstance().yCam.setPosition(camYPose);
-        Robot.getInstance().yCam.setPosition(.7);
+//        Robot.getInstance().yCam.setPosition(.7);
+
+        setCamPositions(0.475, 0.7);
     }
 
     public void setPS1CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.53);
-        Robot.getInstance().yCam.setPosition(.7);
+        setCamPositions(0.53, 0.7);
     }
 
     public void setPS2CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.555);
-        Robot.getInstance().yCam.setPosition(.7);
+        setCamPositions(0.555, 0.7);
     }
 
     public void setPS3CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.58);
-        Robot.getInstance().yCam.setPosition(.7);
+        setCamPositions(0.58, 0.7);
     }
 
     public void setPS1CamPosAuto () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.534);
-        Robot.getInstance().yCam.setPosition(.7);
+        setCamPositions(0.534, 0.7);
     }
 
     public void setPS2CamPosAuto () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.535);
-        Robot.getInstance().yCam.setPosition(.7);
+        setCamPositions(0.535, 0.7);
     }
 
     public void setPS3CamPosAuto () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.548);
-        Robot.getInstance().yCam.setPosition(.7);
+        setCamPositions(0.548, 0.7);
     }
 
     public void setRSCamPos () {
         currentCamState = CameraStates.RS;
-        Robot.getInstance().xCam.setPosition(.64);
-        Robot.getInstance().yCam.setPosition(.9);
+        setCamPositions(0.64, 0.9);
+    }
+
+    public void setCamPositions(double x, double y) {
+        Robot.getInstance().xCam.setPosition(x);
+        Robot.getInstance().yCam.setPosition(y);
     }
 }

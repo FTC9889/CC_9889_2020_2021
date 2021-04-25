@@ -9,20 +9,16 @@ import com.team9889.ftc2020.auto.actions.flywheel.OneStack;
 import com.team9889.ftc2020.auto.actions.flywheel.PowerShotsAuto;
 import com.team9889.ftc2020.auto.actions.flywheel.ShootRings;
 import com.team9889.ftc2020.auto.actions.flywheel.Stack;
-import com.team9889.ftc2020.auto.actions.intake.Outtake;
-import com.team9889.ftc2020.auto.actions.teleop.PowerShots;
-import com.team9889.ftc2020.auto.actions.utl.ParallelAction;
 import com.team9889.ftc2020.auto.actions.utl.Wait;
 import com.team9889.ftc2020.auto.actions.wobblegoal.PickUpWG;
 import com.team9889.ftc2020.auto.actions.wobblegoal.PutDownWG;
 import com.team9889.ftc2020.subsystems.FlyWheel;
-import com.team9889.ftc2020.subsystems.Robot;
+import com.team9889.ftc2020.subsystems.Intake;
 import com.team9889.lib.control.Path;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by Eric on 11/26/2019.
@@ -37,11 +33,6 @@ public class RedAuto extends AutoModeBase {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
-        // I found https://www.geeksforgeeks.org/initialize-an-arraylist-in-java/
-        // It seems easier to understand what is going on with the DrivePurePursuit
-
-        // We also don't need a make a new list each time we want to add a new parallelaction, we
-        // can add in right in with Arrays.asList
         Robot.getCamera().setPS1CamPosAuto();
         Robot.getFlyWheel().setMode(FlyWheel.Mode.POWERSHOT1);
 
@@ -60,11 +51,9 @@ public class RedAuto extends AutoModeBase {
 //                    defaultTolerance, 8, 1));
                 }}));
 
-        Robot.getInstance().wgLeft.setPosition(0.7);
-        Robot.getInstance().wgRight.setPosition(0.7);
+        Robot.getWobbleGoal().releaseIntake();
         runAction(new PowerShotsAuto());
-        Robot.getInstance().wgLeft.setPosition(0.8);
-        Robot.getInstance().wgRight.setPosition(0.8);
+        Robot.getWobbleGoal().setWGUp();
 
 
         switch (box) {
@@ -76,7 +65,7 @@ public class RedAuto extends AutoModeBase {
                 break;
 
             case MIDDLE:
-                Robot.getIntake().SetBackIntakePower(-.5);
+                Robot.getIntake().setBackIntakePower(-.5);
                 ThreadAction(new OneStack());
                 runAction(new DrivePurePursuit(new ArrayList<Path>(){{
                     add(new Path(new Pose2d(60, -22, 0),
@@ -85,7 +74,7 @@ public class RedAuto extends AutoModeBase {
                             new Pose2d(2, 2, 3), 8, .8));
                 }}));
 
-                while (!Robot.getFlyWheel().done) {
+                while (!Robot.getFlyWheel().done && opModeIsActive()) {
 
                 }
 
@@ -96,7 +85,7 @@ public class RedAuto extends AutoModeBase {
                 break;
 
             case FAR:
-                Robot.getIntake().SetBackIntakePower(-.5);
+                Robot.getIntake().setBackIntakePower(-.5);
                 ThreadAction(new Stack());
                 runAction(new DrivePurePursuit(new ArrayList<Path>(){{
                     add(new Path(new Pose2d(65, -20, 0),
@@ -117,7 +106,7 @@ public class RedAuto extends AutoModeBase {
         }
 
 
-        Robot.getIntake().SetFrontIntakePower(0);
+        Robot.getIntake().setFrontIntakePower(0);
 
         Robot.autoWG.setPosition(.75);
         runAction(new Wait(500));
@@ -149,9 +138,7 @@ public class RedAuto extends AutoModeBase {
                 Robot.leftArm.setPosition(1);
                 runAction(new Wait(500));
 
-                Robot.getIntake().SetFrontIntakePower(1);
-                Robot.getIntake().SetBackIntakePower(1);
-                Robot.passThrough.setPower(1);
+                Robot.getIntake().setIntakeState(Intake.IntakeState.Both);
                 Robot.leftArm.setPosition(0);
 
                 runAction(new DrivePurePursuit(new ArrayList<Path>(){{
@@ -215,9 +202,7 @@ public class RedAuto extends AutoModeBase {
                 break;
         }
 
-        Robot.leftArm.setPosition(1);
-        Robot.rightArm.setPosition(0);
-
+        Robot.getIntake().setArmState(Intake.ArmState.Extended);
 
 //        runAction(new Wait(500));
 //

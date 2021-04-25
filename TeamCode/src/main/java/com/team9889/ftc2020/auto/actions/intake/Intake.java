@@ -38,13 +38,13 @@ public class Intake extends Action {
     public void update() {
         if (intake) {
             if (timer.milliseconds() > 300) {
-                Robot.getInstance().getIntake().SetFrontIntakePower(0);
+                Robot.getInstance().getIntake().setFrontIntakePower(0);
                 intake = false;
                 timer.reset();
             }
         } else {
             if (timer.milliseconds() > 100) {
-                Robot.getInstance().getIntake().SetFrontIntakePower(1);
+                Robot.getInstance().getIntake().setFrontIntakePower(1);
                 intake = true;
                 timer.reset();
             }

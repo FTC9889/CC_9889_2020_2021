@@ -3,19 +3,13 @@ package com.team9889.ftc2020.auto.actions.teleop;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.Robot;
 import com.team9889.lib.CruiseLib;
 import com.team9889.lib.control.Path;
-import com.team9889.lib.control.PurePursuit;
 import com.team9889.lib.control.controllers.PID;
-import com.team9889.lib.control.controllers.PIDF;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.internal.android.dx.command.Main;
-import org.opencv.core.MatOfByte;
 import org.opencv.core.Point;
 
 import java.util.ArrayList;
@@ -54,11 +48,11 @@ public class AimAndShoot extends Action {
     boolean driveDone = false;
     @Override
     public void update() {
-        if (Robot.getInstance().result > 12) {
+        if (Robot.getInstance().minCurrentVoltage > 12) {
             multiplier = multiplier12;
-        } else if (Robot.getInstance().result <= 12 && Robot.getInstance().result > 11) {
+        } else if (Robot.getInstance().minCurrentVoltage <= 12 && Robot.getInstance().minCurrentVoltage > 11) {
             multiplier = multiplier11;
-        } else if (Robot.getInstance().result <= 11) {
+        } else if (Robot.getInstance().minCurrentVoltage <= 11) {
             multiplier = multiplier10;
         }
 

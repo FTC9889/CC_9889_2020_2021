@@ -38,9 +38,9 @@ public class Outtake extends Action {
     public void update() {
 //        if(timer.milliseconds() > 100 && timer.milliseconds() < 200) {
         if(outtake) {
-            Robot.getInstance().getIntake().SetFrontIntakePower(-0.3);
+            Robot.getInstance().getIntake().setFrontIntakePower(-0.3);
         } else {
-            Robot.getInstance().getIntake().SetFrontIntakePower(0);
+            Robot.getInstance().getIntake().setFrontIntakePower(0);
         }
 //        }
 //        else if(timer.milliseconds() > 200) {

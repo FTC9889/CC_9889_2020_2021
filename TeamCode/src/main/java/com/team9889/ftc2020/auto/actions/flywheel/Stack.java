@@ -21,7 +21,7 @@ public class Stack extends Action {
 
         Robot.getInstance().fwLock.setPosition(0.4);
 
-        Robot.getInstance().getIntake().SetBackIntakePower(1);
+        Robot.getInstance().getIntake().setBackIntakePower(1);
         Robot.getInstance().passThrough.setPower(1);
 
         Robot.getInstance().getCamera().setGoalCamPos();
@@ -79,7 +79,7 @@ public class Stack extends Action {
     @Override
     public void done() {
         Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.OFF);
-        Robot.getInstance().getIntake().SetBackIntakePower(0);
+        Robot.getInstance().getIntake().setBackIntakePower(0);
         Robot.getInstance().passThrough.setPower(0);
         Robot.getInstance().getFlyWheel().done = true;
         Robot.getInstance().fwArm.setPosition(0.5);
