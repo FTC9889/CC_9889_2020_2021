@@ -1,19 +1,10 @@
 package com.team9889.ftc2020.subsystems;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.team9889.lib.CruiseLib;
-import com.team9889.lib.android.FileReader;
-import com.team9889.lib.android.FileWriter;
-import com.team9889.lib.control.controllers.PID;
 import com.team9889.lib.control.controllers.PIDF;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-import java.lang.reflect.Array;
-import java.util.Arrays;
 
 /**
  * Created by joshua9889 on 3/28/2018.
@@ -25,8 +16,12 @@ public class FlyWheel extends Subsystem{
         OFF, POWERSHOT1, POWERSHOT2, POWERSHOT3, POWERSHOTAUTO1, POWERSHOTAUTO2, POWERSHOTAUTO3, DEFAULT
     }
 
-    public enum RingStop {
+    private enum RingStop {
         Closed, Open
+    }
+
+    private enum FingerState {
+        Extended, Retracted
     }
 
     public static double P = 115, I = 0, D = 1.5, F = 0;
@@ -93,7 +88,7 @@ public class FlyWheel extends Subsystem{
     }
 
     public void setRPM(double rpm) {
-//        pid.update(Robot.getInstance().flyWheel.getVelocity(), rpm);
+        // pid.update(Robot.getInstance().flyWheel.getVelocity(), rpm);
         targetVelocity = rpm;
         Robot.getInstance().flyWheel.motor.setVelocity(rpm);
     }
@@ -110,25 +105,73 @@ public class FlyWheel extends Subsystem{
     }
 
     // IDK if this will work or not
-    private ElapsedTime fireTimer = new ElapsedTime();
-    public void fire() {
-        if(fireTimer.milliseconds() > 120) {
-            retract();
-            fireTimer.reset();
+    // Kinda only allows for continual shooting or the lock will close
+    // Checks if the rpm is within a tolerance before shooting
+    public void fireControl(boolean shoot) {
+        if(shoot) {
+            // Check if the lock has been released and if it hasn't, open it
+            if (currentLockState == RingStop.Open && isLockFinishedMoving()) {
+                // Check if the finger has loaded a ring to push, and if the flywheel is up to speed
+                if (currentFingerState == FingerState.Retracted && isFingerFinishedMoving()
+                        && isRPMInTolerance(10))
+                    setPusherState(FingerState.Extended);
+                // Check if the finger has pushed a ring into the flywheel and if if has moved all the way
+                else if (currentFingerState == FingerState.Extended && isFingerFinishedMoving())
+                    setPusherState(FingerState.Retracted);
+            } else {
+                setLockState(RingStop.Open);
+            }
         } else {
-            extend();
+            // Check if the has cleared the flywheel and if it has, lock the rings in
+            if(currentFingerState == FingerState.Extended && isFingerFinishedMoving()) {
+                setPusherState(FingerState.Retracted);
+            } else if(currentFingerState == FingerState.Retracted && isFingerFinishedMoving()) {
+                setLockState(RingStop.Closed);
+            }
         }
     }
 
+
     // TODO: Fix these values so we don't make direct calls to hardware in teleop thread
-    public void extend() {
+    private void extend() {
         Robot.getInstance().fwArm.setPosition(0.45);
     }
 
-    public void retract() {
+    // TODO: Fix these values so we don't make direct calls to hardware in teleop thread
+    private void retract() {
         Robot.getInstance().fwArm.setPosition(1.0);
     }
 
+    // Set Pusher State
+    private ElapsedTime pusherTimer = new ElapsedTime();
+    private FingerState currentFingerState = FingerState.Extended;
+    private void setPusherState(FingerState state) {
+        switch (state) {
+            case Retracted:
+                retract();
+                break;
+            case Extended:
+                extend();
+                break;
+        }
+
+        if(currentFingerState != state)
+            pusherTimer.reset();
+
+        currentFingerState = state;
+    }
+
+    // Time for finger to move to position
+    private boolean isFingerFinishedMoving() {
+        if (currentFingerState == FingerState.Extended)
+            return pusherTimer.milliseconds() > 100;
+        else
+            return pusherTimer.milliseconds() > 50;
+    }
+
+    // Set Lock State
+    private ElapsedTime lockServoTimer = new ElapsedTime();
+    private RingStop currentLockState = RingStop.Closed;
     public void setLockState(RingStop state) {
         switch (state) {
             case Open:
@@ -138,5 +181,14 @@ public class FlyWheel extends Subsystem{
                 Robot.getInstance().fwLock.setPosition(1);
                 break;
         }
+
+        if(currentLockState != state)
+            lockServoTimer.reset();
+
+        currentLockState = state;
+    }
+
+    private boolean isLockFinishedMoving() {
+        return lockServoTimer.milliseconds() > 500;
     }
 }

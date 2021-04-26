@@ -2,6 +2,7 @@ package com.team9889.ftc2020;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.team9889.ftc2020.subsystems.Intake;
 
 /**
  * Created by MannoMation on 12/14/2018.
@@ -25,18 +26,6 @@ public class DriverStation {
 
     double getSteer(){
         return gamepad1.right_stick_x;
-    }
-
-    boolean getStartIntaking(){
-        return gamepad1.a;
-    }
-
-    boolean getStopIntaking() {
-        return gamepad1.b || gamepad2.left_trigger > .3;
-    }
-
-    boolean getStartOuttaking() {
-        return gamepad1.y;
     }
 
     private boolean wgToggle = true;
@@ -95,5 +84,46 @@ public class DriverStation {
         return gamepad1.right_stick_button && gamepad1.left_stick_button;
     }
 
+    boolean shoot() {
+        return gamepad1.right_bumper || gamepad2.left_bumper;
+    }
+
+    // Intake Control
+    private boolean getStartIntaking(){
+        return gamepad1.a;
+    }
+
+    private boolean getStopIntaking() {
+        return gamepad1.b || gamepad2.left_trigger > .3;
+    }
+
+    private boolean getStartOuttaking() {
+        return gamepad1.y;
+    }
+
+    private boolean backIntake() {
+        return gamepad1.x;
+    }
+
+    private boolean intakeIdle() {
+        return gamepad2.left_bumper;
+    }
+
+    private Intake.IntakeState currentWantedIntakeState = Intake.IntakeState.Stop;
+    Intake.IntakeState getWantedIntakeState() {
+        if (getStartIntaking()) {
+            currentWantedIntakeState = Intake.IntakeState.Front;
+        } else if (getStopIntaking()) {
+            currentWantedIntakeState = Intake.IntakeState.Stop;
+        } else if (getStartOuttaking()) {
+            currentWantedIntakeState = Intake.IntakeState.Outtake;
+        } else if (backIntake()) {
+            currentWantedIntakeState = Intake.IntakeState.Back;
+        } else if (intakeIdle()) {
+            currentWantedIntakeState = Intake.IntakeState.Idle;
+        }
+
+        return currentWantedIntakeState;
+    }
 
 }
