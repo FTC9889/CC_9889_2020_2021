@@ -1,6 +1,5 @@
 package com.team9889.ftc2020.auto.actions.teleop;
 
-import android.os.Debug;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
@@ -10,7 +9,6 @@ import com.team9889.ftc2020.subsystems.FlyWheel;
 import com.team9889.ftc2020.subsystems.Robot;
 import com.team9889.lib.CruiseLib;
 import com.team9889.lib.control.controllers.PID;
-import com.team9889.lib.control.controllers.PIDF;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -21,9 +19,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
 public class PowerShots extends Action {
-    public static double p = 6, i = 0, d = 200, max = 0;
-    public static double p2 = .05, i2 = 0, d2 = 3, max2 = 0;
-    public static double p3 = .05, i3 = 0, d3 = 3, max3 = 0;
+    public static double p = 8, i = 0, d = 100, max = 0;
+    public static double p2 = .05, i2 = 0, d2 = 2, max2 = 0;
+    public static double p3 = .05, i3 = 0, d3 = 2, max3 = 0;
     public static int readyCount = 6;
 
     private PID yOrientationPID = new PID(1, 0, 8, 100);
@@ -50,6 +48,7 @@ public class PowerShots extends Action {
         Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOT1);
         Robot.getInstance().getFlyWheel().psPower = true;
         Robot.getInstance().fwLock.setPosition(.4);
+        Robot.getInstance().fwFlap.setPosition(.52);
 
         y = Robot.getInstance().getMecanumDrive().getAdjustedPose().getX();
 
@@ -175,5 +174,6 @@ public class PowerShots extends Action {
 //        Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.DEFAULT);
         Robot.getInstance().getFlyWheel().psPower = false;
         Robot.getInstance().fwLock.setPosition(1);
+        Robot.getInstance().fwFlap.setPosition(.5);
     }
 }

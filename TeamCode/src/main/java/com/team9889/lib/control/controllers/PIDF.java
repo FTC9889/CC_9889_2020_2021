@@ -17,6 +17,7 @@ public class PIDF extends PID {
         if(error != 0)
             sign = error / Math.abs(error);
 
-        return super.update(current, wanted) + (sign*kFF);
+        output =  super.update(current, wanted) + (sign*kFF);
+        return output;
     }
 }

@@ -10,7 +10,7 @@ public class WobbleGoal extends Subsystem{
     @Override
     public void init(boolean auto) {
         if (auto) {
-            Robot.getInstance().wgGrabber.setPosition(.6);
+            Robot.getInstance().wgGrabber.setPosition(.7);
         }
     }
 

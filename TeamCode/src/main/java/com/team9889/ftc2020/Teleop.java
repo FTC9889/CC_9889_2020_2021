@@ -1,21 +1,16 @@
 package com.team9889.ftc2020;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.VoltageSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
-import com.team9889.ftc2020.auto.actions.flywheel.PowerShotsAuto;
 import com.team9889.ftc2020.auto.actions.teleop.AimAndShoot;
 import com.team9889.ftc2020.auto.actions.teleop.PowerShots;
 import com.team9889.ftc2020.subsystems.Camera;
 import com.team9889.ftc2020.subsystems.FlyWheel;
-import com.team9889.ftc2020.subsystems.Robot;
 import com.team9889.lib.control.controllers.PID;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -30,7 +25,11 @@ import java.util.ArrayList;
 @Config
 public class Teleop extends Team9889Linear {
     public static double x = 103, y = 42, ay = 19.58, ax = 2.603092035700193, multiplier = 3;
-    public static int timeToWait = 120;
+    public static int timeToWait = 80;
+
+    boolean wgUse = false;
+
+    boolean blue = false;
 
     double setRpm = 0;
 
@@ -54,7 +53,7 @@ public class Teleop extends Team9889Linear {
     private PID orientationPID = new PID(1, 0, 100);
 
 
-    public static double rpm = 1300, rpm12 = 1295, rpm11 = 1310, rpm10 = 1310;
+    public static double wantedRpm = 1520, rampAngle = .4, rpm = 1520, trueRPM = 2900, lowRPMTolerance = 350, hightRPMTolerance = 100;
 
     boolean wgInPos = false;
     boolean wgFirst = true;
@@ -74,27 +73,40 @@ public class Teleop extends Team9889Linear {
         DriverStation driverStation = new DriverStation(gamepad1, gamepad2);
         waitForStart(false);
 
+        Robot.fwFlap.setPosition(.5);
+
         wgTimer.reset();
         Robot.flyWheel.resetEncoder();
 
         while (opModeIsActive()) {
+            if (gamepad2.a) {
+                blue = true;
+            } else if (gamepad2.b) {
+                blue = false;
+            }
+
+            x = Math.abs(Robot.getCamera().getPosOfTarget().y);
+//            wantedRpm = (1E+06 * Math.pow(x, 6)) - (2E+06 * Math.pow(x, 5)) + (2E+06 * Math.pow(x, 4)) -
+//                    (668141 * Math.pow(x, 3)) + (122827 * Math.pow(x, 2)) - (10904 * (x)) + 1941.6;
+//            if (x != 1e10)
+//                wantedRpm = 4112.2 * Math.pow(x, 3) - 2586.5 * Math.pow(x, 2) + 74.118 * x + 1594;
+
+//            if (wantedRpm > 1600) {
+//                wantedRpm = 1600;
+//            }
+            telemetry.addData("Wanted RPM", wantedRpm);
+
             if (!shooting) {
                 if (Robot.result > 12.5) {
-                    rpm = rpm12;
-                } else if (Robot.result <= 12.5 && Robot.result > 11.5) {
-                    rpm = rpm11;
-                } else if (Robot.result <= 11.5) {
-                    rpm = rpm10;
+                    rpm = wantedRpm - 30;
+                } else if (Robot.result <= 12.5 && Robot.result > 12) {
+                    rpm = wantedRpm - 15;
+                } else if (Robot.result <= 11) {
+                    rpm = wantedRpm;
                 }
             }
 
-//            Log.v("RPM", "" + wantedRpm / ((Robot.result / multiplier) / 1.3));
-//            rpm = wantedRpm / ((Robot.result / multiplier) / 1.3);
-
-
-//            if (Robot.getCamera().getPosOfTarget().x != 1e10) {
-//                dist = 37.852 * Math.exp(0.0192 * Robot.getCamera().scanForGoal.getPointInPixels().y);
-//            }
+            Robot.fwFlap.setPosition(rampAngle);
 
             if (gamepad2.left_bumper && !shooting) {
 //                rpm = ((3.06 * dist) + 1041) * multiplier;
@@ -211,7 +223,7 @@ public class Teleop extends Team9889Linear {
 //                    timeToWait = 200;
 //                }
 
-                if (Math.abs(Robot.getCamera().getPosOfTarget().x) < 0.1) {
+                if (Math.abs(Robot.getCamera().getPosOfTarget().x) < 0.15) {
                     ready++;
                 } else if (!shooting) {
                     ready = 0;
@@ -221,36 +233,39 @@ public class Teleop extends Team9889Linear {
                     if (false) {
                         if (armTimer.milliseconds() > timeToWait) {
                             if (extend) {
-                                Robot.fwArm.setPosition(.5);
+                                Robot.fwArm.setPosition(.47);
                                 extend = false;
                             } else {
-                                Robot.fwArm.setPosition(.65);
+                                Robot.fwArm.setPosition(.62);
                                 ringsPassed = 0;
                                 extend = true;
                             }
 
                             armTimer.reset();
                         }
-                    } else if ((gamepad1.right_bumper || (gamepad2.left_bumper &&
-                            ready > 5)) && on) {
+                    } else if (gamepad1.right_bumper || (gamepad2.left_bumper &&
+                            ready > 5) && on ) {
                         Robot.fwLock.setPosition(.4);
-                        if (armTimer.milliseconds() > timeToWait) {
-                            if (extend) {
-                                Robot.fwArm.setPosition(0.5);
-                                extend = false;
-                            } else {
-                                Robot.fwArm.setPosition(.65);
-                                setRpm = rpm;
-                                ringsPassed = 0;
-                                extend = true;
-                            }
+                        if ((-lowRPMTolerance < (Robot.getFlyWheel().getRPM() - trueRPM) &&
+                                (Robot.getFlyWheel().getRPM() - trueRPM) < hightRPMTolerance)) {
+                            if (armTimer.milliseconds() > timeToWait) {
+                                if (extend) {
+                                    Robot.fwArm.setPosition(0.47);
+                                    extend = false;
+                                } else {
+                                    Robot.fwArm.setPosition(.62);
+                                    setRpm = rpm;
+                                    ringsPassed = 0;
+                                    extend = true;
+                                }
 
-                            armTimer.reset();
-                            shooting = true;
+                                armTimer.reset();
+                                shooting = true;
+                            }
                         }
                     } else if (armTimer.milliseconds() > timeToWait && !Robot.getFlyWheel().psPower) {
                         Robot.fwLock.setPosition(1);
-                        Robot.fwArm.setPosition(0.5);
+                        Robot.fwArm.setPosition(0.47);
                         extend = true;
                         shooting = false;
                     }
@@ -287,11 +302,20 @@ public class Teleop extends Team9889Linear {
                             Robot.wgRight.setPosition(.8);
                         }
                     } else if (!driverStation.getWG()) {
-                        if (wgTimer.milliseconds() < 500) {
-                            Robot.wgGrabber.setPosition(0.25);
+                        if (wgUse) {
+                            if (wgTimer.milliseconds() < 500) {
+                                Robot.wgGrabber.setPosition(0.25);
+                            } else {
+                                Robot.wgLeft.setPosition(.5);
+                                Robot.wgRight.setPosition(.5);
+                            }
                         } else {
-                            Robot.wgLeft.setPosition(.4);
-                            Robot.wgRight.setPosition(.4);
+                            if (wgTimer.milliseconds() < 500) {
+                                Robot.wgGrabber.setPosition(0.25);
+                            } else {
+                                Robot.wgLeft.setPosition(.4);
+                                Robot.wgRight.setPosition(.4);
+                            }
                         }
 
                         lastWGState = false;
@@ -304,6 +328,8 @@ public class Teleop extends Team9889Linear {
                             Robot.wgLeft.setPosition(0.8);
                             Robot.wgRight.setPosition(0.8);
                         }
+
+                        wgUse = true;
 
                         lastWGState = true;
                     }
@@ -393,10 +419,18 @@ public class Teleop extends Team9889Linear {
                 }
             }
             else if (!on && !Robot.getFlyWheel().psPower) {
+                Robot.getFlyWheel().power = 0;
+                Robot.getFlyWheel().counter = 0;
                 Robot.getFlyWheel().setMode(FlyWheel.Mode.OFF);
             }
 
             telemetry.addData("Loop Time", loopTimer.milliseconds());
+            telemetry.addData("Blue", blue);
+
+            telemetry.addData("Right Dist", Robot.rightDist.getDistance(DistanceUnit.INCH));
+            telemetry.addData("Left Dist", Robot.leftDist.getDistance(DistanceUnit.INCH));
+
+            telemetry.addData("Kf", Robot.getFlyWheel().KfEstimator.getAverage());
             telemetry.addData("Power Shot Power", Robot.getFlyWheel().psPower);
             telemetry.addData("Distance", dist + "");
             telemetry.addData("Rings", ringsPassed);
@@ -406,10 +440,8 @@ public class Teleop extends Team9889Linear {
 
             telemetry.addData("pixels", Robot.getCamera().scanForGoal.getPointInPixels());
 
-            telemetry.addData("Fly Wheel Speed", (Robot.flyWheel.getVelocity() / 28) * 60);
+            telemetry.addData("Fly Wheel Speed", Robot.getFlyWheel().getRPM());
             telemetry.addData("Odometry Adjusted : ", Robot.getMecanumDrive().getAdjustedPose());
-
-            telemetry.addData("sensor", Robot.ringDetector.getDistance(DistanceUnit.INCH));
 
             Robot.outputToTelemetry(telemetry);
             telemetry.update();
@@ -423,7 +455,7 @@ public class Teleop extends Team9889Linear {
             dashboard.sendTelemetryPacket(packet);
 
             Robot.getMecanumDrive().setFieldCentricPower(Robot.getMecanumDrive().xSpeed,
-                    Robot.getMecanumDrive().ySpeed, Robot.getMecanumDrive().turnSpeed);
+                    Robot.getMecanumDrive().ySpeed, Robot.getMecanumDrive().turnSpeed, blue);
             Robot.update();
 
             // dt timer

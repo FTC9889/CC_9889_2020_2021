@@ -3,19 +3,13 @@ package com.team9889.ftc2020.auto.actions.teleop;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.Robot;
 import com.team9889.lib.CruiseLib;
 import com.team9889.lib.control.Path;
-import com.team9889.lib.control.PurePursuit;
 import com.team9889.lib.control.controllers.PID;
-import com.team9889.lib.control.controllers.PIDF;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.internal.android.dx.command.Main;
-import org.opencv.core.MatOfByte;
 import org.opencv.core.Point;
 
 import java.util.ArrayList;
@@ -26,7 +20,7 @@ import java.util.ArrayList;
 
 @Config
 public class AimAndShoot extends Action {
-    public static double p = .6, i = 0, d = 60, f = 0;
+    public static double p = .7, i = 0, d = 20, f = 0;
     public static double multiplier, multiplier12 = .95, multiplier11 = 1, multiplier10 = 1.05;
 //    public static double p = .5, i, d = 0;
 
@@ -74,19 +68,21 @@ public class AimAndShoot extends Action {
         double speed = 0;
         if (Robot.getInstance().getCamera().getPosOfTarget().x != 1e10) {
             camOrientationPID.update(camera, 0);
-            speed = -CruiseLib.limitValue(camOrientationPID.getOutput() / 1.2, -.12, -.6, .12, .6);
+            speed = -CruiseLib.limitValue(camOrientationPID.getOutput() / 1.2, -.2, -.6, .2, .6);
 //            if (Math.abs(camera) < .2) {
 //                speed = (camera / Math.abs(camera)) * .15;
 //            } else {
 //                speed = (camera / Math.abs(camera)) * .25;
 //            }
         } else if (Math.abs(turn) > Math.toRadians(5)) {
-            camOrientationPID.update(turn * 1.3, 0);
+            camOrientationPID.update(turn, 0);
             Log.v("Turn", turn + "");
-            speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.05, -1, .05, 1);
+            speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.3, -1, .3, 1);
         }
 
-        Robot.getInstance().getMecanumDrive().turnSpeed += (speed);
+        if (Math.abs(Robot.getInstance().getCamera().getPosOfTarget().x) >= 0.15) {
+            Robot.getInstance().getMecanumDrive().turnSpeed += (speed);
+        }
 //        Robot.getInstance().getMecanumDrive().turnSpeed += (camera / Math.abs(camera)) * .2;
     }
 

@@ -52,10 +52,6 @@ public class Constants {
 //        0.005007837
     }
 
-    public static void main(String[] args) {
-        System.out.println(OdometryConstants.ENCODER_TO_DISTANCE_RATIO * 4741);
-    }
-
    /*---------------------
     |                     |
     |       Intake        |
@@ -68,6 +64,8 @@ public class Constants {
         public final static String kBackIntakeMotorId = "bi";
         public final static String kPassThroughId = "pass";
         public final static String kRingDetector = "frontring";
+        public final static String kLeftDist = "leftdist";
+        public final static String kRightDist = "rightdist";
         public final static String kLeftArm = "leftarm";
         public final static String kRightArm = "rightarm";
     }
@@ -79,10 +77,11 @@ public class Constants {
     ---------------------*/
 
     //Settings for Lift
-    public static class LiftConstants {
+    public static class ShooterConstants {
         public final static String kFlyWheel = "fw";
         public final static String kFWArm = "fwarm";
         public final static String kFWLock = "lock";
+        public final static String kFWFlap = "flap";
     }
 
     /*---------------------

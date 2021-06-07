@@ -2,17 +2,13 @@ package com.team9889.ftc2020.subsystems;
 
 import android.util.Log;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.team9889.ftc2020.auto.AutoModeBase;
-import com.team9889.lib.CruiseLib;
 import com.team9889.lib.control.controllers.PID;
 import com.team9889.lib.detectors.ScanForGoal;
 import com.team9889.lib.detectors.ScanForRS;
 import com.team9889.lib.detectors.ScanForWG;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.opencv.android.Utils;
-import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -82,9 +78,9 @@ public class Camera extends Subsystem{
         AutoModeBase.Boxes box = AutoModeBase.Boxes.CLOSE;
         if (Math.abs(getPosOfTarget().y) == 0) {
             box = AutoModeBase.Boxes.CLOSE;
-        } else if (Math.abs(getPosOfTarget().y) >= .1) {
+        } else if (Math.abs(getPosOfTarget().y) >= .15) {
             box = AutoModeBase.Boxes.MIDDLE;
-        } else if (Math.abs(getPosOfTarget().y) < .1) {
+        } else if (Math.abs(getPosOfTarget().y) < .15) {
             box = AutoModeBase.Boxes.FAR;
         }
 

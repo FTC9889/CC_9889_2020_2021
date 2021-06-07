@@ -1,8 +1,5 @@
 package com.team9889.ftc2020.subsystems;
 
-import android.util.Log;
-
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -13,12 +10,13 @@ import com.team9889.ftc2020.Constants;
 import com.team9889.ftc2020.auto.actions.ActionVariables;
 import com.team9889.lib.hardware.Motor;
 import com.team9889.lib.hardware.RevIMU;
+import com.team9889.lib.roadrunner.drive.RoadRunner;
+import com.team9889.lib.roadrunner.drive.StandardTrackingWheelLocalizer;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvInternalCamera2;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.RevBulkData;
 
@@ -40,12 +38,15 @@ public class Robot{
     public Motor fLDrive, fRDrive, bLDrive, bRDrive;
     public RevIMU imu = null;
 
-    public Motor frontIntake, backIntake, passThrough;
+    public Motor frontIntake;
+    public Motor backIntake;
+    public Motor passThrough;
     public Servo leftArm, rightArm;
     public DistanceSensor ringDetector;
+    public DistanceSensor leftDist, rightDist;
 
     public Motor flyWheel;
-    public Servo fwArm, fwLock;
+    public Servo fwArm, fwLock, fwFlap;
 
     public Servo wgGrabber, wgLeft, wgRight, autoWG;
 
@@ -74,6 +75,9 @@ public class Robot{
     private FlyWheel mFW = new FlyWheel();
     private WobbleGoal mWG = new WobbleGoal();
     private Camera mCamera = new Camera();
+
+    public RoadRunner rr;
+    public StandardTrackingWheelLocalizer localizer;
 
     // List of subsystems
     private List<Subsystem> subsystems = Arrays.asList(mMecanumDrive, mIntake, mFW, mWG, mCamera);
@@ -117,12 +121,16 @@ public class Robot{
 
         ringDetector = hardwareMap.get(DistanceSensor.class, Constants.IntakeConstants.kRingDetector);
 
+        leftDist = hardwareMap.get(DistanceSensor.class, Constants.IntakeConstants.kLeftDist);
+        rightDist = hardwareMap.get(DistanceSensor.class, Constants.IntakeConstants.kRightDist);
+
         //FlyWheel
-        flyWheel = new Motor(hardwareMap, Constants.LiftConstants.kFlyWheel, 1,
+        flyWheel = new Motor(hardwareMap, Constants.ShooterConstants.kFlyWheel, 1,
                 DcMotorSimple.Direction.REVERSE, false, false, true);
 
-        fwArm = hardwareMap.get(Servo.class, Constants.LiftConstants.kFWArm);
-        fwLock = hardwareMap.get(Servo.class, Constants.LiftConstants.kFWLock);
+        fwArm = hardwareMap.get(Servo.class, Constants.ShooterConstants.kFWArm);
+        fwLock = hardwareMap.get(Servo.class, Constants.ShooterConstants.kFWLock);
+        fwFlap = hardwareMap.get(Servo.class, Constants.ShooterConstants.kFWFlap);
 
         wgGrabber = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGGrabber);
         wgLeft = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGLeft);
@@ -139,6 +147,9 @@ public class Robot{
         for (Subsystem subsystem : subsystems) {
             subsystem.init(auto);
         }
+
+        rr = new RoadRunner(hardwareMap);
+        localizer = (StandardTrackingWheelLocalizer) rr.getLocalizer();
     }
 
     // Update data from Hubs and Apply new data
