@@ -2,42 +2,34 @@ package com.team9889.ftc2020.subsystems;
 
 import android.util.Log;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
-import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
-import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
+import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.localization.ThreeTrackingWheelLocalizer;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.Constants;
 import com.team9889.lib.control.math.cartesian.Rotation2d;
-import com.team9889.lib.roadrunner.trajectorysequence.TrajectorySequence;
-import com.team9889.lib.roadrunner.trajectorysequence.TrajectorySequenceBuilder;
-import com.team9889.lib.roadrunner.trajectorysequence.TrajectorySequenceRunner;
+import com.team9889.lib.roadrunner.drive.DriveConstants;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.opencv.core.Point;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static com.team9889.lib.roadrunner.drive.DriveConstants.MAX_ACCEL;
-import static com.team9889.lib.roadrunner.drive.DriveConstants.MAX_ANG_ACCEL;
-import static com.team9889.lib.roadrunner.drive.DriveConstants.MAX_ANG_VEL;
-import static com.team9889.lib.roadrunner.drive.DriveConstants.MAX_VEL;
-import static com.team9889.lib.roadrunner.drive.DriveConstants.TRACK_WIDTH;
-import static com.team9889.lib.roadrunner.drive.RoadRunner.getAccelerationConstraint;
-import static com.team9889.lib.roadrunner.drive.RoadRunner.getVelocityConstraint;
 
 /**
  * Created by Eric on 9/7/2019.
  */
 
+@Config
 public class MecanumDrive extends Subsystem {
     public double x, y, xSpeed, ySpeed, turnSpeed;
+
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(12, 0, .5);
+    public PIDFController headingController = new PIDFController(HEADING_PID);
 
     public Pose2d currentPose = new Pose2d();
     public Rotation2d gyroAngle = new Rotation2d();
@@ -63,9 +55,9 @@ public class MecanumDrive extends Subsystem {
 //            readAngleFromFile();
         }
 
-        follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID,
-                new Pose2d(0.5, 0.5, Math.toRadians(5.0)), 0.5);
-        trajectorySequenceRunner = new TrajectorySequenceRunner(follower, HEADING_PID);
+        // Set input bounds for the heading controller
+        // Automatically handles overflow
+        headingController.setInputBounds(-Math.PI, Math.PI);
 
         odometry = new Odometry();
 //        odometry.reverseLeftEncoder();
@@ -122,6 +114,8 @@ public class MecanumDrive extends Subsystem {
 //        odometry.update();
 
         updated = true;
+
+//        Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(xSpeed, ySpeed, turnSpeed));
 
         xSpeed = 0;
         ySpeed = 0;
@@ -186,22 +180,6 @@ public class MecanumDrive extends Subsystem {
         angleFromAuton = gyroAngle.getTheda(AngleUnit.RADIANS);
     }
 
-//    public void readAngleFromFile() {
-//        try {
-//            FileReader angleReader = new FileReader(filename);
-//            String[] rows = angleReader.lines();
-//            if (rows[rows.length - 1] != null) {
-//                String value = rows[rows.length - 1];
-//                angleFromAuton = Double.parseDouble(value);
-//                angleReader.close();
-//            } else{
-//                angleFromAuton = 0;
-//            }
-//        } catch (NumberFormatException e) {
-//            angleFromAuton = 0;
-//        }
-//    }
-
     public void setFieldCentricPower(double x, double y, double rotation, boolean blue){
         double angle = getAngle().getTheda(AngleUnit.RADIANS) + Math.toRadians(90);
 
@@ -240,110 +218,50 @@ public class MecanumDrive extends Subsystem {
     }
 
 
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 1);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(10, 0, .5);
-
-    public static double LATERAL_MULTIPLIER = 1;
-
-    public static double VX_WEIGHT = 1;
-    public static double VY_WEIGHT = 1;
-    public static double OMEGA_WEIGHT = 1;
-
-    private TrajectorySequenceRunner trajectorySequenceRunner;
-
-    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
-    private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);
-
-    private TrajectoryFollower follower;
-
-
-    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose) {
-        return new TrajectoryBuilder(startPose, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+    public double robotAngleToTarget(Vector2d target, Pose2d curPos){
+        double tgtAngle = Math.PI/2.0 - Math.atan2(target.getX()-curPos.getX(),target.getY()-curPos.getY());
+        return tgtAngle;
     }
 
-    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, boolean reversed) {
-        return new TrajectoryBuilder(startPose, reversed, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+    public double robotDistanceToTarget(Point target, Pose2d curPos) {
+        double dist = Math.sqrt(Math.pow(target.x - curPos.getX(), 2) + Math.pow(target.y - curPos.getY(), 2));
+        return dist;
     }
 
-    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, double startHeading) {
-        return new TrajectoryBuilder(startPose, startHeading, VEL_CONSTRAINT, ACCEL_CONSTRAINT);
+    public void turn (Vector2d targetPosition) {
+        Pose2d poseEstimate = Robot.getInstance().rr.getPoseEstimate();
+
+        // Create a vector from the gamepad x/y inputs which is the field relative movement
+        // Then, rotate that vector by the inverse of that heading for field centric control
+        Vector2d fieldFrameInput = new Vector2d(0, 0);
+        Vector2d robotFrameInput = fieldFrameInput.rotated(-poseEstimate.getHeading());
+
+        // Difference between the target vector and the bot's position
+        Vector2d difference = targetPosition.minus(poseEstimate.vec());
+        // Obtain the target angle for feedback and derivative for feedforward
+        double theta = difference.angle();
+
+        // Not technically omega because its power. This is the derivative of atan2
+        double thetaFF = -fieldFrameInput.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
+
+        // Set the target heading for the heading controller to our desired angle
+        headingController.setTargetPosition(theta);
+
+        // Set desired angular velocity to the heading controller output + angular
+        // velocity feedforward
+        double headingInput = (headingController.update(poseEstimate.getHeading())
+                * DriveConstants.kV + thetaFF)
+                * DriveConstants.TRACK_WIDTH;
+
+        turnSpeed += headingInput;
+
+        // Update the heading controller with our current heading
+        headingController.update(poseEstimate.getHeading());
+
+        // Update he localizer
+//        Robot.getInstance().rr.getLocalizer().update();
     }
 
-    public TrajectorySequenceBuilder trajectorySequenceBuilder(Pose2d startPose) {
-        return new TrajectorySequenceBuilder(
-                startPose,
-                VEL_CONSTRAINT, ACCEL_CONSTRAINT,
-                MAX_ANG_VEL, MAX_ANG_ACCEL
-        );
-    }
-
-//    public void turnAsync(double angle) {
-//        trajectorySequenceRunner.followTrajectorySequenceAsync(
-//                trajectorySequenceBuilder(getPoseEstimate())
-//                        .turn(angle)
-//                        .build()
-//        );
-//    }
-
-//    public void turn(double angle) {
-//        turnAsync(angle);
-//        waitForIdle();
-//    }
-
-    public void followTrajectoryAsync(Trajectory trajectory) {
-        trajectorySequenceRunner.followTrajectorySequenceAsync(
-                trajectorySequenceBuilder(trajectory.start())
-                        .addTrajectory(trajectory)
-                        .build()
-        );
-    }
-
-    public void followTrajectory(Trajectory trajectory) {
-        followTrajectoryAsync(trajectory);
-        waitForIdle();
-    }
-
-    public void followTrajectorySequenceAsync(TrajectorySequence trajectorySequence) {
-        trajectorySequenceRunner.followTrajectorySequenceAsync(trajectorySequence);
-    }
-
-    public void followTrajectorySequence(TrajectorySequence trajectorySequence) {
-        followTrajectorySequenceAsync(trajectorySequence);
-        waitForIdle();
-    }
-
-    public void waitForIdle() {
-        while (!Thread.currentThread().isInterrupted() && isBusy())
-            update();
-    }
-
-    public boolean isBusy() {
-        return trajectorySequenceRunner.isBusy();
-    }
-
-
-//    public static class RoadRunner extends com.acmerobotics.roadrunner.drive.MecanumDrive {
-//
-//        public RoadRunner() {
-//            super(kV, kA, kStatic, TRACK_WIDTH, TRACK_WIDTH, LATERAL_MULTIPLIER);
-//        }
-//
-//        @NotNull
-//        @Override
-//        public List<Double> getWheelPositions() {
-//            return null;
-//        }
-//
-//        @Override
-//        public void setMotorPowers(double v, double v1, double v2, double v3) {
-//
-//        }
-//
-//        @Override
-//        protected double getRawExternalHeading() {
-//            return 0;
-//        }
-//    }
 }
 
 class Odometry extends ThreeTrackingWheelLocalizer {

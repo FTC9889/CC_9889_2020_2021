@@ -72,8 +72,15 @@ public class ScanForGoal extends OpenCvPipeline {
         Mat hsvThresholdInput = cvResizeOutput;
         double[] hsvThresholdHue = {100, 120};
         double[] hsvThresholdSaturation = {s3, s4};
-        double[] hsvThresholdValue = {0, 230};
+        double[] hsvThresholdValue = {0, 255};
         hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
+
+        // Step HSV_Threshold0:
+//        Mat hsvThresholdInput = cvResizeOutput;
+//        double[] hsvThresholdHueRed = {100, 120};
+//        double[] hsvThresholdSaturationRed = {s3, s4};
+//        double[] hsvThresholdValueRed = {0, 230};
+//        hsvThreshold(hsvThresholdInput, hsvThresholdHueRed, hsvThresholdSaturationRed, hsvThresholdValueRed, hsvThresholdOutput);
 
         // Step Find_Contours0:
         Mat findContoursInput = hsvThresholdOutput;
@@ -180,8 +187,8 @@ public class ScanForGoal extends OpenCvPipeline {
         int cvResizeInterpolation2 = Imgproc.INTER_LINEAR;
         cvResize(cvResizeSrc2, cvResizeDsize2, cvResizeFx2, cvResizeFy2, cvResizeInterpolation2, cvResizeOutput);
 
-        return cvResizeOutput;
-//        return input;
+//        return hsvThresholdOutput;
+        return input;
     }
 
     public Mat getImage () {

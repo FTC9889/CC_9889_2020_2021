@@ -1,4 +1,4 @@
-package com.team9889.ftc2020;
+package com.team9889.ftc2020.test;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
@@ -16,7 +16,7 @@ import com.team9889.lib.roadrunner.PoseStorage;
  * and pasting init code.
  */
 
-public abstract class Team9889Linear extends LinearOpMode {
+public abstract class RRTeleOp extends LinearOpMode {
     // Robot Object
     protected Robot Robot = com.team9889.ftc2020.subsystems.Robot.getInstance();
 

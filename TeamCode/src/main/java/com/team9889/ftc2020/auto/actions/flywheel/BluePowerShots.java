@@ -7,20 +7,20 @@ import com.team9889.ftc2020.subsystems.Robot;
 /**
  * Created by Eric on 6/7/2021.
  */
-public class PowerShots extends Action {
+public class BluePowerShots extends Action {
     int power = 1320;
 
     boolean ps1, ps2, ps3;
 
-    Vector2d ps1Pos = new Vector2d(73, -21), ps2Pos = new Vector2d(73, -10), ps3Pos = new Vector2d(73, -4);
+    Vector2d ps1Pos = new Vector2d(73, 21), ps2Pos = new Vector2d(73, 10), ps3Pos = new Vector2d(73, 4);
 
-    public PowerShots () {
+    public BluePowerShots() {
         ps1 = true;
         ps2 = true;
         ps3 = true;
     }
 
-    public PowerShots (boolean ps1, boolean ps2, boolean ps3) {
+    public BluePowerShots(boolean ps1, boolean ps2, boolean ps3) {
         this.ps1 = ps1;
         this.ps2 = ps2;
         this.ps3 = ps3;

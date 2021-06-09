@@ -128,7 +128,7 @@ public class Teleop extends Team9889Linear {
 //                    rpm = 2340;
 //                } else
 //                if (gamepad2.right_trigger > .1) {
-                    Robot.getCamera().setGoalCamPos();
+                Robot.getCamera().setGoalCamPos();
 //                }
 
                 Robot.getCamera().setScanForGoal();
@@ -195,9 +195,9 @@ public class Teleop extends Team9889Linear {
                     Robot.backIntake.setPower(0);
                     Robot.passThrough.setPower(0);
                 } else if (driverStation.getStartOuttaking()) {
-                        Robot.getIntake().SetFrontIntakePower(-1);
-                        Robot.backIntake.setPower(-1);
-                        Robot.passThrough.setPower(-1);
+                    Robot.getIntake().SetFrontIntakePower(-1);
+                    Robot.backIntake.setPower(-1);
+                    Robot.passThrough.setPower(-1);
                 }
                 if (gamepad2.left_bumper && Robot.frontIntake.motor.getPower() == 0) {
 //                   Robot.getIntake().SetFrontIntakePower(0);
@@ -286,53 +286,53 @@ public class Teleop extends Team9889Linear {
 //                    Robot.wgRight.setPosition(.3);
 //                    Robot.wgGrabber.setPosition(.52);
 //                } else {
-                    if (autoDrive && !wgInPos) {
-                        Robot.wgLeft.setPosition(.2);
-                        Robot.wgRight.setPosition(.2);
-                    } else if (wgInPos) {
-                        if (wgAutoTimer.milliseconds() < 500) {
-                            Robot.wgLeft.setPosition(.4);
-                            Robot.wgRight.setPosition(.4);
-                        } else if (wgAutoTimer.milliseconds() > 500 && wgAutoTimer.milliseconds() < 1000) {
-                            Robot.wgGrabber.setPosition(0.25);
-                            Robot.wgLeft.setPosition(.4);
-                            Robot.wgRight.setPosition(.4);
-                        } else {
-                            Robot.wgLeft.setPosition(.8);
-                            Robot.wgRight.setPosition(.8);
-                        }
-                    } else if (!driverStation.getWG()) {
-                        if (wgUse) {
-                            if (wgTimer.milliseconds() < 500) {
-                                Robot.wgGrabber.setPosition(0.25);
-                            } else {
-                                Robot.wgLeft.setPosition(.5);
-                                Robot.wgRight.setPosition(.5);
-                            }
-                        } else {
-                            if (wgTimer.milliseconds() < 500) {
-                                Robot.wgGrabber.setPosition(0.25);
-                            } else {
-                                Robot.wgLeft.setPosition(.4);
-                                Robot.wgRight.setPosition(.4);
-                            }
-                        }
-
-                        lastWGState = false;
-                    } else if (driverStation.getWG()) {
-                        if (wgTimer.milliseconds() < 500) {
-                            Robot.wgLeft.setPosition(0.8);
-                            Robot.wgRight.setPosition(0.8);
-                        } else {
-                            Robot.wgGrabber.setPosition(.52);
-                            Robot.wgLeft.setPosition(0.8);
-                            Robot.wgRight.setPosition(0.8);
-                        }
-
-                        wgUse = true;
-
-                        lastWGState = true;
+                if (autoDrive && !wgInPos) {
+                    Robot.wgLeft.setPosition(.2);
+                    Robot.wgRight.setPosition(.2);
+                } else if (wgInPos) {
+                    if (wgAutoTimer.milliseconds() < 500) {
+                        Robot.wgLeft.setPosition(.4);
+                        Robot.wgRight.setPosition(.4);
+                    } else if (wgAutoTimer.milliseconds() > 500 && wgAutoTimer.milliseconds() < 1000) {
+                        Robot.wgGrabber.setPosition(0.25);
+                        Robot.wgLeft.setPosition(.4);
+                        Robot.wgRight.setPosition(.4);
+                    } else {
+                        Robot.wgLeft.setPosition(.8);
+                        Robot.wgRight.setPosition(.8);
                     }
+                } else if (!driverStation.getWG()) {
+                    if (wgUse) {
+                        if (wgTimer.milliseconds() < 500) {
+                            Robot.wgGrabber.setPosition(0.25);
+                        } else {
+                            Robot.wgLeft.setPosition(.5);
+                            Robot.wgRight.setPosition(.5);
+                        }
+                    } else {
+                        if (wgTimer.milliseconds() < 500) {
+                            Robot.wgGrabber.setPosition(0.25);
+                        } else {
+                            Robot.wgLeft.setPosition(.4);
+                            Robot.wgRight.setPosition(.4);
+                        }
+                    }
+
+                    lastWGState = false;
+                } else if (driverStation.getWG()) {
+                    if (wgTimer.milliseconds() < 500) {
+                        Robot.wgLeft.setPosition(0.8);
+                        Robot.wgRight.setPosition(0.8);
+                    } else {
+                        Robot.wgGrabber.setPosition(.52);
+                        Robot.wgLeft.setPosition(0.8);
+                        Robot.wgRight.setPosition(0.8);
+                    }
+
+                    wgUse = true;
+
+                    lastWGState = true;
+                }
 //                }
 
                 if (gamepad2.right_bumper){

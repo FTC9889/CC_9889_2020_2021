@@ -1,6 +1,7 @@
 package com.team9889.ftc2020.subsystems;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.lib.CircularBuffer;
 import com.team9889.lib.control.controllers.PIDF;
 
@@ -15,6 +16,10 @@ public class FlyWheel extends Subsystem{
     public enum Mode {
         OFF, POWERSHOT1, POWERSHOT2, POWERSHOT3, POWERSHOTAUTO1, POWERSHOTAUTO2, POWERSHOTAUTO3, DEFAULT
     }
+
+    double time = 200;
+    ElapsedTime shootTimer = new ElapsedTime();
+    boolean extend = false;
 
     public static double P = 150, I = 0, D = 20, F = 0.3;
     public static int ps1 = 1250, ps2 = 1250, ps3 = 1250;
@@ -74,6 +79,21 @@ public class FlyWheel extends Subsystem{
             case POWERSHOTAUTO3:
                 setRPM(ps3 + 80);
         }
+    }
+
+    public boolean shootRing() {
+        if (shootTimer.milliseconds() > time) {
+            shootTimer.reset();
+            if (extend) {
+                Robot.getInstance().fwArm.setPosition(0.47);
+                extend = false;
+                return true;
+            } else {
+                Robot.getInstance().fwArm.setPosition(.62);
+                extend = true;
+            }
+        }
+        return false;
     }
 
     public int counter = 0;
