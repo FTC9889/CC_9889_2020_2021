@@ -28,7 +28,11 @@ public class Wait extends Action {
 
     @Override
     public boolean isFinished() {
-        return t.milliseconds()>timeToWaitMilli;
+        try {
+            return t.milliseconds()>timeToWaitMilli;
+        } catch (Exception e){
+            return false;
+        }
     }
 
     @Override

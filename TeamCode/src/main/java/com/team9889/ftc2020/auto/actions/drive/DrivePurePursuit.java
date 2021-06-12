@@ -4,7 +4,6 @@ import android.util.Log;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.team9889.ftc2020.auto.actions.Action;
-import com.team9889.ftc2020.auto.actions.ActionVariables;
 import com.team9889.ftc2020.subsystems.Robot;
 import com.team9889.lib.CruiseLib;
 import com.team9889.lib.control.Path;
@@ -102,7 +101,7 @@ public class DrivePurePursuit extends Action {
         }else
             wantedAngle = paths.get(lineNum + 1).getPose().getHeading();
 
-        double turn = wantedAngle - Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES);
+        double turn = wantedAngle - Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES);
 
         if (turn > 180){
             turn = turn - 360;

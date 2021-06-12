@@ -1,5 +1,7 @@
 package com.team9889.ftc2020.subsystems;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -42,7 +44,6 @@ public class Robot{
     public Motor backIntake;
     public Motor passThrough;
     public Servo leftArm, rightArm;
-    public DistanceSensor ringDetector;
     public DistanceSensor leftDist, rightDist;
 
     public Motor flyWheel;
@@ -78,6 +79,8 @@ public class Robot{
 
     public RoadRunner rr;
     public StandardTrackingWheelLocalizer localizer;
+
+    public boolean blue = false, blueGoal = false;
 
     // List of subsystems
     private List<Subsystem> subsystems = Arrays.asList(mMecanumDrive, mIntake, mFW, mWG, mCamera);
@@ -119,8 +122,6 @@ public class Robot{
         leftArm = hardwareMap.get(Servo.class, Constants.IntakeConstants.kLeftArm);
         rightArm = hardwareMap.get(Servo.class, Constants.IntakeConstants.kRightArm);
 
-        ringDetector = hardwareMap.get(DistanceSensor.class, Constants.IntakeConstants.kRingDetector);
-
         leftDist = hardwareMap.get(DistanceSensor.class, Constants.IntakeConstants.kLeftDist);
         rightDist = hardwareMap.get(DistanceSensor.class, Constants.IntakeConstants.kRightDist);
 
@@ -155,26 +156,33 @@ public class Robot{
     // Update data from Hubs and Apply new data
     public void update() {
         // Update Bulk Data
-        bulkDataMaster = revHubMaster.getBulkInputData();
-        bulkDataSlave = revHubSlave.getBulkInputData();
+        try {
+            bulkDataMaster = revHubMaster.getBulkInputData();
+            bulkDataSlave = revHubSlave.getBulkInputData();
 
-        // Update Motors
-        flyWheel.update(bulkDataSlave);
-        frontIntake.update(bulkDataSlave);
-        backIntake.update(bulkDataSlave);
-        passThrough.update(bulkDataSlave);
+            // Update Motors
+            flyWheel.update(bulkDataSlave);
+            frontIntake.update(bulkDataSlave);
+            backIntake.update(bulkDataSlave);
+            passThrough.update(bulkDataSlave);
 
-        // Update Subsystems
-        for (Subsystem subsystem : subsystems)
-            subsystem.update();
+            // Update Subsystems
+            for (Subsystem subsystem : subsystems)
+                subsystem.update();
 
-        result = Double.POSITIVE_INFINITY;
-        for (VoltageSensor sensor : hardwareMap.voltageSensor) {
-            double voltage = sensor.getVoltage();
-            if (voltage > 0){
-                result = Math.min(result, voltage);
+            result = Double.POSITIVE_INFINITY;
+            for (VoltageSensor sensor : hardwareMap.voltageSensor) {
+                double voltage = sensor.getVoltage();
+                if (voltage > 0){
+                    result = Math.min(result, voltage);
+                }
             }
+
+            Robot.getInstance().getIntake().current = passThrough.motor.getCurrentDraw(ExpansionHubEx.CurrentDrawUnits.MILLIAMPS);
+        } catch (Exception e){
+            Log.v("Exception@robot.update", "" + e);
         }
+
     }
 
     // Output Telemetry for all subsystems
@@ -182,6 +190,7 @@ public class Robot{
         for (Subsystem subsystem : subsystems)
             subsystem.outputToTelemetry(telemetry);
 
+        telemetry.addData("Current", passThrough.motor.getCurrentDraw(ExpansionHubEx.CurrentDrawUnits.MILLIAMPS));
     }
 
     // Stop all subsystems

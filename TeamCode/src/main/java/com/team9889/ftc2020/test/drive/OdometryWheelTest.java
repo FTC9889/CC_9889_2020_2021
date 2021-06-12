@@ -15,8 +15,8 @@ import java.util.List;
 @Disabled
 public class OdometryWheelTest extends AutoModeBase {
     @Override
-    public void run(Side side, Boxes box) {
-        Side Side_ = Side.BLUE;
+    public void run(StartPosition startPosition, Boxes box) {
+        StartPosition startPosition_ = StartPosition.BLUELEFT;
         List<Path> pose = new ArrayList<>();
 //        Robot.getMecanumDrive().setCurrentPose(new Pose2d());
 
@@ -43,5 +43,10 @@ public class OdometryWheelTest extends AutoModeBase {
             Robot.outputToTelemetry(telemetry);
             telemetry.update();
         }
+    }
+
+    @Override
+    public StartPosition side() {
+        return StartPosition.REDLEFT;
     }
 }

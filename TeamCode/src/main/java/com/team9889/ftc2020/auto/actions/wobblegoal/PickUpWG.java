@@ -9,6 +9,15 @@ import com.team9889.ftc2020.subsystems.Robot;
  */
 public class PickUpWG extends Action {
     ElapsedTime timer = new ElapsedTime();
+    double time = 0;
+
+    public PickUpWG() {
+
+    }
+
+    public PickUpWG(double time) {
+        this.time = time;
+    }
 
     @Override
     public void start() {
@@ -16,17 +25,19 @@ public class PickUpWG extends Action {
 
     @Override
     public void update() {
-        if (timer.milliseconds() < 700) {
-            Robot.getInstance().wgGrabber.setPosition(0.25);
-        } else {
-            Robot.getInstance().wgLeft.setPosition(.7);
-            Robot.getInstance().wgRight.setPosition(.7);
+        if (timer.milliseconds() > time) {
+            if (timer.milliseconds() < 700 + time) {
+                Robot.getInstance().wgGrabber.setPosition(0.25);
+            } else {
+                Robot.getInstance().wgLeft.setPosition(.6);
+                Robot.getInstance().wgRight.setPosition(.6);
+            }
         }
     }
 
     @Override
     public boolean isFinished() {
-        return timer.milliseconds() > 1000;
+        return timer.milliseconds() > 1000 + time;
     }
 
     @Override

@@ -38,7 +38,7 @@ public class BluePowerShots extends Action {
 
     @Override
     public void update() {
-        Robot.getInstance().passThrough.setPower(.4);
+        Robot.getInstance().getIntake().SetPassThroughPower(0.4);
 
         if (ps1) {
 //            double angle = Robot.getInstance().getMecanumDrive().robotAngleToTarget(ps1Pos, Robot.getInstance().rr.getPoseEstimate());
@@ -93,6 +93,6 @@ public class BluePowerShots extends Action {
         Robot.getInstance().flyWheel.motor.setVelocity(0);
         Robot.getInstance().fwFlap.setPosition(.4);
         Robot.getInstance().fwLock.setPosition(1);
-        Robot.getInstance().passThrough.setPower(0);
+        Robot.getInstance().getIntake().SetPassThroughPower(0);
     }
 }

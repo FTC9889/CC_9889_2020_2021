@@ -3,16 +3,13 @@ package com.team9889.ftc2020.auto.actions.teleop;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import com.acmerobotics.roadrunner.control.PIDFController;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.Robot;
-import com.team9889.lib.CruiseLib;
-import com.team9889.lib.control.Path;
 import com.team9889.lib.control.controllers.PID;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.opencv.core.Point;
-
-import java.util.ArrayList;
 
 /**
  * Created by Eric on 8/26/2020.
@@ -20,97 +17,52 @@ import java.util.ArrayList;
 
 @Config
 public class AimAndShoot extends Action {
-    public static double p = .7, i = 0, d = 20, f = 0;
-    public static double multiplier, multiplier12 = .95, multiplier11 = 1, multiplier10 = 1.05;
-//    public static double p = .5, i, d = 0;
+    public static double p = .5, d = 30;
+    public static double p2 = 1.2, d2 = 50;
 
-    ArrayList<Path> paths = new ArrayList<>();
+    private PID camOrientationPID = new PID(0.5, 0, 30);
+    private PID gyroOrientationPID = new PID(12, 0, .5);
 
-    Point posOfTarget = new Point(0, 65);
-
-    boolean extend = false;
-    int ringsShot = 0;
-
-    private PID camOrientationPID;
-
-    private int angleCounter = 0;
-    private int xCounter = 0;
-    private int yCounter = 0;
-    Point lastPoint = new Point();
-
-    boolean first = true;
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(12, 0, .5);
+    public PIDFController headingController = new PIDFController(HEADING_PID);
 
     @Override
-    public void start() {
-        camOrientationPID = new PID(0.4, 0.0000001, 0.7, 1);
-    }
+    public void start() {}
 
-    boolean driveDone = false;
     @Override
     public void update() {
-        if (Robot.getInstance().result > 12) {
-            multiplier = multiplier12;
-        } else if (Robot.getInstance().result <= 12 && Robot.getInstance().result > 11) {
-            multiplier = multiplier11;
-        } else if (Robot.getInstance().result <= 11) {
-            multiplier = multiplier10;
-        }
+        updatePIDValues();
 
-        camOrientationPID.p = p;
-        camOrientationPID.i = i;
-        camOrientationPID.d = d;
-        camOrientationPID.maxIntegral = f;
-
-        double turn = Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.RADIANS) -
+        double cameraTarget = Robot.getInstance().getCamera().getPosOfTarget().x;
+        double turn = Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS) -
                 Robot.getInstance().getMecanumDrive().angleFromAuton;
 
-        double camera = Robot.getInstance().getCamera().getPosOfTarget().x;
         double speed = 0;
-        if (Robot.getInstance().getCamera().getPosOfTarget().x != 1e10) {
-            camOrientationPID.update(camera, 0);
-            speed = -CruiseLib.limitValue(camOrientationPID.getOutput() / 1.2, -.2, -.6, .2, .6);
-//            if (Math.abs(camera) < .2) {
-//                speed = (camera / Math.abs(camera)) * .15;
-//            } else {
-//                speed = (camera / Math.abs(camera)) * .25;
-//            }
-        } else if (Math.abs(turn) > Math.toRadians(5)) {
-            camOrientationPID.update(turn, 0);
-            Log.v("Turn", turn + "");
-            speed = CruiseLib.limitValue(camOrientationPID.getOutput(), -.3, -1, .3, 1);
+        if (Math.abs(turn) > Math.toRadians(25)) {
+            speed = gyroOrientationPID.update(turn, 0);
+            Log.i("Turn", "" + turn);
+        }
+        else if (Math.abs(Robot.getInstance().getCamera().getPosOfTarget().x) >= 0.05){
+            speed = -camOrientationPID.update(cameraTarget, 0);
         }
 
-        if (Math.abs(Robot.getInstance().getCamera().getPosOfTarget().x) >= 0.15) {
-            Robot.getInstance().getMecanumDrive().turnSpeed += (speed);
-        }
-//        Robot.getInstance().getMecanumDrive().turnSpeed += (camera / Math.abs(camera)) * .2;
+        Robot.getInstance().getMecanumDrive().turnSpeed += (speed);
+    }
+
+    void updatePIDValues () {
+        camOrientationPID.p = p;
+        camOrientationPID.d = d;
+
+        gyroOrientationPID.p = p2;
+        gyroOrientationPID.d = d2;
     }
 
     @Override
     public boolean isFinished() {
-//        Pose2d tolerancePose = paths.get(paths.size() - 1).getTolerancePose();
-//
-//        if (Math.abs(paths.get(paths.size() - 1).getPoint().x - Robot.getInstance().getMecanumDrive().getAdjustedPose().getX())
-//                < Math.abs(tolerancePose.getX())) xCounter++; else xCounter = 0;
-//
-//        if (Math.abs(paths.get(paths.size() - 1).getPoint().y - Robot.getInstance().getMecanumDrive().getAdjustedPose().getY())
-//                < Math.abs(tolerancePose.getY())) yCounter++; else yCounter = 0;
-//
-//        if (Math.abs(camOrientationPID.getError()) < 5)
-//            angleCounter++;
-//        else angleCounter = 0;
-
-//        return (angleCounter > 3);
-
         return false;
-
-//        return ringsShot >= 4;
     }
 
     @Override
     public void done() {
-        extend = false;
-        ringsShot = 0;
-        driveDone = false;
     }
 }

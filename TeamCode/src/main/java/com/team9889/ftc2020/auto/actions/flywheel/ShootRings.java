@@ -19,7 +19,6 @@ public class ShootRings extends Action {
     int stage = 0, ringsShot = 0, rings, time, power = 1145;
 //    1135
     boolean extend = false, stop = true;
-    int originalPower;
 
     Telemetry telemetry;
 
@@ -34,7 +33,6 @@ public class ShootRings extends Action {
         this.time = time;
         this.telemetry = telemetry;
         this.power = power;
-        this.originalPower = power;
     }
 
     public ShootRings (int rings, int time, Telemetry telemetry, int power, boolean stop) {
@@ -58,13 +56,6 @@ public class ShootRings extends Action {
 
     @Override
     public void update() {
-//        Robot.getInstance().passThrough.setPower(.4);
-        if (Robot.getInstance().rr.getLocalizer().getPoseEstimate().getX() > -25) {
-            power = originalPower + 25;
-        } else {
-            power = originalPower;
-        }
-
         if (totalTimer.milliseconds() > time && shootTimer.milliseconds() > 80) {
             if (extend) {
                 Robot.getInstance().fwArm.setPosition(0.47);
@@ -83,7 +74,7 @@ public class ShootRings extends Action {
         Robot.getInstance().flyWheel.motor.setVelocity(power);
         telemetry.update();
 
-        Robot.getInstance().update();
+//        Robot.getInstance().update();
         loopTimer.reset();
     }
 
@@ -99,5 +90,7 @@ public class ShootRings extends Action {
             Robot.getInstance().fwLock.setPosition(1);
             Log.i("Shot", "");
         }
+
+        Robot.getInstance().getIntake().ringsIntaken = 0;
     }
 }

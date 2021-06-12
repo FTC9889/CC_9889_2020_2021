@@ -13,11 +13,12 @@ import java.util.ArrayList;
  * Created by Eric on 8/24/2020.
  */
 
+@Disabled
 @Autonomous
 public class TestPurePursuit extends AutoModeBase {
 
     @Override
-    public void run(Side side, Boxes box) {
+    public void run(StartPosition startPosition, Boxes box) {
         runAction(new DrivePurePursuit(new ArrayList<Path>(){{
             add(new Path(new Pose2d(40, 0, 0),
                     new Pose2d(1, 1, 2), 8, 1));
@@ -28,5 +29,10 @@ public class TestPurePursuit extends AutoModeBase {
             add(new Path(new Pose2d(50, -60, 20),
                     new Pose2d(1, 1, 2), 8, 1));
         }}));
+    }
+
+    @Override
+    public StartPosition side() {
+        return StartPosition.REDLEFT;
     }
 }

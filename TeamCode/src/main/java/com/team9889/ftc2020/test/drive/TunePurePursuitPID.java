@@ -45,7 +45,7 @@ public class TunePurePursuitPID extends Team9889Linear {
                 path.add(new Path(new Pose2d(
                         1,
                         0,
-                        Robot.getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES) + 90),
+                        Robot.getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES) + 90),
                         new Pose2d(1, 1, 2), 30, maxVelocity));
 
                 runAction(new DrivePurePursuit(path, pid));

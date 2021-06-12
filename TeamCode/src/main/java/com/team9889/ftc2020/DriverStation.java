@@ -1,7 +1,6 @@
 package com.team9889.ftc2020;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * Created by MannoMation on 12/14/2018.
@@ -89,6 +88,18 @@ public class DriverStation {
             intakeToggle = true;
 
         return intakeOn;
+    }
+
+    private boolean goalToggle = true;
+    private boolean middleGoal = false;
+    boolean getGoal() {
+        if(gamepad2.x && goalToggle) {
+            middleGoal = !middleGoal;
+            goalToggle = false;
+        } else if(!gamepad2.x)
+            goalToggle = true;
+
+        return middleGoal;
     }
 
     boolean resetIMU() {

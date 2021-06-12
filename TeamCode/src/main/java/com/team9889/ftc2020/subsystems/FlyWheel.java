@@ -43,7 +43,9 @@ public class FlyWheel extends Subsystem{
     }
 
     @Override
-    public void outputToTelemetry(Telemetry telemetry) {}
+    public void outputToTelemetry(Telemetry telemetry) {
+        telemetry.addData("Fly Wheel Speed", getRPM());
+    }
 
     @Override
     public void update() {

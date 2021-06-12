@@ -2,6 +2,7 @@ package com.team9889.ftc2020.subsystems;
 
 import android.util.Log;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.team9889.ftc2020.auto.AutoModeBase;
 import com.team9889.lib.control.controllers.PID;
 import com.team9889.lib.detectors.ScanForGoal;
@@ -17,8 +18,13 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
  * Created by MannoMation on 10/27/2018.
  */
 
+@Config
 public class Camera extends Subsystem{
-    public static double p = -0.016, i, d;
+    public static double ps1 = .52, ps2 = .54, ps3 = .57;
+    public static double tPS1 = .52, tPS2 = .54, tPS3 = .57, tPS4 = .59;
+    public static double bluetPS1 = .42, bluetPS2 = .4, bluetPS3 = .39, bluetPS4 = .36;
+
+    public double p = -0.016, i, d;
     PID cameraY = new PID(-0.016, 0, 0);
     public double camYPose = .7;
 
@@ -46,7 +52,6 @@ public class Camera extends Subsystem{
                 Robot.getInstance().camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
                 if (auto) {
                     setScanForRS();
-                    setRSCamPos();
                 } else {
                     setScanForGoal();
                     Log.i("Hi", "");
@@ -59,7 +64,7 @@ public class Camera extends Subsystem{
     @Override
     public void outputToTelemetry(Telemetry telemetry) {
         telemetry.addData("Pos Of Target", getPosOfTarget());
-        telemetry.addData("Box", getRSBox().toString());
+        telemetry.addData("Camera Error", Math.abs(Math.round(getPosOfTarget().x * 100.0))/100.0);
     }
 
     @Override
@@ -78,9 +83,9 @@ public class Camera extends Subsystem{
         AutoModeBase.Boxes box = AutoModeBase.Boxes.CLOSE;
         if (Math.abs(getPosOfTarget().y) == 0) {
             box = AutoModeBase.Boxes.CLOSE;
-        } else if (Math.abs(getPosOfTarget().y) >= .15) {
+        } else if (Math.abs(getPosOfTarget().y) < 20) {
             box = AutoModeBase.Boxes.MIDDLE;
-        } else if (Math.abs(getPosOfTarget().y) < .15) {
+        } else if (Math.abs(getPosOfTarget().y) >= 20) {
             box = AutoModeBase.Boxes.FAR;
         }
 
@@ -128,7 +133,7 @@ public class Camera extends Subsystem{
 
     public void setGoalCamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.475);
+        Robot.getInstance().xCam.setPosition(.465);
 
 //        camYPose += cameraY.update(getPosOfTarget().y, 0);
 //        CruiseLib.limitValue(camYPose, 1, 0);
@@ -138,19 +143,60 @@ public class Camera extends Subsystem{
 
     public void setPS1CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.53);
+        Robot.getInstance().xCam.setPosition(ps1);
         Robot.getInstance().yCam.setPosition(.7);
     }
 
     public void setPS2CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.555);
+        Robot.getInstance().xCam.setPosition(ps2);
         Robot.getInstance().yCam.setPosition(.7);
     }
 
     public void setPS3CamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.58);
+        Robot.getInstance().xCam.setPosition(ps3);
+        Robot.getInstance().yCam.setPosition(.7);
+    }
+
+
+    public void setTelePS1CamPos () {
+        currentCamState = CameraStates.GOAL;
+        if (Robot.getInstance().blue) {
+            Robot.getInstance().xCam.setPosition(bluetPS1);
+        } else {
+            Robot.getInstance().xCam.setPosition(tPS1);
+        }
+        Robot.getInstance().yCam.setPosition(.7);
+    }
+
+    public void setTelePS2CamPos () {
+        currentCamState = CameraStates.GOAL;
+        if (Robot.getInstance().blue) {
+            Robot.getInstance().xCam.setPosition(bluetPS2);
+        } else {
+            Robot.getInstance().xCam.setPosition(tPS2);
+        }
+        Robot.getInstance().yCam.setPosition(.7);
+    }
+
+    public void setTelePS3CamPos () {
+        currentCamState = CameraStates.GOAL;
+        if (Robot.getInstance().blue) {
+            Robot.getInstance().xCam.setPosition(bluetPS3);
+        } else {
+            Robot.getInstance().xCam.setPosition(tPS3);
+        }
+        Robot.getInstance().yCam.setPosition(.7);
+    }
+
+    public void setTelePS4CamPos () {
+        currentCamState = CameraStates.GOAL;
+        if (Robot.getInstance().blue) {
+            Robot.getInstance().xCam.setPosition(bluetPS4);
+        } else {
+            Robot.getInstance().xCam.setPosition(tPS4);
+        }
         Robot.getInstance().yCam.setPosition(.7);
     }
 
@@ -172,9 +218,15 @@ public class Camera extends Subsystem{
         Robot.getInstance().yCam.setPosition(.7);
     }
 
-    public void setRSCamPos () {
+    public void setRSCamPosRight() {
         currentCamState = CameraStates.RS;
         Robot.getInstance().xCam.setPosition(.64);
+        Robot.getInstance().yCam.setPosition(.9);
+    }
+
+    public void setRSCamPosLeft() {
+        currentCamState = CameraStates.RS;
+        Robot.getInstance().xCam.setPosition(.4);
         Robot.getInstance().yCam.setPosition(.9);
     }
 }

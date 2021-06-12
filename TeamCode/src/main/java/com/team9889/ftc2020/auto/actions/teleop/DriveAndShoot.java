@@ -83,7 +83,7 @@ public class DriveAndShoot extends Action {
             } else
                 wantedAngle = paths.get(1).getPose().getHeading();
 
-            double turn = wantedAngle - Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES);
+            double turn = wantedAngle - Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES);
 
             if (turn > 180) {
                 turn = turn - 360;

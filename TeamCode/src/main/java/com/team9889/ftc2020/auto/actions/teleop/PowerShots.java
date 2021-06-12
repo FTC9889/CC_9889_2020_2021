@@ -58,7 +58,7 @@ public class PowerShots extends Action {
     @Override
     public void update() {
 //        Robot.getInstance().update();
-        turn = Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES) -
+        turn = Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES) -
                 Math.toDegrees(Robot.getInstance().getMecanumDrive().angleFromAuton);
 
         Log.v("Turn", turn + "");

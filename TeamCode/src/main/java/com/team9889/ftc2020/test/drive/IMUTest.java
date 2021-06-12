@@ -20,7 +20,7 @@ public class IMUTest extends Team9889Linear {
         waitForStart(true);
 
         while (opModeIsActive()) {
-            double currentAngle = Robot.getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES);
+            double currentAngle = Robot.getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES);
             double angle = 175;
 
             if (Math.abs(angle) > 175) {

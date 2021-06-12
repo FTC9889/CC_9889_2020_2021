@@ -26,7 +26,7 @@ public class TuneFollowPathPIDAuto extends AutoModeBase {
     boolean lRToggle = true, upDownToggle = true, speedToggle = true, addToggle = true;
 
     @Override
-    public void run(Side side, Boxes box) {
+    public void run(StartPosition startPosition, Boxes box) {
         while (opModeIsActive()) {
             Robot.update();
 
@@ -113,5 +113,10 @@ public class TuneFollowPathPIDAuto extends AutoModeBase {
             telemetry.update();
         }
 
+    }
+
+    @Override
+    public StartPosition side() {
+        return StartPosition.REDLEFT;
     }
 }

@@ -4,7 +4,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.Team9889Linear;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.auto.actions.utl.RobotUpdate;
-import com.team9889.ftc2020.subsystems.Camera;
 
 /**
  * Created by joshua9889 on 8/5/2017.
@@ -13,28 +12,20 @@ import com.team9889.ftc2020.subsystems.Camera;
 public abstract class AutoModeBase extends Team9889Linear {
 
     // Autonomous Settings
-    private Side currentAutoRunning = AutoModeBase.Side.RED;
+    private StartPosition currentAutoRunning = StartPosition.REDRIGHT;
 
     // Timer for autonomous
     protected ElapsedTime autoTimer = new ElapsedTime();
     double lastLoop = 0;
 
-    protected enum Side {
-        RED, BLUE;
+    public enum StartPosition {
+        REDRIGHT, REDLEFT, BLUERIGHT, BLUELEFT, PARK;
 
         private static String redString = "Red";
         private static String blueString = "Blue";
 
         private static int RED_Num = 1;
         private static int BLUE_Num = -1;
-
-        public static int getNum(Side side){
-            return side == RED ? RED_Num : BLUE_Num;
-        }
-
-        public static Side fromText(String side) {
-            return side.equals(redString) ? RED : BLUE;
-        }
     }
 
     public enum Boxes {
@@ -45,22 +36,24 @@ public abstract class AutoModeBase extends Team9889Linear {
     // Checks for a saved file to see what auto we are running?
     // TODO: Use gamepad or maybe camera to select which auto to run
     private void setCurrentAutoRunning(){
-
+        currentAutoRunning = side();
     }
 
     // Method to implement in the auto to run the autonomous
-    public abstract void run(Side side, Boxes box);
+    public abstract void run(StartPosition startPosition, Boxes box);
+
+    public abstract StartPosition side();
 
     @Override
     public void runOpMode() throws InterruptedException{
         setCurrentAutoRunning();
 
-        waitForStart(true);
+        waitForStart(true, currentAutoRunning);
         autoTimer.reset();
 
         box = Robot.getCamera().getRSBox();
 
-//        ThreadAction(new RobotUpdate());
+        ThreadAction(new RobotUpdate());
 
         // If the opmode is still running, run auto
         if (opModeIsActive() && !isStopRequested()) {
@@ -77,24 +70,25 @@ public abstract class AutoModeBase extends Team9889Linear {
      * @param action Action Class wanting to run
      */
     public void runAction(Action action){
-        if(opModeIsActive() && !isStopRequested())
+        if(opModeIsActive() && !isStopRequested()) {
             action.start();
 
-        while (!action.isFinished() && opModeIsActive() && !isStopRequested()) {
-            action.update();
+            while (!action.isFinished() && opModeIsActive() && !isStopRequested()) {
+                action.update();
 //            Robot.getMecanumDrive().setFieldCentricAutoPower(Robot.getMecanumDrive().xSpeed,
 //                    Robot.getMecanumDrive().ySpeed, Robot.getMecanumDrive().turnSpeed);
-            Robot.update();
-            Robot.outputToTelemetry(telemetry);
-            telemetry.update();
-            while (autoTimer.milliseconds() - lastLoop < 10) {
-
+//            Robot.update();
+//                Robot.outputToTelemetry(telemetry);
+//                telemetry.update();
+//                while (autoTimer.milliseconds() - lastLoop < 10) {
+//
+//                }
+//                lastLoop = autoTimer.milliseconds();
             }
-            lastLoop = autoTimer.milliseconds();
-        }
 
-        if(opModeIsActive() && !isStopRequested()) {
-            action.done();
+            if (opModeIsActive() && !isStopRequested()) {
+                action.done();
+            }
         }
     }
 

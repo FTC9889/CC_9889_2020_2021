@@ -13,7 +13,6 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.Moments;
 import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
@@ -109,33 +108,45 @@ public class ScanForRS extends OpenCvPipeline {
         double filterContoursMaxRatio = 1000;
         filterContours(filterContoursContours, filterContoursMinArea, filterContoursMinPerimeter, filterContoursMinWidth, filterContoursMaxWidth, filterContoursMinHeight, filterContoursMaxHeight, filterContoursSolidity, filterContoursMaxVertices, filterContoursMinVertices, filterContoursMinRatio, filterContoursMaxRatio, filterContoursOutput);
 
-        List<Moments> mu = new ArrayList<>();
+//        List<Moments> mu = new ArrayList<>();
+//
+//        for (int i = 0; i < filterContoursOutput.size(); i++) {
+//            mu.add(Imgproc.moments(filterContoursOutput.get(i)));
+//        }
+//
+//        List<Point> mc = new ArrayList<>();
+//        for (int i = 0; i < filterContoursOutput.size(); i++) {
+//            mc.add(new Point(mu.get(i).m10 / mu.get(i).m00 + 1e-5, mu.get(i).m01 / mu.get(i).m00 + 1e-5));
+//        }
+//        Imgproc.cvtColor(blurOutput, blurOutput, Imgproc.COLOR_HSV2RGB);
+//
+//        for (int i = 0; i < filterContoursContours.size(); i++) {
+//            Imgproc.drawContours(blurOutput, filterContoursContours, i, new Scalar(0, 255, 0));
+//        }
+//
+//        for (int i = 0; i < filterContoursOutput.size(); i++) {
+//            Imgproc.drawContours(blurOutput, filterContoursOutput, i, new Scalar(0, 0, 255));
+//            Imgproc.circle(blurOutput, mc.get(i), 4, new Scalar(0, 255, 0), -1);
+//        }
+//
+//        if (mc.size() > 0) {
+//            stackHeight = mc.get(0).y;
+//            Imgproc.circle(blurOutput, mc.get(0), 2, new Scalar(0, 0, 255), -1);
+//            point = new Point((mc.get(0).x / ((double) blurOutput.width() / 2)) - 1, (mc.get(0).y / ((double) blurOutput.height() / 2)) - 1);
+//        } else {
+//            point = new Point (0, 0);
+//        }
 
-        for (int i = 0; i < filterContoursOutput.size(); i++) {
-            mu.add(Imgproc.moments(filterContoursOutput.get(i)));
-        }
-
-        List<Point> mc = new ArrayList<>();
-        for (int i = 0; i < filterContoursOutput.size(); i++) {
-            mc.add(new Point(mu.get(i).m10 / mu.get(i).m00 + 1e-5, mu.get(i).m01 / mu.get(i).m00 + 1e-5));
-        }
         Imgproc.cvtColor(blurOutput, blurOutput, Imgproc.COLOR_HSV2RGB);
-
-        for (int i = 0; i < filterContoursContours.size(); i++) {
-            Imgproc.drawContours(blurOutput, filterContoursContours, i, new Scalar(0, 255, 0));
-        }
-
         for (int i = 0; i < filterContoursOutput.size(); i++) {
             Imgproc.drawContours(blurOutput, filterContoursOutput, i, new Scalar(0, 0, 255));
-            Imgproc.circle(blurOutput, mc.get(i), 4, new Scalar(0, 255, 0), -1);
         }
 
-        if (mc.size() > 0) {
-            stackHeight = mc.get(0).y;
-            Imgproc.circle(blurOutput, mc.get(0), 2, new Scalar(0, 0, 255), -1);
-            point = new Point((mc.get(0).x / ((double) blurOutput.width() / 2)) - 1, (mc.get(0).y / ((double) blurOutput.height() / 2)) - 1);
+        if (filterContoursOutput.size() > 0) {
+            Rect rect = Imgproc.boundingRect(filterContoursOutput.get(0));
+            point = new Point(0, rect.height);
         } else {
-            point = new Point (0, 0);
+            point = new Point(0, 0);
         }
 
         Log.i("Stack Height", "" + getPoint().y);

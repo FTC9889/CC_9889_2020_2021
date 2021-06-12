@@ -30,12 +30,12 @@ public class WobbleGoal extends Subsystem{
     }
 
     public void setWGDown () {
-        Robot.getInstance().wgLeft.setPosition(0.4);
-        Robot.getInstance().wgRight.setPosition(0.4);
+        Robot.getInstance().wgLeft.setPosition(0.8);
+        Robot.getInstance().wgRight.setPosition(0.8);
     }
 
     public void setWGUp () {
-        Robot.getInstance().wgLeft.setPosition(0.8);
-        Robot.getInstance().wgRight.setPosition(0.8);
+        Robot.getInstance().wgLeft.setPosition(0.4);
+        Robot.getInstance().wgRight.setPosition(0.4);
     }
 }

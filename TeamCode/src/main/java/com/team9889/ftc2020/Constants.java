@@ -1,5 +1,9 @@
 package com.team9889.ftc2020;
 
+import android.graphics.Color;
+
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+
 /**
  * Class to store constants
  * Created by joshua9889 on 4/10/2017.
@@ -18,6 +22,9 @@ public class Constants {
     public final static String kRevHubSlave = "E";
 
     public final static String kWebcam = "Webcam";
+
+    public static int side = Color.RED;
+    public static Pose2d pose = new Pose2d(0, 0, 0);
 
     /*---------------------
     |                     |

@@ -1,12 +1,14 @@
 package com.team9889.ftc2020;
 
+import android.graphics.Color;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.team9889.ftc2020.auto.AutoModeBase;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.Robot;
-import com.team9889.lib.roadrunner.PoseStorage;
 
 /**
  * Created by joshua9889 on 3/28/2018.
@@ -26,29 +28,70 @@ public abstract class Team9889Linear extends LinearOpMode {
     // Dashboard
     public FtcDashboard dashboard = FtcDashboard.getInstance();
 
+    public int timeToWait = 0;
+    boolean buttonReleased = true;
+
     public void waitForStart(boolean autonomous) {
+        this.waitForStart(autonomous, AutoModeBase.StartPosition.REDRIGHT);
+    }
+
+    public void waitForStart(boolean autonomous, AutoModeBase.StartPosition startPosition) {
         Robot.init(hardwareMap, autonomous);
 
-        if (PoseStorage.currentPose.equals(new Pose2d(0, 0, 0))) {
+        if (Constants.pose.equals(new Pose2d(0, 0, 0))) {
             Robot.rr.getLocalizer().setPoseEstimate(new Pose2d(-63, -17.5, Math.toRadians(0)));
         } else {
-            Robot.rr.getLocalizer().setPoseEstimate(PoseStorage.currentPose);
+            Robot.rr.getLocalizer().setPoseEstimate(Constants.pose);
+        }
+
+        if (autonomous) {
+            if (startPosition == AutoModeBase.StartPosition.REDRIGHT ||
+                startPosition == AutoModeBase.StartPosition.BLUERIGHT) {
+                Robot.getCamera().setRSCamPosLeft();
+            } else if (startPosition == AutoModeBase.StartPosition.REDLEFT ||
+                startPosition == AutoModeBase.StartPosition.BLUELEFT) {
+                Robot.getCamera().setRSCamPosRight();
+            }
+
+            if (startPosition == AutoModeBase.StartPosition.REDLEFT ||
+                startPosition == AutoModeBase.StartPosition.REDRIGHT) {
+                Constants.side = Color.RED;
+            } else if (startPosition == AutoModeBase.StartPosition.BLUELEFT ||
+                    startPosition == AutoModeBase.StartPosition.BLUERIGHT) {
+                Constants.side = Color.BLUE;
+            }
         }
 
         telemetry.setMsTransmissionInterval(autonomous ? 50:1000);
 
-        telemetry = dashboard.getTelemetry();
+//        telemetry = dashboard.getTelemetry();
 
         if(autonomous){
             // Autonomous Init Loop code
             while(isInInitLoop()){
                 telemetry.addData("Waiting for Start","");
+                telemetry.addData("Box", Robot.getCamera().getRSBox().toString());
+
+                telemetry.addData("Delay at beginning", timeToWait / 1000);
+
                 Robot.outputToTelemetry(telemetry);
                 telemetry.update();
 
                 FtcDashboard.getInstance().startCameraStream(Robot.camera, 0);
+
+                if (gamepad1.dpad_up && buttonReleased) {
+                    timeToWait += 1000;
+                    buttonReleased = false;
+                } else if (gamepad1.dpad_down && buttonReleased) {
+                    timeToWait -= 1000;
+                    buttonReleased = false;
+                } else if (!gamepad1.dpad_up && !gamepad1.dpad_down) {
+                    buttonReleased = true;
+                }
             }
         } else {
+            Robot.blue = Constants.side == Color.BLUE;
+
             // Teleop Init Loop code
             while(isInInitLoop()){
                 telemetry.addData("Waiting for Start","");
@@ -64,7 +107,7 @@ public abstract class Team9889Linear extends LinearOpMode {
      * Used to stop everything (Robot and OpMode).
      */
     protected void finalAction(){
-        PoseStorage.currentPose = Robot.rr.getPoseEstimate();
+        Constants.pose = Robot.rr.getPoseEstimate();
         Robot.stop();
         requestOpModeStop();
     }

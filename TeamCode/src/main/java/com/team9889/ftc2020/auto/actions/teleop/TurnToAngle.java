@@ -1,19 +1,11 @@
 package com.team9889.ftc2020.auto.actions.teleop;
 
-import android.util.Log;
-
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.Robot;
 import com.team9889.lib.CruiseLib;
-import com.team9889.lib.control.Path;
-import com.team9889.lib.control.PurePursuit;
 import com.team9889.lib.control.controllers.PID;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.opencv.core.Point;
-
-import java.util.ArrayList;
 
 /**
  * Created by Eric on 8/26/2020.
@@ -42,7 +34,7 @@ public class TurnToAngle extends Action {
         }else
             wantedAngle = angle;
 
-        double turn = wantedAngle - Robot.getInstance().getMecanumDrive().getAngle().getTheda(AngleUnit.DEGREES);
+        double turn = wantedAngle - Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES);
 
         if (turn > 180){
             turn = turn - 360;
