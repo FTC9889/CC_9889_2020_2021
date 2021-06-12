@@ -8,8 +8,8 @@ import com.team9889.ftc2020.auto.actions.utl.Wait;
  * Created by Eric on 6/11/2021.
  */
 
-@Autonomous(preselectTeleOp = "Teleop")
-public class Park extends AutoModeBase {
+@Autonomous(group = "Blue", preselectTeleOp = "Teleop")
+public class BluePark extends AutoModeBase {
 
     @Override
     public void run(StartPosition startPosition, Boxes box) {
@@ -22,6 +22,6 @@ public class Park extends AutoModeBase {
 
     @Override
     public StartPosition side() {
-        return StartPosition.REDRIGHT;
+        return StartPosition.BLUERIGHT;
     }
 }

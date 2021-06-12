@@ -17,12 +17,12 @@ import com.team9889.lib.roadrunner.drive.RoadRunner;
  * Created by Eric on 6/4/2021.
  */
 
-@Autonomous
-public class TestAuto extends AutoModeBase {
+@Autonomous(group = "Red", name = "Full Left Red", preselectTeleOp = "Teleop")
+public class FullLeftRed extends AutoModeBase {
     Trajectory traj;
 
     @Override
-    public void run(Side side, Boxes box) {
+    public void run(StartPosition startPosition, Boxes box) {
         Robot.flyWheel.motor.setVelocity(1320);
 
         Robot.getCamera().setPS1CamPos();
@@ -40,7 +40,7 @@ public class TestAuto extends AutoModeBase {
                 .build();
         Robot.rr.followTrajectory(traj);
 
-        runAction(new PowerShots());
+        runAction(new PowerShots(true));
 
         if (box == Boxes.FAR) {
             Robot.leftArm.setPosition(0);
@@ -239,17 +239,8 @@ public class TestAuto extends AutoModeBase {
                 ThreadAction(new PutDownWG());
                 Robot.flyWheel.motor.setVelocity(1450);
 
-                Robot.getIntake().backIntakeOn = true;
-                Robot.getIntake().passThroughIntakeOn = true;
                 traj = Robot.rr.trajectoryBuilder(traj.end(), true)
                         .splineTo(new Vector2d(-5, -35), Math.toRadians(180))
-                        .build();
-
-                Robot.rr.followTrajectory(traj);
-
-                runAction(new ShootRings(3, 0, telemetry, 1450, false));
-
-                traj = Robot.rr.trajectoryBuilder(traj.end(), true)
                         .splineToConstantHeading(new Vector2d(-20, -35), Math.toRadians(180),
                                 RoadRunner.getVelocityConstraint(20, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                                 RoadRunner.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
@@ -306,5 +297,10 @@ public class TestAuto extends AutoModeBase {
                 Robot.rr.followTrajectory(traj);
                 break;
         }
+    }
+
+    @Override
+    public StartPosition side() {
+        return StartPosition.REDLEFT;
     }
 }

@@ -5,7 +5,7 @@ import com.team9889.ftc2020.auto.actions.Action;
 /**
  * Created by Eric on 6/10/2021.
  */
-public class IntakeMonitor extends Action {
+public class IntakeController extends Action {
     @Override
     public void start() {
 
