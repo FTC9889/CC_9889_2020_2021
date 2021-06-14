@@ -208,7 +208,6 @@ public class HalfLeftRed extends AutoModeBase {
 //                Robot.rr.followTrajectory(traj);
 
                 traj = Robot.rr.trajectoryBuilder(traj.end())
-//                        .splineTo(new Vector2d(60, -45), Math.toRadians(-90))
                         .splineTo(new Vector2d(60, -15), Math.toRadians(-90))
                         .splineTo(new Vector2d(40, -10), Math.toRadians(180))
                         .splineTo(new Vector2d(10, -10), Math.toRadians(0))
