@@ -21,7 +21,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 @Config
 public class Camera extends Subsystem{
     public static double ps1 = .52, ps2 = .54, ps3 = .57;
-    public static double tPS1 = .52, tPS2 = .54, tPS3 = .57, tPS4 = .59;
+    public static double tPS1 = .53, tPS2 = .54, tPS3 = .58, tPS4 = .59;
     public static double bluetPS1 = .42, bluetPS2 = .4, bluetPS3 = .39, bluetPS4 = .36;
 
     public double p = -0.016, i, d;
@@ -83,9 +83,9 @@ public class Camera extends Subsystem{
         AutoModeBase.Boxes box = AutoModeBase.Boxes.CLOSE;
         if (Math.abs(getPosOfTarget().y) == 0) {
             box = AutoModeBase.Boxes.CLOSE;
-        } else if (Math.abs(getPosOfTarget().y) < 20) {
+        } else if (Math.abs(getPosOfTarget().y) < 17) {
             box = AutoModeBase.Boxes.MIDDLE;
-        } else if (Math.abs(getPosOfTarget().y) >= 20) {
+        } else if (Math.abs(getPosOfTarget().y) >= 17) {
             box = AutoModeBase.Boxes.FAR;
         }
 

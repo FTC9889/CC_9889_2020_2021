@@ -19,7 +19,7 @@ public class HalfLeftRed extends AutoModeBase {
 
     @Override
     public void run(StartPosition startPosition, Boxes box) {
-        Robot.flyWheel.motor.setVelocity(1270);
+        Robot.flyWheel.motor.setVelocity(1290);
 
         Robot.getCamera().setPS1CamPos();
         Robot.getCamera().setScanForGoal();
@@ -169,43 +169,53 @@ public class HalfLeftRed extends AutoModeBase {
                 Robot.leftArm.setPosition(0);
                 Robot.rightArm.setPosition(1);
 
-                traj = Robot.rr.trajectoryBuilder(traj.end(), true)
-                        .splineTo(new Vector2d(60, -35), Math.toRadians(90))
-                        .build();
-                Robot.rr.followTrajectory(traj);
+//                traj = Robot.rr.trajectoryBuilder(traj.end(), true)
+//                        .splineTo(new Vector2d(60, -35), Math.toRadians(90))
+//                        .build();
+//                Robot.rr.followTrajectory(traj);
 
-                Robot.getIntake().frontIntakeOn = true;
-                Robot.getIntake().backIntakeOn = true;
-                Robot.getIntake().passThroughIntakeOn = true;
+//                Robot.getIntake().frontIntakeOn = true;
+//                Robot.getIntake().backIntakeOn = true;
+//                Robot.getIntake().passThroughIntakeOn = true;
 
-                Robot.getFlyWheel().setRPM(1500);
+//                Robot.getFlyWheel().setRPM(1500);
+
+//                traj = Robot.rr.trajectoryBuilder(traj.end())
+//                        .splineTo(new Vector2d(50, -40), Math.toRadians(-180))
+//                        .splineTo(new Vector2d(40, -45), Math.toRadians(-90))
+//                        .splineTo(new Vector2d(37.5, -55), Math.toRadians(-180))
+//                        .splineTo(new Vector2d(35, -50), Math.toRadians(90))
+//                        .splineTo(new Vector2d(45, -15), Math.toRadians(90))
+//                        .splineTo(new Vector2d(40, -10), Math.toRadians(180))
+//                        .splineTo(new Vector2d(35, -15), Math.toRadians(-90))
+//                        .splineTo(new Vector2d(25, -50), Math.toRadians(-90))
+//                        .splineTo(new Vector2d(20, -55), Math.toRadians(-180))
+//                        .splineTo(new Vector2d(-35, -60), Math.toRadians(-180))
+//
+//                        .splineTo(new Vector2d(-40, -45), Math.toRadians(90))
+//                        .splineTo(new Vector2d(-40, -25), Math.toRadians(90))
+//                        .splineTo(new Vector2d(-10, -10), Math.toRadians(-17))
+//                        .build();
+//                Robot.rr.followTrajectory(traj);
+//
+//                Robot.fwLock.setPosition(.4);
+//                runAction(new ShootRings(6, 0, telemetry, 1500, true));
+//
+//                Robot.leftArm.setPosition(1);
+//                traj = Robot.rr.trajectoryBuilder(traj.end())
+//                        .lineTo(new Vector2d(0, -10))
+//                        .build();
+//                Robot.rr.followTrajectory(traj);
 
                 traj = Robot.rr.trajectoryBuilder(traj.end())
-                        .splineTo(new Vector2d(50, -40), Math.toRadians(-180))
-                        .splineTo(new Vector2d(40, -45), Math.toRadians(-90))
-                        .splineTo(new Vector2d(37.5, -55), Math.toRadians(-180))
-                        .splineTo(new Vector2d(35, -50), Math.toRadians(90))
-                        .splineTo(new Vector2d(45, -15), Math.toRadians(90))
+//                        .splineTo(new Vector2d(60, -45), Math.toRadians(-90))
+                        .splineTo(new Vector2d(60, -15), Math.toRadians(-90))
                         .splineTo(new Vector2d(40, -10), Math.toRadians(180))
-                        .splineTo(new Vector2d(35, -15), Math.toRadians(-90))
-                        .splineTo(new Vector2d(25, -50), Math.toRadians(-90))
-                        .splineTo(new Vector2d(20, -55), Math.toRadians(-180))
-                        .splineTo(new Vector2d(-35, -60), Math.toRadians(-180))
-
-                        .splineTo(new Vector2d(-40, -45), Math.toRadians(90))
-                        .splineTo(new Vector2d(-40, -25), Math.toRadians(90))
-                        .splineTo(new Vector2d(-10, -10), Math.toRadians(-17))
+                        .splineTo(new Vector2d(10, -10), Math.toRadians(0))
                         .build();
+
                 Robot.rr.followTrajectory(traj);
 
-                Robot.fwLock.setPosition(.4);
-                runAction(new ShootRings(6, 0, telemetry, 1500, true));
-
-                Robot.leftArm.setPosition(1);
-                traj = Robot.rr.trajectoryBuilder(traj.end())
-                        .lineTo(new Vector2d(0, -10))
-                        .build();
-                Robot.rr.followTrajectory(traj);
                 runAction(new Wait(500));
                 break;
         }

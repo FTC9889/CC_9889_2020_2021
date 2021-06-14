@@ -55,7 +55,7 @@ public class ScanForRS extends OpenCvPipeline {
         Imgproc.rectangle(input, new Point(0, 0), new Point(input.cols(), ((double) input.rows() / 3)), new Scalar(0, 0, 0), -1);
         Imgproc.rectangle(input, new Point(((double) input.cols() / 2), 0), new Point(input.cols(), input.rows()), new Scalar(0, 0, 0), -1);
 
-        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
+//        Imgproc.cvtColor(input, input, Imgproc.COLOR_RGB2HSV);
 
         Mat cvResizeSrc = input;
         Size cvResizeDsize = new Size(0, 0);
@@ -73,8 +73,13 @@ public class ScanForRS extends OpenCvPipeline {
         // Step HSV_Threshold0:
         Mat hsvThresholdInput = blurOutput;
 
-        double[] hsvThresholdHue = {10, 40};
-        double[] hsvThresholdSaturation = {220, 255};
+//        OLD VALUES
+//        double[] hsvThresholdHue = {5, 50};
+//        double[] hsvThresholdSaturation = {210, 255};
+//        double[] hsvThresholdValue = {0.0, 255.0};
+
+        double[] hsvThresholdHue = {100, 138};
+        double[] hsvThresholdSaturation = {126, 253};
         double[] hsvThresholdValue = {0.0, 255.0};
         hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
 
@@ -86,9 +91,9 @@ public class ScanForRS extends OpenCvPipeline {
         // Step Find Contours
         Mat contourInput = new Mat();
 
-        Imgproc.cvtColor(maskOutput, contourInput, Imgproc.COLOR_HSV2RGB);
-        Imgproc.cvtColor(contourInput, contourInput, Imgproc.COLOR_RGB2GRAY);
-
+//        Imgproc.cvtColor(maskOutput, contourInput, Imgproc.COLOR_HSV2RGB);
+//        Imgproc.cvtColor(contourInput, contourInput, Imgproc.COLOR_RGB2GRAY);
+        contourInput = hsvThresholdOutput;
         List<MatOfPoint> contours = new ArrayList<>();
         Mat hierachy = new Mat();
         Imgproc.findContours(contourInput, contours, hierachy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
@@ -137,10 +142,10 @@ public class ScanForRS extends OpenCvPipeline {
 //            point = new Point (0, 0);
 //        }
 
-        Imgproc.cvtColor(blurOutput, blurOutput, Imgproc.COLOR_HSV2RGB);
-        for (int i = 0; i < filterContoursOutput.size(); i++) {
-            Imgproc.drawContours(blurOutput, filterContoursOutput, i, new Scalar(0, 0, 255));
-        }
+//        Imgproc.cvtColor(blurOutput, blurOutput, Imgproc.COLOR_GRAY2RGB);
+//        for (int i = 0; i < filterContoursOutput.size(); i++) {
+//            Imgproc.drawContours(blurOutput, filterContoursOutput, i, new Scalar(0, 0, 255));
+//        }
 
         if (filterContoursOutput.size() > 0) {
             Rect rect = Imgproc.boundingRect(filterContoursOutput.get(0));
@@ -150,7 +155,7 @@ public class ScanForRS extends OpenCvPipeline {
         }
 
         Log.i("Stack Height", "" + getPoint().y);
-        return blurOutput;
+        return hsvThresholdOutput;
     }
 
     /**

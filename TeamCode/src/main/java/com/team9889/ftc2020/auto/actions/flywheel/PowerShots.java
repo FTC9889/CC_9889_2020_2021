@@ -8,7 +8,7 @@ import com.team9889.ftc2020.subsystems.Robot;
  * Created by Eric on 6/7/2021.
  */
 public class PowerShots extends Action {
-    int power = 1270;
+    int power = 1290;
 
     boolean ps1, ps2, ps3, red;
 

@@ -78,6 +78,18 @@ public class DriverStation {
         return fwOn;
     }
 
+    private boolean psToggle = true;
+    private boolean psOn = false;
+    boolean getPS() {
+        if(gamepad1.left_trigger > 0.3 && psToggle) {
+            psOn = !psOn;
+            psToggle = false;
+        } else if(gamepad1.left_trigger <= 0.1)
+            psToggle = true;
+
+        return psOn;
+    }
+
     private boolean intakeToggle = true;
     private boolean intakeOn = false;
     boolean getIntake() {

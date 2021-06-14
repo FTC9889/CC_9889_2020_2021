@@ -138,16 +138,6 @@ public class Teleop extends Team9889Linear {
 //                    Robot.flyWheel.setPower(rpm);
             }
 
-            if (driverStation.getGoal()) {
-                middleGoal = true;
-                Robot.blueGoal = !Robot.blue;
-                Robot.autoWG.setPosition(0.9);
-            } else {
-                middleGoal = false;
-                Robot.blueGoal = Robot.blue;
-                Robot.autoWG.setPosition(0.1);
-            }
-
             x = Math.abs(Robot.getCamera().getPosOfTarget().y);
 
             if (!shooting && !middleGoal) {
@@ -221,9 +211,10 @@ public class Teleop extends Team9889Linear {
                     Robot.getIntake().SetPassThroughPower(1);
                 }
 
-                if (driverStation.getFW() && (!Robot.getFlyWheel().psPower)){
+                if (driverStation.getFW() && (!Robot.getFlyWheel().psPower) && !driverStation.getPS()){
                     on = true;
                     Robot.getFlyWheel().psPower = false;
+                    timeToWait = 80;
                 } else if (!driverStation.getFW() && (!Robot.getFlyWheel().psPower || gamepad1.x)) {
                     on = false;
                     Robot.getFlyWheel().psPower = false;
@@ -284,9 +275,10 @@ public class Teleop extends Team9889Linear {
                     }
                 }
 
-                if (lastWGState != driverStation.getWG() || gamepad1.left_trigger > .5) {
+                if (gamepad1.left_bumper) {
                     wgTimer.reset();
                 }
+
                 if (!wgInPos) {
                     wgAutoTimer.reset();
                 } else if (gamepad1.left_bumper){
@@ -352,40 +344,19 @@ public class Teleop extends Team9889Linear {
                     Robot.wgGrabber.setPosition(.7);
                 }
 
-                if (gamepad1.left_trigger > .5 && !wgInPos) {
-                    if (wgFirst) {
-                        Robot.getCamera().setWGCamPos();
-                        camTimer.reset();
-                        wgFirst = false;
-                    }
-                    autoDrive = true;
-                    Robot.getCamera().setScanForWG();
-
-                    if (camTimer.milliseconds() > 700) {
-                        if (Math.abs(driverStation.getX()) < 0.1 && Math.abs(driverStation.getY()) < 0.1 &&
-                                Math.abs(driverStation.getSteer()) < 0.1) {
-
-                            double forward = 0.5;
-                            double turn = 0;
-
-//                            if (Robot.getCamera().getPosOfTarget().y > .5)
-//                                forward = .5;
-//                            else if (Robot.getCamera().getPosOfTarget().y <= .5)
-//                                forward = 0.5;
-
-                            int center = 25;
-                            if (Robot.getCamera().getPosOfTarget().x > .1)
-                                turn = -0.1;
-                            else if (Robot.getCamera().getPosOfTarget().x < -.1)
-                                turn = 0.1;
-
-
-                            Robot.getMecanumDrive().setPower(0, -forward, -turn);
-                        }
-                    }
+                if (driverStation.getPS()) {
+                    middleGoal = true;
+                    timeToWait = 300;
+                    Robot.autoWG.setPosition(0.5);
+                    on = true;
+                } else if (driverStation.getGoal()) {
+                    middleGoal = true;
+                    Robot.blueGoal = !Robot.blue;
+                    Robot.autoWG.setPosition(0.9);
                 } else {
-                    autoDrive = false;
-                    wgFirst = true;
+                    middleGoal = false;
+                    Robot.blueGoal = Robot.blue;
+                    Robot.autoWG.setPosition(0.1);
                 }
 
             } else {

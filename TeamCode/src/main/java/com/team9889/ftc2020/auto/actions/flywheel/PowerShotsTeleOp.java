@@ -136,7 +136,7 @@ public class PowerShotsTeleOp extends Action {
     }
 
     void ready() {
-        if (Math.abs(camOrientationPID.getError()) < 0.15)
+        if (Math.abs(camOrientationPID.getError()) < 0.1)
             ready++;
         else
             ready = 0;

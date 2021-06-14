@@ -24,17 +24,12 @@ public class FullRightBlue extends AutoModeBase {
 
     @Override
     public void run(StartPosition startPosition, Boxes box) {
-        Robot.flyWheel.motor.setVelocity(1320);
+        Robot.flyWheel.motor.setVelocity(1260);
 
         Robot.getCamera().setPS1CamPos();
         Robot.getCamera().setScanForGoal();
 
         Robot.localizer.setPoseEstimate(new Pose2d(-63, 17.5, Math.toRadians(0)));
-
-        if (box == Boxes.FAR) {
-            Robot.leftArm.setPosition(0.5);
-            Robot.rightArm.setPosition(0.5);
-        }
 
         // Drive to Shoot
         traj = Robot.rr.trajectoryBuilder(new Pose2d(-63, 17.5, Math.toRadians(0)))
@@ -44,11 +39,6 @@ public class FullRightBlue extends AutoModeBase {
 
         // Shoot Powershots
         runAction(new PowerShots(false));
-
-        if (box == Boxes.FAR) {
-            Robot.leftArm.setPosition(0);
-            Robot.rightArm.setPosition(1);
-        }
 
         Robot.fwLock.setPosition(.4);
 
@@ -147,14 +137,14 @@ public class FullRightBlue extends AutoModeBase {
             case MIDDLE:
                 traj = Robot.rr.trajectoryBuilder(traj.end())
                         .splineTo(new Vector2d(10, 20), Math.toRadians(0))
-                        .splineTo(new Vector2d(25, 25), Math.toRadians(45))
+                        .splineTo(new Vector2d(22, 22), Math.toRadians(45))
                         .build();
 
                 Robot.rr.followTrajectory(traj);
 
                 Robot.getIntake().frontIntakeOn = false;
                 Robot.autoWG.setPosition(.75);
-                runAction(new Wait(200));
+                runAction(new Wait(500));
 
                 ThreadAction(new PutDownWG());
                 Robot.flyWheel.motor.setVelocity(1450);
@@ -195,8 +185,8 @@ public class FullRightBlue extends AutoModeBase {
 
                 traj = Robot.rr.trajectoryBuilder(traj.end())
                         .splineTo(new Vector2d(-10, 50), Math.toRadians(0))
-                        .splineTo(new Vector2d(55, 50), Math.toRadians(0))
-                        .splineTo(new Vector2d(56, 50), Math.toRadians(45))
+                        .splineTo(new Vector2d(50, 50), Math.toRadians(0))
+                        .splineTo(new Vector2d(51, 50), Math.toRadians(45))
                         .build();
 
                 Robot.rr.followTrajectory(traj);
@@ -243,7 +233,6 @@ public class FullRightBlue extends AutoModeBase {
 
                 Robot.rr.followTrajectory(traj);
 
-                Robot.getIntake().frontIntakeOn = false;
                 Robot.autoWG.setPosition(.75);
                 runAction(new Wait(200));
 
@@ -278,10 +267,17 @@ public class FullRightBlue extends AutoModeBase {
 
                 Robot.rr.followTrajectory(traj);
 
+                Robot.leftArm.setPosition(0.5);
+                Robot.rightArm.setPosition(0.5);
+
                 runAction(new ShootRings(10, 0, telemetry, 1470, true));
+
+                Robot.leftArm.setPosition(0);
+                Robot.rightArm.setPosition(1);
 
                 Robot.getIntake().backIntakeOn = false;
                 Robot.getIntake().frontIntakeOn = true;
+                Robot.getIntake().frontIntakeOn = false;
 
                 traj = Robot.rr.trajectoryBuilder(traj.end())
                         .splineToConstantHeading(new Vector2d(-32, 50), Math.toRadians(0))
