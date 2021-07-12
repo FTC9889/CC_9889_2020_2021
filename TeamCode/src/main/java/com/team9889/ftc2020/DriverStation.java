@@ -38,6 +38,12 @@ public class DriverStation {
         return gamepad1.y;
     }
 
+    boolean getArmsDown() {return gamepad2.dpad_down;}
+
+    boolean getArmsUp()  {return gamepad2.dpad_left;}
+
+    boolean getDropWG() {return gamepad2.right_bumper;}
+
     private boolean wgToggle = true;
     private boolean wgDown = false;
     public  boolean codePress = false;

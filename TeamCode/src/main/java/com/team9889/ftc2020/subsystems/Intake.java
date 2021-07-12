@@ -19,6 +19,12 @@ public class Intake extends Subsystem {
 
     boolean auto = false;
 
+    public enum ArmPositions {
+        DOWN, UP, HALF, NULL
+    }
+    public ArmPositions wantedArmPos = ArmPositions.NULL;
+    public ArmPositions currentArmPos = ArmPositions.NULL;
+
     @Override
     public void init(boolean auto) {
         if (auto) {
@@ -41,26 +47,24 @@ public class Intake extends Subsystem {
             backIntakeOn = false;
         }
 
-        if (auto) {
-            if (frontIntakeOn) {
-                SetFrontIntakePower(1);
-            } else {
-                SetFrontIntakePower(0);
-            }
-            if (backIntakeOn) {
-                SetBackIntakePower(1);
-            } else {
-                SetBackIntakePower(0);
-            }
-            if (passThroughIntakeOn) {
-                SetPassThroughPower(1);
-            } else {
-                SetPassThroughPower(0);
-            }
+        if (frontIntakeOn) {
+            SetFrontIntakePower(1);
+        } else {
+            SetFrontIntakePower(0);
+        }
+        if (backIntakeOn) {
+            SetBackIntakePower(1);
+        } else {
+            SetBackIntakePower(0);
+        }
+        if (passThroughIntakeOn) {
+            SetPassThroughPower(1);
+        } else {
+            SetPassThroughPower(0);
         }
 
 
-        if ( current > 5500 &&
+        if (current > 5500 &&
                 intakeReady && numSinceIntakeOn > 10) {
             intakeReady = false;
             ringsIntaken++;
@@ -69,6 +73,30 @@ public class Intake extends Subsystem {
         }
 
         numSinceIntakeOn++;
+
+        if (currentArmPos != wantedArmPos) {
+            switch (wantedArmPos) {
+                case UP:
+                    Robot.getInstance().leftArm.setPosition(0);
+                    Robot.getInstance().rightArm.setPosition(1);
+                    break;
+
+                case HALF:
+                    Robot.getInstance().leftArm.setPosition(0.5);
+                    Robot.getInstance().rightArm.setPosition(0.5);
+                    break;
+
+                case DOWN:
+                    Robot.getInstance().leftArm.setPosition(1);
+                    Robot.getInstance().rightArm.setPosition(0);
+                    break;
+
+                case NULL:
+                    break;
+            }
+
+            currentArmPos = wantedArmPos;
+        }
     }
 
     @Override

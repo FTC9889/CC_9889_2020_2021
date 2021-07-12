@@ -13,7 +13,7 @@ public class WGUp extends Action {
     @Override
     public void start() {
         timer.reset();
-        Robot.getInstance().getWobbleGoal().setWGUp();
+        Robot.getInstance().getWobbleGoal().pickUpWG();
     }
 
     @Override

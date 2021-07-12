@@ -3,10 +3,10 @@ package com.team9889.ftc2020.subsystems;
 import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.RobotLog;
 import com.team9889.ftc2020.Constants;
 import com.team9889.ftc2020.auto.actions.ActionVariables;
@@ -44,7 +44,6 @@ public class Robot{
     public Motor backIntake;
     public Motor passThrough;
     public Servo leftArm, rightArm;
-    public DistanceSensor leftDist, rightDist;
 
     public Motor flyWheel;
     public Servo fwArm, fwLock, fwFlap;
@@ -59,6 +58,8 @@ public class Robot{
     public HardwareMap hardwareMap;
 
     public ActionVariables actionVariables = new ActionVariables();
+
+    ElapsedTime robotTimer = new ElapsedTime();
 
     public double result = Double.POSITIVE_INFINITY;
 
@@ -122,9 +123,6 @@ public class Robot{
         leftArm = hardwareMap.get(Servo.class, Constants.IntakeConstants.kLeftArm);
         rightArm = hardwareMap.get(Servo.class, Constants.IntakeConstants.kRightArm);
 
-        leftDist = hardwareMap.get(DistanceSensor.class, Constants.IntakeConstants.kLeftDist);
-        rightDist = hardwareMap.get(DistanceSensor.class, Constants.IntakeConstants.kRightDist);
-
         //FlyWheel
         flyWheel = new Motor(hardwareMap, Constants.ShooterConstants.kFlyWheel, 1,
                 DcMotorSimple.Direction.REVERSE, false, false, true);
@@ -151,6 +149,8 @@ public class Robot{
 
         rr = new RoadRunner(hardwareMap);
         localizer = (StandardTrackingWheelLocalizer) rr.getLocalizer();
+
+        robotTimer.reset();
     }
 
     // Update data from Hubs and Apply new data

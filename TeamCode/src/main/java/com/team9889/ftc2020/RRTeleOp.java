@@ -212,12 +212,12 @@ public class RRTeleOp extends Team9889Linear {
                     Robot.passThrough.setPower(1);
                 }
 
-                if (driverStation.getFW() && (!Robot.getFlyWheel().psPower)){
+                if (driverStation.getFW() && (!Robot.getFlyWheel().autoPower)){
                     on = true;
-                    Robot.getFlyWheel().psPower = false;
-                } else if (!driverStation.getFW() && (!Robot.getFlyWheel().psPower || gamepad1.x)) {
+                    Robot.getFlyWheel().autoPower = false;
+                } else if (!driverStation.getFW() && (!Robot.getFlyWheel().autoPower || gamepad1.x)) {
                     on = false;
-                    Robot.getFlyWheel().psPower = false;
+                    Robot.getFlyWheel().autoPower = false;
                 }
 
 //                if (Robot.getFlyWheel().psPower) {
@@ -264,7 +264,7 @@ public class RRTeleOp extends Team9889Linear {
                                 shooting = true;
                             }
                         }
-                    } else if (armTimer.milliseconds() > timeToWait && !Robot.getFlyWheel().psPower) {
+                    } else if (armTimer.milliseconds() > timeToWait && !Robot.getFlyWheel().autoPower) {
                         Robot.fwLock.setPosition(1);
                         Robot.fwArm.setPosition(0.47);
                         extend = true;
@@ -397,11 +397,11 @@ public class RRTeleOp extends Team9889Linear {
             }
 
             if (on) {
-                if (!Robot.getFlyWheel().psPower) {
+                if (!Robot.getFlyWheel().autoPower) {
                     Robot.getFlyWheel().setRPM(rpm);
                 }
             }
-            else if (!on && !Robot.getFlyWheel().psPower) {
+            else if (!on && !Robot.getFlyWheel().autoPower) {
                 Robot.getFlyWheel().power = 0;
                 Robot.getFlyWheel().counter = 0;
                 Robot.getFlyWheel().setMode(FlyWheel.Mode.OFF);
@@ -414,7 +414,7 @@ public class RRTeleOp extends Team9889Linear {
             telemetry.addData("Left Dist", Robot.leftDist.getDistance(DistanceUnit.INCH));
 
             telemetry.addData("Kf", Robot.getFlyWheel().KfEstimator.getAverage());
-            telemetry.addData("Power Shot Power", Robot.getFlyWheel().psPower);
+            telemetry.addData("Power Shot Power", Robot.getFlyWheel().autoPower);
             telemetry.addData("Distance", dist + "");
             telemetry.addData("Rings", ringsPassed);
 

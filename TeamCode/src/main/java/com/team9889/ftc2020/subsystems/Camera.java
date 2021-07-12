@@ -1,10 +1,7 @@
 package com.team9889.ftc2020.subsystems;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.team9889.ftc2020.auto.AutoModeBase;
-import com.team9889.lib.control.controllers.PID;
 import com.team9889.lib.detectors.ScanForGoal;
 import com.team9889.lib.detectors.ScanForRS;
 import com.team9889.lib.detectors.ScanForWG;
@@ -20,12 +17,9 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Config
 public class Camera extends Subsystem{
-    public static double ps1 = .52, ps2 = .54, ps3 = .57;
     public static double tPS1 = .53, tPS2 = .54, tPS3 = .58, tPS4 = .59;
     public static double bluetPS1 = .42, bluetPS2 = .4, bluetPS3 = .39, bluetPS4 = .36;
 
-    public double p = -0.016, i, d;
-    PID cameraY = new PID(-0.016, 0, 0);
     public double camYPose = .7;
 
     public ScanForGoal scanForGoal = new ScanForGoal();
@@ -33,9 +27,10 @@ public class Camera extends Subsystem{
     ScanForRS scanForRS = new ScanForRS();
 
     public enum CameraStates {
-        GOAL, WG, RS, NULL
+        GOAL, PS1, PS2, PS3, RSRIGHT, RSLEFT, NULL
     }
     public CameraStates currentCamState = CameraStates.NULL;
+    public CameraStates wantedCamState = CameraStates.NULL;
 
     enum Pipelines {
         GOAL, WG, RS, NULL
@@ -54,8 +49,6 @@ public class Camera extends Subsystem{
                     setScanForRS();
                 } else {
                     setScanForGoal();
-                    Log.i("Hi", "");
-//                    setGoalCamPos();
                 }
             }
         });
@@ -69,9 +62,38 @@ public class Camera extends Subsystem{
 
     @Override
     public void update() {
-        cameraY.p = p;
-        cameraY.i = i;
-        cameraY.d = d;
+        if (currentCamState != wantedCamState) {
+            switch (wantedCamState) {
+                case GOAL:
+                    setCamPositions(.465, .7);
+                    break;
+
+                case PS1:
+                    setCamPositions(.52, .7);
+                    break;
+
+                case PS2:
+                    setCamPositions(.54, .7);
+                    break;
+
+                case PS3:
+                    setCamPositions(.57, .7);
+                    break;
+
+                case RSRIGHT:
+                    setCamPositions(.64, .9);
+                    break;
+
+                case RSLEFT:
+                    setCamPositions(.4, .9);
+                    break;
+
+                case NULL:
+                    break;
+            }
+
+            currentCamState = wantedCamState;
+        }
     }
 
     @Override
@@ -125,38 +147,28 @@ public class Camera extends Subsystem{
         return posToReturn;
     }
 
-    public void setWGCamPos () {
-        currentCamState = CameraStates.WG;
-        Robot.getInstance().xCam.setPosition(1);
-        Robot.getInstance().yCam.setPosition(.85);
-    }
-
     public void setGoalCamPos () {
         currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.465);
-
-//        camYPose += cameraY.update(getPosOfTarget().y, 0);
-//        CruiseLib.limitValue(camYPose, 1, 0);
-//        Robot.getInstance().yCam.setPosition(camYPose);
-        Robot.getInstance().yCam.setPosition(.7);
     }
 
     public void setPS1CamPos () {
-        currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(ps1);
-        Robot.getInstance().yCam.setPosition(.7);
+        currentCamState = CameraStates.PS1;
     }
 
     public void setPS2CamPos () {
-        currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(ps2);
-        Robot.getInstance().yCam.setPosition(.7);
+        currentCamState = CameraStates.PS2;
     }
 
     public void setPS3CamPos () {
-        currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(ps3);
-        Robot.getInstance().yCam.setPosition(.7);
+        currentCamState = CameraStates.PS3;
+    }
+
+    public void setRSCamPosRight() {
+        currentCamState = CameraStates.RSRIGHT;
+    }
+
+    public void setRSCamPosLeft() {
+        currentCamState = CameraStates.RSLEFT;
     }
 
 
@@ -200,33 +212,9 @@ public class Camera extends Subsystem{
         Robot.getInstance().yCam.setPosition(.7);
     }
 
-    public void setPS1CamPosAuto () {
-        currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.534);
-        Robot.getInstance().yCam.setPosition(.7);
-    }
 
-    public void setPS2CamPosAuto () {
-        currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.535);
-        Robot.getInstance().yCam.setPosition(.7);
-    }
-
-    public void setPS3CamPosAuto () {
-        currentCamState = CameraStates.GOAL;
-        Robot.getInstance().xCam.setPosition(.548);
-        Robot.getInstance().yCam.setPosition(.7);
-    }
-
-    public void setRSCamPosRight() {
-        currentCamState = CameraStates.RS;
-        Robot.getInstance().xCam.setPosition(.64);
-        Robot.getInstance().yCam.setPosition(.9);
-    }
-
-    public void setRSCamPosLeft() {
-        currentCamState = CameraStates.RS;
-        Robot.getInstance().xCam.setPosition(.4);
-        Robot.getInstance().yCam.setPosition(.9);
+    public void setCamPositions(double x, double y) {
+        Robot.getInstance().xCam.setPosition(x);
+        Robot.getInstance().yCam.setPosition(y);
     }
 }

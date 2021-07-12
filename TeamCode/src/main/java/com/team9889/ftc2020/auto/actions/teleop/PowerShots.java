@@ -45,8 +45,8 @@ public class PowerShots extends Action {
         Robot.getInstance().getCamera().setScanForGoal();
         Robot.getInstance().getMecanumDrive().setPower(0,0,0);
         Robot.getInstance().getMecanumDrive().writeAngleToFile();
-        Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOT1);
-        Robot.getInstance().getFlyWheel().psPower = true;
+        Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.POWERSHOT1;
+        Robot.getInstance().getFlyWheel().autoPower = true;
         Robot.getInstance().fwLock.setPosition(.4);
         Robot.getInstance().fwFlap.setPosition(.52);
 
@@ -171,8 +171,8 @@ public class PowerShots extends Action {
 
     @Override
     public void done() {
-//        Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.DEFAULT);
-        Robot.getInstance().getFlyWheel().psPower = false;
+        Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.DEFAULT;
+        Robot.getInstance().getFlyWheel().autoPower = false;
         Robot.getInstance().fwLock.setPosition(1);
         Robot.getInstance().fwFlap.setPosition(.5);
     }
