@@ -4,17 +4,13 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.auto.actions.teleop.AimAndShoot;
 import com.team9889.ftc2020.auto.actions.teleop.PowerShots;
 import com.team9889.ftc2020.subsystems.Camera;
-import com.team9889.ftc2020.subsystems.FlyWheel;
 import com.team9889.lib.control.controllers.PID;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.ArrayList;
 
@@ -342,7 +338,7 @@ public class RRTeleOp extends Team9889Linear {
 
                 if (gamepad1.left_trigger > .5 && !wgInPos) {
                     if (wgFirst) {
-                        Robot.getCamera().setWGCamPos();
+//                        Robot.getCamera().setWGCamPos();
                         camTimer.reset();
                         wgFirst = false;
                     }
@@ -382,7 +378,7 @@ public class RRTeleOp extends Team9889Linear {
             }
 
             if (gamepad2.left_stick_button && gamepad2.right_stick_button && !resetPressed) {
-                Robot.getMecanumDrive().setCurrentPose(new Pose2d(0, 0, 0));
+//                Robot.getMecanumDrive().setCurrentPose(new Pose2d(0, 0, 0));
                 resetPressed = true;
             } else if (!gamepad2.left_stick_button && !gamepad2.right_stick_button) {
                 resetPressed = false;
@@ -404,16 +400,16 @@ public class RRTeleOp extends Team9889Linear {
             else if (!on && !Robot.getFlyWheel().autoPower) {
                 Robot.getFlyWheel().power = 0;
                 Robot.getFlyWheel().counter = 0;
-                Robot.getFlyWheel().setMode(FlyWheel.Mode.OFF);
+//                Robot.getFlyWheel().setMode(FlyWheel.Mode.OFF);
             }
 
             telemetry.addData("Loop Time", loopTimer.milliseconds());
             telemetry.addData("Blue", blue);
 
-            telemetry.addData("Right Dist", Robot.rightDist.getDistance(DistanceUnit.INCH));
-            telemetry.addData("Left Dist", Robot.leftDist.getDistance(DistanceUnit.INCH));
+//            telemetry.addData("Right Dist", Robot.rightDist.getDistance(DistanceUnit.INCH));
+//            telemetry.addData("Left Dist", Robot.leftDist.getDistance(DistanceUnit.INCH));
 
-            telemetry.addData("Kf", Robot.getFlyWheel().KfEstimator.getAverage());
+//            telemetry.addData("Kf", Robot.getFlyWheel().KfEstimator.getAverage());
             telemetry.addData("Power Shot Power", Robot.getFlyWheel().autoPower);
             telemetry.addData("Distance", dist + "");
             telemetry.addData("Rings", ringsPassed);
@@ -421,10 +417,10 @@ public class RRTeleOp extends Team9889Linear {
             telemetry.addData("Volts", Robot.result);
             telemetry.addData("Current RPM", setRpm);
 
-            telemetry.addData("pixels", Robot.getCamera().scanForGoal.getPointInPixels());
+//            telemetry.addData("pixels", Robot.getCamera().scanForGoal.getPointInPixels());
 
             telemetry.addData("Fly Wheel Speed", Robot.getFlyWheel().getRPM());
-            telemetry.addData("Odometry Adjusted : ", Robot.getMecanumDrive().getAdjustedPose());
+//            telemetry.addData("Odometry Adjusted : ", Robot.getMecanumDrive().getAdjustedPose());
 
             Robot.outputToTelemetry(telemetry);
             telemetry.update();

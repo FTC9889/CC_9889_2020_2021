@@ -2,7 +2,6 @@ package com.team9889.ftc2020.auto.actions.flywheel;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
-import com.team9889.ftc2020.subsystems.FlyWheel;
 import com.team9889.ftc2020.subsystems.Robot;
 
 /**
@@ -78,7 +77,7 @@ public class Stack extends Action {
 
     @Override
     public void done() {
-        Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.OFF);
+//        Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.OFF);
         Robot.getInstance().getIntake().SetBackIntakePower(0);
         Robot.getInstance().getIntake().SetPassThroughPower(1);
         Robot.getInstance().getFlyWheel().done = true;

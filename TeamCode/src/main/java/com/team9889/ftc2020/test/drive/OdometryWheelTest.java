@@ -39,7 +39,7 @@ public class OdometryWheelTest extends AutoModeBase {
 //        runAction(new DriveFollowPath(pose));
 
         while (opModeIsActive()) {
-            telemetry.addData("Pose", Robot.getMecanumDrive().getCurrentPose());
+//            telemetry.addData("Pose", Robot.getMecanumDrive().getCurrentPose());
             Robot.outputToTelemetry(telemetry);
             telemetry.update();
         }

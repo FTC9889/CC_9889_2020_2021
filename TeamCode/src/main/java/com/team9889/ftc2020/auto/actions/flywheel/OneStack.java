@@ -2,7 +2,6 @@ package com.team9889.ftc2020.auto.actions.flywheel;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
-import com.team9889.ftc2020.subsystems.FlyWheel;
 import com.team9889.ftc2020.subsystems.Robot;
 
 /**
@@ -30,8 +29,8 @@ public class OneStack extends Action {
     @Override
     public void update() {
         if (shootTimer.milliseconds() > 380 && shootTimer.milliseconds() < 450) {
-            double dist = 37.852 * Math.exp(0.0192 * Robot.getInstance().getCamera().scanForGoal.getPointInPixels().y);
-            double rpm = (3.06 * dist) + 1041;
+//            double dist = 37.852 * Math.exp(0.0192 * Robot.getInstance().getCamera().scanForGoal.getPointInPixels().y);
+//            double rpm = (3.06 * dist) + 1041;
 
             Robot.getInstance().getFlyWheel().setRPM(1410);
         }
@@ -59,7 +58,7 @@ public class OneStack extends Action {
 
     @Override
     public void done() {
-        Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.OFF);
+//        Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.OFF);
         Robot.getInstance().getIntake().SetBackIntakePower(0);
         Robot.getInstance().getIntake().SetPassThroughPower(0);
         Robot.getInstance().getFlyWheel().done = true;

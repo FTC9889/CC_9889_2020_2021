@@ -50,7 +50,7 @@ public class PowerShots extends Action {
         Robot.getInstance().fwLock.setPosition(.4);
         Robot.getInstance().fwFlap.setPosition(.52);
 
-        y = Robot.getInstance().getMecanumDrive().getAdjustedPose().getX();
+//        y = Robot.getInstance().getMecanumDrive().getAdjustedPose().getX();
 
         beginning.reset();
     }

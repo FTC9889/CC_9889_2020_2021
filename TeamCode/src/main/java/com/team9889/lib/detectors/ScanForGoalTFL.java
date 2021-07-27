@@ -1,11 +1,15 @@
 package com.team9889.lib.detectors;
 
+import android.graphics.Bitmap;
+import android.graphics.RectF;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.team9889.ftc2020.subsystems.Robot;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.opencv.android.Utils;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -18,9 +22,12 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
+import org.tensorflow.lite.support.image.TensorImage;
+import org.tensorflow.lite.task.vision.detector.Detection;
+import org.tensorflow.lite.task.vision.detector.ObjectDetector;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,33 +35,7 @@ import java.util.List;
  */
 
 @Config
-public class ScanForGoal extends OpenCvPipeline {
-//      RED VALUES
-    public static double h1 = 100, h2 = 120;
-    public static double s1 = 80, s2 = 255;
-    public static double v1 = 0, v2 = 255;
-
-//      BLUE VALUES
-    public static double blueh1 = 0, blueh2 = 35;
-    public static double blues1 = 123, blues2 = 181;
-    public static double bluev1 = 0, bluev2 = 255;
-
-    public static double size = 50;
-
-    //Outputs
-    private Mat cvResizeOutput = new Mat();
-    private Mat cvBlurOutput = new Mat();
-    private Mat hsvThresholdOutput = new Mat();
-    private ArrayList<MatOfPoint> findContoursOutput = new ArrayList<MatOfPoint>(), findContoursOutput2 = new ArrayList<MatOfPoint>();
-    private ArrayList<MatOfPoint> convexHullsOutput = new ArrayList<MatOfPoint>(), convexHullsOutput2 = new ArrayList<MatOfPoint>();
-    private ArrayList<MatOfPoint> filterContoursOutput = new ArrayList<MatOfPoint>(), filterContoursOutput2 = new ArrayList<MatOfPoint>();
-
-    boolean debug = false;
-    double upperPercentLimit = 0.55, lowerPercentLimit = 0.64;
-    int threshold = 60;
-
-    ElapsedTime fpsTimer = new ElapsedTime();
-
+public class ScanForGoalTFL extends OpenCvPipeline {
     public Mat bitmap;
 
     private Point point = new Point(1e10, 1e10), pointInPixels = new Point(1e10, 1e10);
@@ -63,104 +44,94 @@ public class ScanForGoal extends OpenCvPipeline {
         return point;
     }
 
-    public Point getPointInPixels() {
-        return pointInPixels;
+    public Detection goal = null;
+
+    public Pose2d odoPos = new Pose2d(0, 0, 0);
+
+    ObjectDetector detector = null;
+    public ScanForGoalTFL() {
+        // Step 2: Initialize the detector object
+        ObjectDetector.ObjectDetectorOptions options = ObjectDetector.ObjectDetectorOptions.builder()
+                .setMaxResults(2)
+                .setScoreThreshold(0.8f)
+                .setNumThreads(2)
+                .build();
+
+//        Model.Options options;
+//        CompatibilityList compatList = new CompatibilityList();
+
+//        if (compatList.isDelegateSupportedOnThisDevice()) {
+//            options = Model.Options.Builder().setDevice(Model.Device.GPU).build();
+//        }
+
+        try {
+            detector = ObjectDetector.createFromFileAndOptions(
+                    Robot.getInstance().hardwareMap.appContext, // the application context
+                    "goal.tflite", // must be same as the filename in assets folder
+                    options
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public ScanForGoal() {
-
-    }
+    Mat cam = null;
 
     @Override
-    public Mat processFrame(Mat input) {
-        fpsTimer.reset();
+    public Mat processFrame(Mat inputMat) {
+        cam = inputMat;
 
-        // Step CV_resize0:
-        Mat cvResizeSrc = input;
-        double resizeFactor = 0.25;
-        cvResize(cvResizeSrc, new Size(0, 0), resizeFactor, resizeFactor, Imgproc.INTER_LINEAR, cvResizeOutput);
+        if (goal != null) {
+            RectF bb = goal.getBoundingBox();
+            Imgproc.line(inputMat, new Point(bb.left, bb.top), new Point(bb.right, bb.top), new Scalar(0, 255, 0));
+            Imgproc.line(inputMat, new Point(bb.right, bb.top), new Point(bb.right, bb.bottom), new Scalar(0, 255, 0));
+            Imgproc.line(inputMat, new Point(bb.right, bb.bottom), new Point(bb.left, bb.bottom), new Scalar(0, 255, 0));
+            Imgproc.line(inputMat, new Point(bb.left, bb.bottom), new Point(bb.left, bb.top), new Scalar(0, 255, 0));
 
-        Mat cvBlur = cvResizeOutput;
-        blur(cvBlur, ScanForRS.BlurType.GAUSSIAN, 2, cvBlurOutput);
+            Imgproc.circle(inputMat, new Point(bb.centerX(), bb.centerY()), 5, new Scalar(0, 255, 255), -1);
 
-        if (Robot.getInstance().blueGoal) {
-            // Step HSV_Threshold0:
-            Mat hsvThresholdInput = cvBlurOutput;
-            double[] hsvThresholdHue = {blueh1, blueh2};
-            double[] hsvThresholdSaturation = {blues1, blues2};
-            double[] hsvThresholdValue = {bluev1, bluev2};
-            hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
-        } else {
-            // Step HSV_Threshold0:
-            Mat hsvThresholdInput = cvBlurOutput;
-            double[] hsvThresholdHue = {h1, h2};
-            double[] hsvThresholdSaturation = {s1, s2};
-            double[] hsvThresholdValue = {v1, v2};
-            hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
+            Imgproc.putText(inputMat, goal.getCategories().get(0).getLabel(),
+                    new Point(bb.left, bb.bottom), 1, 3, new Scalar(0, 0, 255), 4);
         }
 
-        // Step Find_Contours0:
-        Mat findContoursInput = hsvThresholdOutput;
-        findContours(findContoursInput, true, findContoursOutput);
+        return inputMat;
+    }
 
+    public void findGoal() {
+        if (cam != null) {
+            odoPos = Robot.getInstance().rr.getLocalizer().getPoseEstimate();
+            odoPos = new Pose2d(odoPos.getX(), odoPos.getY(), Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS));
 
+            Bitmap input = Bitmap.createBitmap(cam.width(), cam.height(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(cam, input);
 
-        // Step Filter_Contours0:
-        ArrayList<MatOfPoint> filterContoursContours = findContoursOutput;
-        double filterContoursMinArea = 0;
-        double filterContoursMinPerimeter = 0.0;
-        double filterContoursMinWidth = 0;
-        double filterContoursMaxWidth = 1000;
-        double filterContoursMinHeight = 0;
-        double filterContoursMaxHeight = 1000;
-        double[] filterContoursSolidity = {0.0, 100.0};
-        double filterContoursMaxVertices = 1.0E7;
-        double filterContoursMinVertices = 4;
-        double filterContoursMinRatio = 0;
-        double filterContoursMaxRatio = 2;
-        filterContours(filterContoursContours, filterContoursMinArea, filterContoursMinPerimeter, filterContoursMinWidth, filterContoursMaxWidth, filterContoursMinHeight, filterContoursMaxHeight, filterContoursSolidity, filterContoursMaxVertices, filterContoursMinVertices, filterContoursMinRatio, filterContoursMaxRatio, filterContoursOutput);
+            // Step 1: create TFLite's TensorImage object
+            TensorImage image = TensorImage.fromBitmap(input);
 
-        ArrayList<Double> areaArray = new ArrayList<>();
-        for (int i = 0; i < filterContoursOutput.size(); i++) {
-            double area = Imgproc.contourArea(filterContoursOutput.get(i));
-            areaArray.add(area);
-        }
+            // Step 3: feed given image to the model and print the detection result
+            assert detector != null;
+            List<Detection> results = detector.detect(image);
 
-        ArrayList<Double> sortedAreas = areaArray;
-        Collections.sort(sortedAreas);
-
-        Mat goal = new Mat();
-        cvResizeOutput.copyTo(goal);
-
-        if (sortedAreas.size() > 1) {
-            int index1 = areaArray.indexOf(sortedAreas.get(sortedAreas.size() - 1));
-            int index2 = areaArray.indexOf(sortedAreas.get(sortedAreas.size() - 2));
-
-            Rect rect1 = Imgproc.boundingRect(filterContoursOutput.get(index1));
-            Rect rect2 = Imgproc.boundingRect(filterContoursOutput.get(index2));
-
-            if (rect1.x > rect2.x) {
-                Rect rectTemp = rect2;
-                rect2 = rect1;
-                rect1 = rectTemp;
+            double highestCon = 0;
+            int goalIndex = -1;
+            for (int i = 0; i < results.size(); i++) {
+                if (results.get(i).getCategories().get(0).getScore() > highestCon) {
+                    Log.i("Score", "" + results.get(i).getCategories().get(0).getScore());
+                    highestCon = results.get(i).getCategories().get(0).getScore();
+                    goalIndex = i;
+                }
             }
 
-            int xAverage = ((rect1.x + rect1.width) + (rect2.x)) / 2;
-//            int yAverage = ((rect1.y + rect1.height / 2) + (rect2.y + rect2.height / 2)) / 2;
+            if (goalIndex > -1) {
+                Log.i("Result", results.get(goalIndex).toString());
+                Log.i("Bounding Box", results.get(goalIndex).getBoundingBox().toString());
+                Log.i("Class", results.get(goalIndex).getCategories().get(0).getLabel());
 
-            Imgproc.line(goal, new Point(rect1.x + rect1.width, 0), new Point(rect1.x + rect1.width, goal.height()), new Scalar(0, 0, 255), 3);
-            Imgproc.line(goal, new Point(rect2.x, 0), new Point(rect2.x, goal.height()), new Scalar(0, 0, 255), 3);
-
-            Imgproc.rectangle(goal, rect1, new Scalar(0, 0, 0), -1);
-            Imgproc.rectangle(goal, rect2, new Scalar(0, 0, 0), -1);
-            Imgproc.line(goal, new Point(xAverage, 0), new Point(xAverage, goal.height()), new Scalar(0, 255, 0), 3);
-
-            point = new Point(((double) (xAverage * 2) / (double) goal.width()) - 1, 0);
+                goal = results.get(goalIndex);
+            } else {
+                goal = null;
+            }
         }
-
-        Log.v("FPS", "" + 1000.0 / fpsTimer.milliseconds());
-
-        return goal;
     }
 
     public Mat getImage () {
@@ -198,7 +169,7 @@ public class ScanForGoal extends OpenCvPipeline {
             this.label = label;
         }
 
-        public static ScanForGoal.BlurType get(String type) {
+        public static ScanForGoalTFL.BlurType get(String type) {
             if (BILATERAL.label.equals(type)) {
                 return BILATERAL;
             }

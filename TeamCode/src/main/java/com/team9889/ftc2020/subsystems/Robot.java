@@ -124,6 +124,8 @@ public class Robot{
         rightArm = hardwareMap.get(Servo.class, Constants.IntakeConstants.kRightArm);
 
         //FlyWheel
+//        flyWheel = new Motor(hardwareMap, Constants.ShooterConstants.kFlyWheel, 1,
+//                DcMotorSimple.Direction.REVERSE, false, false, true);
         flyWheel = new Motor(hardwareMap, Constants.ShooterConstants.kFlyWheel, 1,
                 DcMotorSimple.Direction.REVERSE, false, false, true);
 

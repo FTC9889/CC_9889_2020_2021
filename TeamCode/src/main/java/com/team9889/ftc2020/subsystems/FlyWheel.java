@@ -1,8 +1,13 @@
 package com.team9889.ftc2020.subsystems;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.team9889.lib.CruiseLib;
+import com.team9889.lib.control.controllers.FFFBMath;
 import com.team9889.lib.control.controllers.PIDF;
+import com.team9889.lib.control.controllers.PIDMath;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -18,11 +23,11 @@ public class FlyWheel extends Subsystem{
     public Mode currentMode = Mode.OFF;
     public Mode wantedMode = Mode.OFF;
 
-    double time = 200;
+    public static double time = 100, rpm = 3000;
     ElapsedTime shootTimer = new ElapsedTime();
     boolean extend = false;
 
-    public static double P = 150, I = 0, D = 20, F = 0.3;
+    public static double P = 0.002, I = 0, D = 0, F = 0, V = 0.0002, A, S;
     public PIDF pid = new PIDF(150, 0, 20, 0.3);
 
     public boolean done = false;
@@ -37,7 +42,7 @@ public class FlyWheel extends Subsystem{
 
     @Override
     public void init(boolean auto) {
-        Robot.getInstance().flyWheel.motor.setVelocityPIDFCoefficients(P, I, D, F);
+//        Robot.getInstance().flyWheel.motor.setVelocityPIDFCoefficients(P, I, D, F);
 
         if (auto) {
             setRampUp();
@@ -72,13 +77,14 @@ public class FlyWheel extends Subsystem{
             currentRampPos = wantedRampPos;
         }
 
-        if (currentMode != wantedMode) {
+//        if (currentMode != wantedMode) {
             switch (wantedMode) {
                 case OFF:
-                    Robot.getInstance().flyWheel.motor.setVelocity(0);
+//                    Robot.getInstance().flyWheel.motor.setVelocity(0);
+                    setRPM(0);
                     break;
                 case DEFAULT:
-                    setRPM(1500);
+                    setRPM(rpm);
                     break;
                 case POWERSHOT1:
                     setRPM(1250);
@@ -98,9 +104,12 @@ public class FlyWheel extends Subsystem{
             }
 
             currentMode = wantedMode;
-        }
+//        }
 
-        Robot.getInstance().flyWheel.motor.setVelocityPIDFCoefficients(P, I, D, F);
+//        Robot.getInstance().flyWheel.motor.setVelocityPIDFCoefficients(P, I, D, F);
+
+        PMath.PIDConstants(P, I, D);
+        FFMath.FFConstants(V, A, S);
     }
 
     @Override
@@ -123,10 +132,18 @@ public class FlyWheel extends Subsystem{
         return false;
     }
 
+    FFFBMath FFMath = new FFFBMath(0, 0, 0);
+    PIDMath PMath = new PIDMath(0, 0, 0);
+
     public int counter = 0;
     public double power;
     public void setRPM(double rpm) {
-        Robot.getInstance().flyWheel.motor.setVelocity(rpm);
+//        Robot.getInstance().flyWheel.motor.setVelocity(rpm);
+        double power = FFMath.calculateFFFBGain(rpm)+PMath.calculateGain(rpm - (Robot.getInstance().flyWheel.getVelocity() / 28 * 60));
+        power = CruiseLib.limitValue(power, 1, 0);
+        Log.i("Power", "" + power);
+
+        Robot.getInstance().flyWheel.setPower(power);
     }
 
     public double getRPM() {
@@ -146,7 +163,7 @@ public class FlyWheel extends Subsystem{
     }
 
     public void unlocked() {
-        Robot.getInstance().fwLock.setPosition(.4);
+        Robot.getInstance().fwLock.setPosition(.5);
     };
 
     public void setRampUp () {

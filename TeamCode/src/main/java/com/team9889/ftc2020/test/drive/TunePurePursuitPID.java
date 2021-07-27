@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.Team9889Linear;
-import com.team9889.ftc2020.auto.actions.drive.DrivePurePursuit;
 import com.team9889.ftc2020.auto.actions.utl.RobotUpdate;
 import com.team9889.lib.control.Path;
 import com.team9889.lib.control.controllers.PID;
@@ -48,7 +47,7 @@ public class TunePurePursuitPID extends Team9889Linear {
                         Robot.getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES) + 90),
                         new Pose2d(1, 1, 2), 30, maxVelocity));
 
-                runAction(new DrivePurePursuit(path, pid));
+//                runAction(new DrivePurePursuit(path, pid));
                 path.clear();
             }
 
@@ -103,7 +102,7 @@ public class TunePurePursuitPID extends Team9889Linear {
             else if (number > 2)
                 telemetry.addData("PID", p + ", " + i + ", " + "[" + d + "]");
 
-            telemetry.addData("X", Robot.getMecanumDrive().getCurrentPose().getX());
+//            telemetry.addData("X", Robot.getMecanumDrive().getCurrentPose().getX());
 
             telemetry.addData("Max Velocity", maxVelocity);
             telemetry.addLine();

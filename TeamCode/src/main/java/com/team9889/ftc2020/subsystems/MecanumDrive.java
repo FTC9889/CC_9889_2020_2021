@@ -9,7 +9,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.Constants;
-import com.team9889.lib.CruiseLib;
 import com.team9889.lib.control.math.cartesian.Rotation2d;
 import com.team9889.lib.roadrunner.drive.DriveConstants;
 
@@ -27,6 +26,8 @@ public class MecanumDrive extends Subsystem {
 
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(14, 0, .8);
     public PIDFController headingController = new PIDFController(HEADING_PID);
+
+    public double theta;
 
     public Rotation2d gyroAngle = new Rotation2d();
     private double Right_Position_Offset = 0, Left_Position_Offset = 0, Y_Position_Offset = 0;
@@ -54,13 +55,16 @@ public class MecanumDrive extends Subsystem {
 
     @Override
     public void outputToTelemetry(Telemetry telemetry) {
-        Robot.getInstance().rr.getLocalizer().getPoseEstimate();
+        telemetry.addData("Pos", Robot.getInstance().rr.getLocalizer().getPoseEstimate());
+
+        telemetry.addData("Gyro", gyroAngle.getTheda(AngleUnit.DEGREES) - angleFromAuton);
     }
 
     @Override
     public void update() {
         getAngle();
 
+        setFieldCentricPower(xSpeed, ySpeed, turnSpeed, Robot.getInstance().blue);
         xSpeed = 0;
         ySpeed = 0;
         turnSpeed = 0;
@@ -154,7 +158,7 @@ public class MecanumDrive extends Subsystem {
     }
 
     public void turn (Vector2d targetPosition) {
-        Pose2d poseEstimate = Robot.getInstance().rr.getPoseEstimate();
+        Pose2d poseEstimate = Robot.getInstance().rr.getLocalizer().getPoseEstimate();
 
         // Create a vector from the gamepad x/y inputs which is the field relative movement
         // Then, rotate that vector by the inverse of that heading for field centric control
@@ -164,7 +168,7 @@ public class MecanumDrive extends Subsystem {
         // Difference between the target vector and the bot's position
         Vector2d difference = targetPosition.minus(poseEstimate.vec());
         // Obtain the target angle for feedback and derivative for feedforward
-        double theta = difference.angle();
+        theta = difference.angle();
 
         // Not technically omega because its power. This is the derivative of atan2
         double thetaFF = -fieldFrameInput.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
@@ -180,7 +184,7 @@ public class MecanumDrive extends Subsystem {
 
 //        turnSpeed += headingInput;
 
-        headingInput = CruiseLib.limitValue(headingInput, 0.4);
+//        headingInput = CruiseLib.limitValue(headingInput, 0.4);
         Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, headingInput));
 
         // Update the heading controller with our current heading
@@ -190,19 +194,21 @@ public class MecanumDrive extends Subsystem {
         Robot.getInstance().rr.getLocalizer().update();
     }
 
-    public void psTurn (Vector2d targetPosition) {
-        Robot.getInstance().rr.getLocalizer().setPoseEstimate(new Pose2d(-8, -16, gyroAngle.getTheda(AngleUnit.RADIANS)));
-        Pose2d poseEstimate = Robot.getInstance().rr.getPoseEstimate();
+    public void turn (Vector2d targetPosition, Vector2d input) {
+        Pose2d poseEstimate = Robot.getInstance().rr.getLocalizer().getPoseEstimate();
+//        poseEstimate = new Pose2d(poseEstimate.getX(), poseEstimate.getY(), gyroAngle.getTheda(AngleUnit.DEGREES));
 
         // Create a vector from the gamepad x/y inputs which is the field relative movement
         // Then, rotate that vector by the inverse of that heading for field centric control
-        Vector2d fieldFrameInput = new Vector2d(0, 0);
+        Vector2d fieldFrameInput = input;
         Vector2d robotFrameInput = fieldFrameInput.rotated(-poseEstimate.getHeading());
 
         // Difference between the target vector and the bot's position
         Vector2d difference = targetPosition.minus(poseEstimate.vec());
         // Obtain the target angle for feedback and derivative for feedforward
-        double theta = difference.angle();
+        theta = difference.angle();
+
+        Log.i("Theta", "" + theta);
 
         // Not technically omega because its power. This is the derivative of atan2
         double thetaFF = -fieldFrameInput.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
@@ -216,7 +222,10 @@ public class MecanumDrive extends Subsystem {
                 * DriveConstants.kV + thetaFF)
                 * DriveConstants.TRACK_WIDTH;
 
-        turnSpeed += headingInput / 26;
+//        turnSpeed += headingInput;
+
+//        headingInput = CruiseLib.limitValue(headingInput, 0.4);
+        Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, headingInput));
 
         // Update the heading controller with our current heading
         headingController.update(poseEstimate.getHeading());
