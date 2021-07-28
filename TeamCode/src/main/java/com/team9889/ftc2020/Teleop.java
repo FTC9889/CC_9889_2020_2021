@@ -3,13 +3,13 @@ package com.team9889.ftc2020;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.team9889.ftc2020.auto.actions.teleop.FindGoal;
 import com.team9889.ftc2020.subsystems.Camera;
 import com.team9889.ftc2020.subsystems.FlyWheel;
 import com.team9889.ftc2020.subsystems.Intake;
-import com.team9889.ftc2020.subsystems.WobbleGoal;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -20,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @TeleOp
 @Config
 public class Teleop extends Team9889Linear {
-    boolean shooting = false;
+    int ready = 0;
 
     @Override
     public void runOpMode() {
@@ -60,18 +60,26 @@ public class Teleop extends Team9889Linear {
 //                --------------------
 
                 //TODO Turn intake motors to run on enum
-                if (driverStation.getStartIntaking()) {
+                if (driverStation.getStartFrontIntaking()) {
                     Robot.getIntake().frontIntakeOn = true;
                     Robot.getIntake().backIntakeOn = false;
                     Robot.getIntake().passThroughIntakeOn = true;
-                } else if (driverStation.getStartOuttaking()) {
+                    Robot.getIntake().outtake = false;
+                } else if (driverStation.getStartBackIntaking()) {
                     Robot.getIntake().frontIntakeOn = false;
                     Robot.getIntake().backIntakeOn = true;
                     Robot.getIntake().passThroughIntakeOn = true;
+                    Robot.getIntake().outtake = false;
+                } else if (driverStation.getStartOuttaking()) {
+                    Robot.getIntake().frontIntakeOn = true;
+                    Robot.getIntake().backIntakeOn = true;
+                    Robot.getIntake().passThroughIntakeOn = true;
+                    Robot.getIntake().outtake = true;
                 } else if (driverStation.getStopIntaking()) {
                     Robot.getIntake().frontIntakeOn = false;
                     Robot.getIntake().backIntakeOn = false;
                     Robot.getIntake().passThroughIntakeOn = false;
+                    Robot.getIntake().outtake = false;
                 }
 
 
@@ -94,19 +102,21 @@ public class Teleop extends Team9889Linear {
                 }
 
                 if (gamepad1.right_bumper) {
-                    if (Math.abs(Math.abs(Math.toDegrees(Robot.getMecanumDrive().theta) - 360) - Robot.getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES)) < 3 || shooting) {
+                    if (ready > 3 || Robot.getFlyWheel().shooting) {
                         Robot.getFlyWheel().shootRing();
                         Robot.getFlyWheel().unlocked();
 
-                        shooting = true;
+                        Robot.rr.setWeightedDrivePower(new Pose2d(0, 0, 0));
+
+                        Robot.getFlyWheel().shooting = true;
                     } else {
-                        Robot.getMecanumDrive().turn(new Vector2d(73, -36), new Vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
+                        Robot.getMecanumDrive().turn(new Vector2d(73, -38), new Vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
                     }
 
                 } else {
                     Robot.getMecanumDrive().theta = 1000;
                     Robot.getFlyWheel().locked();
-                    shooting = false;
+                    Robot.getFlyWheel().shooting = false;
                 }
 
                 //TODO Add shooting
@@ -126,11 +136,17 @@ public class Teleop extends Team9889Linear {
 //                --------------------
 //                |    WobbleGoal    |
 //                --------------------
-                if (driverStation.getWG() && Robot.getWobbleGoal().currentArmPos != WobbleGoal.wgArmPositions.UP) {
+//                 && Robot.getWobbleGoal().currentArmPos != WobbleGoal.wgArmPositions.UP
+                if (gamepad1.left_bumper) {
+                    Robot.getWobbleGoal().wgTimer.reset();
+                }
+
+                if (driverStation.getWG()) {
                     Robot.getWobbleGoal().pickUpWG();
-                } else if (Robot.getWobbleGoal().currentArmPos != WobbleGoal.wgArmPositions.DOWN){
+                } else{
                     Robot.getWobbleGoal().putWGDown();
                 }
+//                if (Robot.getWobbleGoal().currentArmPos != WobbleGoal.wgArmPositions.DOWN)
 
                 if (driverStation.getDropWG()) {
                     Robot.getWobbleGoal().wantedGrabberOpen = true;
@@ -139,6 +155,17 @@ public class Teleop extends Team9889Linear {
 //                --------------------
 //                |      Camera      |
 //                --------------------
+                double angle = -Robot.getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES);
+                if (angle < 0) {
+                    angle += 360;
+                }
+                telemetry.addData("Angle", angle);
+                if (Math.abs(Math.toDegrees(Robot.getMecanumDrive().theta) - angle) < 3) {
+                    ready++;
+                } else {
+                    ready = 0;
+                }
+
             } else {
                 Robot.getMecanumDrive().writeAngleToFile();
             }

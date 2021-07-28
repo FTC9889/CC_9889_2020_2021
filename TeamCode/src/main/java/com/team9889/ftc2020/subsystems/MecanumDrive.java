@@ -196,7 +196,8 @@ public class MecanumDrive extends Subsystem {
 
     public void turn (Vector2d targetPosition, Vector2d input) {
         Pose2d poseEstimate = Robot.getInstance().rr.getLocalizer().getPoseEstimate();
-//        poseEstimate = new Pose2d(poseEstimate.getX(), poseEstimate.getY(), gyroAngle.getTheda(AngleUnit.DEGREES));
+        poseEstimate = new Pose2d(poseEstimate.getX(), poseEstimate.getY(), -gyroAngle.getTheda(AngleUnit.RADIANS));
+        Robot.getInstance().rr.update();
 
         // Create a vector from the gamepad x/y inputs which is the field relative movement
         // Then, rotate that vector by the inverse of that heading for field centric control
@@ -208,7 +209,15 @@ public class MecanumDrive extends Subsystem {
         // Obtain the target angle for feedback and derivative for feedforward
         theta = difference.angle();
 
-        Log.i("Theta", "" + theta);
+//        if (Math.toDegrees(theta) < 180) {
+//            Log.i("Added", "" + 0.25 * Math.toDegrees(theta));
+//            theta += Math.toRadians(0.25 * Math.toDegrees(theta));
+//        } else {
+//            Log.i("Added", "" + (45 - (0.25 * (Math.toDegrees(theta) - 180))));
+//            theta -= Math.toRadians((45 - (0.25 * (Math.toDegrees(theta) - 180))));
+//        }
+
+        Log.i("Theta", "" + Math.toDegrees(theta));
 
         // Not technically omega because its power. This is the derivative of atan2
         double thetaFF = -fieldFrameInput.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
@@ -218,7 +227,12 @@ public class MecanumDrive extends Subsystem {
 
         // Set desired angular velocity to the heading controller output + angular
         // velocity feedforward
-        double headingInput = (headingController.update(poseEstimate.getHeading())
+        double angle = -gyroAngle.getTheda(AngleUnit.DEGREES);
+        if (angle < 0) {
+            angle += 360;
+        }
+
+        double headingInput = (headingController.update(Math.toRadians(angle))
                 * DriveConstants.kV + thetaFF)
                 * DriveConstants.TRACK_WIDTH;
 
@@ -228,7 +242,7 @@ public class MecanumDrive extends Subsystem {
         Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, headingInput));
 
         // Update the heading controller with our current heading
-        headingController.update(poseEstimate.getHeading());
+        headingController.update(Math.toRadians(angle));
 
         // Update he localizer
 //        Robot.getInstance().rr.getLocalizer().update();

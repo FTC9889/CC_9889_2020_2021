@@ -1,5 +1,7 @@
 package com.team9889.ftc2020.subsystems;
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
@@ -32,12 +34,12 @@ public class WobbleGoal extends Subsystem{
     @Override
     public void update() {
         if (currentArmPos != wantedArmPos) {
-            if (Robot.getInstance().robotTimer.milliseconds() - grabberTime > 500) {
-                currentArmPos = wantedArmPos;
-            }
-
             if (Robot.getInstance().robotTimer.milliseconds() - grabberTime > 700) {
                 grabberTime = Robot.getInstance().robotTimer.milliseconds();
+            }
+
+            if (Robot.getInstance().robotTimer.milliseconds() - grabberTime > 500) {
+                currentArmPos = wantedArmPos;
             }
 
             switch (wantedArmPos) {
@@ -60,28 +62,28 @@ public class WobbleGoal extends Subsystem{
                     break;
             }
 
-            currentArmPos = wantedArmPos;
+//            currentArmPos = wantedArmPos;
         }
 
         if (wantedGrabberOpen) {
             Robot.getInstance().wgGrabber.setPosition(.7);
 
-            if (Robot.getInstance().robotTimer.milliseconds() - grabberTime > 500) {
-                currentGrabberOpen = true;
-            }
-
             if (Robot.getInstance().robotTimer.milliseconds() - grabberTime > 700) {
                 grabberTime = Robot.getInstance().robotTimer.milliseconds();
+            }
+
+            if (Robot.getInstance().robotTimer.milliseconds() - grabberTime > 500) {
+                currentGrabberOpen = true;
             }
         } else {
             Robot.getInstance().wgGrabber.setPosition(.25);
 
-            if (Robot.getInstance().robotTimer.milliseconds() - grabberTime > 500) {
-                currentGrabberOpen = false;
-            }
-
             if (Robot.getInstance().robotTimer.milliseconds() - grabberTime > 700) {
                 grabberTime = Robot.getInstance().robotTimer.milliseconds();
+            }
+
+            if (Robot.getInstance().robotTimer.milliseconds() - grabberTime > 500) {
+                currentGrabberOpen = false;
             }
         }
     }
@@ -91,19 +93,25 @@ public class WobbleGoal extends Subsystem{
 
     }
 
+    public ElapsedTime wgTimer = new ElapsedTime();
     public void putWGDown() {
-        if (currentArmPos != wgArmPositions.DOWN) {
+
+//        if (currentArmPos != wgArmPositions.DOWN) {
+        if (wgTimer.milliseconds() < 500)
             wantedArmPos = wgArmPositions.DOWN;
-        } else {
+//        } else {
+        else
             wantedGrabberOpen = true;
-        }
+//        }
     }
 
     public void pickUpWG() {
-        if (currentGrabberOpen) {
+//        if (currentGrabberOpen) {
+        if (wgTimer.milliseconds() < 500)
             wantedGrabberOpen = false;
-        } else {
+//        } else {
+        else
             wantedArmPos = wgArmPositions.UP;
-        }
+//        }
     }
 }

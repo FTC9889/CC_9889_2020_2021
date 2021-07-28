@@ -229,12 +229,12 @@ public class Camera extends Subsystem{
         Robot.getInstance().yCam.setPosition(y);
     }
 
-    public static double widthOfGoal = 23.875, f = 430.157;
+    public static double widthOfGoal = 23.875, f = 426.89;
     public Pose2d getRobotPos() {
         ScanForGoalTFL scan = Robot.getInstance().getCamera().scanForGoal;
         if (scan.goal != null) {
             RectF bb = scan.goal.getBoundingBox();
-            if (scan.goal.getCategories().get(0).getScore() > 0.9 && timer.milliseconds() > 2000
+            if (scan.goal.getCategories().get(0).getScore() > 0.9 && timer.milliseconds() > 0
                     && bb.left > 5 && bb.right < 315 && bb.top < 235 && bb.bottom > 5) {
                 float p = bb.right - bb.left;
                 double dist = ((widthOfGoal * f) / p);
@@ -247,10 +247,10 @@ public class Camera extends Subsystem{
 
                 Pose2d pos = new Pose2d(-Math.cos(Math.toRadians(fullAngle)) * dist,
                         Math.sin(Math.toRadians(fullAngle)) * dist,
-                        Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS));
+                        -Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS));
 
                 Log.i("Goal Pos", "" + pos);
-                pos = pos.plus(new Pose2d(80, -36, 0));
+                pos = pos.plus(new Pose2d(64, -36, 0));
 
 //                pos = new Pose2d(pos.getX(), pos.getY(), Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES));
 

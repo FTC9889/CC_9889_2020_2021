@@ -26,8 +26,12 @@ public class DriverStation {
         return gamepad1.right_stick_x;
     }
 
-    boolean getStartIntaking(){
+    boolean getStartFrontIntaking(){
         return gamepad1.a;
+    }
+
+    boolean getStartBackIntaking(){
+        return gamepad1.x;
     }
 
     boolean getStopIntaking() {

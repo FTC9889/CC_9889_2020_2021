@@ -23,11 +23,13 @@ public class FlyWheel extends Subsystem{
     public Mode currentMode = Mode.OFF;
     public Mode wantedMode = Mode.OFF;
 
+    public boolean shooting = false;
+
     public static double time = 100, rpm = 3000;
     ElapsedTime shootTimer = new ElapsedTime();
     boolean extend = false;
 
-    public static double P = 0.002, I = 0, D = 0, F = 0, V = 0.0002, A, S;
+    public static double P = 0.0005, I = 0, D = 0, F = 0, V = 0.0002, A, S;
     public PIDF pid = new PIDF(150, 0, 20, 0.3);
 
     public boolean done = false;
@@ -123,6 +125,7 @@ public class FlyWheel extends Subsystem{
             if (extend) {
                 Robot.getInstance().fwArm.setPosition(0.47);
                 extend = false;
+                Robot.getInstance().getIntake().ringsIntaken--;
                 return true;
             } else {
                 Robot.getInstance().fwArm.setPosition(.62);

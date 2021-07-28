@@ -183,7 +183,7 @@ public class RRTeleOp extends Team9889Linear {
 //                    Robot.flyWheel.setPower(rpm);
                 }
 
-                if (driverStation.getStartIntaking()) {
+                if (driverStation.getStartFrontIntaking()) {
                     Robot.getIntake().SetFrontIntakePower(1);
                     Robot.backIntake.setPower(0);
                     Robot.passThrough.setPower(1);

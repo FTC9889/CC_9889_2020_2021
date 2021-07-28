@@ -16,6 +16,7 @@ public class Intake extends Subsystem {
     public boolean frontIntakeOn = false;
     public boolean backIntakeOn = false;
     public boolean passThroughIntakeOn = false;
+    public boolean outtake = false;
 
     boolean auto = false;
 
@@ -48,17 +49,26 @@ public class Intake extends Subsystem {
         }
 
         if (frontIntakeOn) {
-            SetFrontIntakePower(1);
+            if (outtake)
+                SetFrontIntakePower(-1);
+            else
+                SetFrontIntakePower(1);
         } else {
             SetFrontIntakePower(0);
         }
         if (backIntakeOn) {
-            SetBackIntakePower(1);
+            if (outtake)
+                SetBackIntakePower(-1);
+            else
+                SetBackIntakePower(1);
         } else {
             SetBackIntakePower(0);
         }
         if (passThroughIntakeOn) {
-            SetPassThroughPower(1);
+            if (outtake)
+                SetPassThroughPower(-1);
+            else
+                SetPassThroughPower(1);
         } else {
             SetPassThroughPower(0);
         }
