@@ -100,6 +100,44 @@ public class DriverStation {
         return psOn;
     }
 
+    boolean getAutoPS () {return gamepad1.dpad_right;}
+
+    private boolean psFirstToggle = true;
+    private boolean psFirst = true;
+    boolean getPSFirst() {
+        if(gamepad2.a && psFirstToggle) {
+            psFirst = !psFirst;
+            psFirstToggle = false;
+        } else if(!gamepad2.a)
+            psFirstToggle = true;
+
+        return psFirst;
+    }
+
+    private boolean psSecondToggle = true;
+    private boolean psSecond = true;
+    boolean getPSSecond() {
+        if(gamepad2.b && psSecondToggle) {
+            psSecond = !psSecond;
+            psSecondToggle = false;
+        } else if(!gamepad2.b)
+            psSecondToggle = true;
+
+        return psSecond;
+    }
+
+    private boolean psThirdToggle = true;
+    private boolean psThird = true;
+    boolean getPSThird() {
+        if(gamepad2.y && psThirdToggle) {
+            psThird = !psThird;
+            psThirdToggle = false;
+        } else if(!gamepad2.y)
+            psThirdToggle = true;
+
+        return psThird;
+    }
+
     private boolean intakeToggle = true;
     private boolean intakeOn = false;
     boolean getIntake() {

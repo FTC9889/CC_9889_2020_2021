@@ -24,10 +24,10 @@ public class FindGoal extends Action {
     public void update() {
         Robot.getInstance().getCamera().scanForGoal.findGoal();
 
-        if (Robot.getInstance().getFlyWheel().shooting) {
+        if (Robot.getInstance().getFlyWheel().shooting || Robot.getInstance().getMecanumDrive().resetPos) {
             Pose2d updatedPos = Robot.getInstance().getCamera().getRobotPos();
-            if (updatedPos != null && Math.abs(Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES)) < 40
-                    && Robot.getInstance().getFlyWheel().shooting) {
+            if (updatedPos.getX() < 900 && Math.abs(Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES)) < 40
+                    && Robot.getInstance().getFlyWheel().shooting || (updatedPos.getX() < 900 && Robot.getInstance().getMecanumDrive().resetPos)) {
                 Robot.getInstance().rr.setPoseEstimate(updatedPos);
 
                 Robot.getInstance().rr.getLocalizer().update();

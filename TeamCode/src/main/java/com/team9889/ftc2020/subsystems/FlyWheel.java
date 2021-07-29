@@ -25,7 +25,7 @@ public class FlyWheel extends Subsystem{
 
     public boolean shooting = false;
 
-    public static double time = 100, rpm = 3000;
+    public static double time = 100, rpm = 2900;
     ElapsedTime shootTimer = new ElapsedTime();
     boolean extend = false;
 
@@ -89,7 +89,7 @@ public class FlyWheel extends Subsystem{
                     setRPM(rpm);
                     break;
                 case POWERSHOT1:
-                    setRPM(1250);
+                    setRPM(2420);
                     break;
                 case POWERSHOT2:
                     setRPM(1250);
@@ -179,5 +179,26 @@ public class FlyWheel extends Subsystem{
 
     public void setRampPS () {
         wantedRampPos = RampPositions.PS;
+    }
+
+    public double distanceBasedPower () {
+        double initHeight = 1.16, gravity = -32.17, length = 15, y = 0;
+        double vX, vY, t;
+        double ringVel = 0, angle = 29;
+
+        vX = ringVel * Math.cos(angle);
+        vY = ringVel * Math.sin(angle);
+
+        t = (Robot.getInstance().getCamera().dist / 12) / vX;
+
+//        vY * t
+        double vel = y - initHeight - (0.5 * gravity * (Math.pow(t, 2)));
+
+        vel = vel / t;
+        vel = vel / Math.sin(angle);
+        return vel;
+
+//        14.925
+//        y - initHeight - (0.5 * gravity * (Math.pow(t, 2))) = (vY * t);
     }
 }

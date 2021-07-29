@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
+import com.team9889.ftc2020.subsystems.FlyWheel;
 import com.team9889.ftc2020.subsystems.Robot;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -71,7 +72,7 @@ public class ShootRings extends Action {
 
 //        RobotLog.a("Loops Time: " + String.valueOf(loopTimer.milliseconds()) + " | Velocity: " + String.valueOf(Robot.getInstance().flyWheel.getVelocity()));
 
-        Robot.getInstance().flyWheel.motor.setVelocity(power);
+        Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.DEFAULT;
         telemetry.update();
 
 //        Robot.getInstance().update();

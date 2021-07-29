@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.Constants;
+import com.team9889.lib.CruiseLib;
 import com.team9889.lib.control.math.cartesian.Rotation2d;
 import com.team9889.lib.roadrunner.drive.DriveConstants;
 
@@ -24,10 +25,11 @@ import org.opencv.core.Point;
 public class MecanumDrive extends Subsystem {
     public double x, y, xSpeed, ySpeed, turnSpeed;
 
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(14, 0, .8);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(15, 0, .8);
     public PIDFController headingController = new PIDFController(HEADING_PID);
 
     public double theta;
+    public boolean resetPos = false;
 
     public Rotation2d gyroAngle = new Rotation2d();
     private double Right_Position_Offset = 0, Left_Position_Offset = 0, Y_Position_Offset = 0;
@@ -185,6 +187,7 @@ public class MecanumDrive extends Subsystem {
 //        turnSpeed += headingInput;
 
 //        headingInput = CruiseLib.limitValue(headingInput, 0.4);
+        headingInput = CruiseLib.limitValue(headingInput, -0.1, -1, 0.1, 1);
         Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, headingInput));
 
         // Update the heading controller with our current heading
@@ -238,7 +241,7 @@ public class MecanumDrive extends Subsystem {
 
 //        turnSpeed += headingInput;
 
-//        headingInput = CruiseLib.limitValue(headingInput, 0.4);
+        headingInput = CruiseLib.limitValue(headingInput, -0.1, -1, 0.1, 1);
         Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, headingInput));
 
         // Update the heading controller with our current heading

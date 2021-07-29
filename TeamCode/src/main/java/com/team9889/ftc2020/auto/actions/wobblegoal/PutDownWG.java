@@ -12,16 +12,13 @@ public class PutDownWG extends Action {
 
     @Override
     public void start() {
+        Robot.getInstance().getWobbleGoal().wgTimer.reset();
+        timer.reset();
     }
 
     @Override
     public void update() {
-        if (timer.milliseconds() < 500) {
-            Robot.getInstance().wgLeft.setPosition(0.8);
-            Robot.getInstance().wgRight.setPosition(0.8);
-        } else {
-            Robot.getInstance().wgGrabber.setPosition(.75);
-        }
+        Robot.getInstance().getWobbleGoal().putWGDown();
     }
 
     @Override

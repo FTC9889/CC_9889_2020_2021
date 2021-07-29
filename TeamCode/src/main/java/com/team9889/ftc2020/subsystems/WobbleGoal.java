@@ -1,5 +1,7 @@
 package com.team9889.ftc2020.subsystems;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -110,8 +112,10 @@ public class WobbleGoal extends Subsystem{
         if (wgTimer.milliseconds() < 500)
             wantedGrabberOpen = false;
 //        } else {
-        else
+        else {
             wantedArmPos = wgArmPositions.UP;
+            Log.i("PickUp", "");
+        }
 //        }
     }
 }

@@ -51,11 +51,12 @@ public class ScanForGoalTFL extends OpenCvPipeline {
     ObjectDetector detector = null;
     public ScanForGoalTFL() {
         // Step 2: Initialize the detector object
-        ObjectDetector.ObjectDetectorOptions options = ObjectDetector.ObjectDetectorOptions.builder()
-                .setMaxResults(2)
-                .setScoreThreshold(0.8f)
-                .setNumThreads(2)
-                .build();
+        if (!Robot.getInstance().blue) {
+            ObjectDetector.ObjectDetectorOptions options = ObjectDetector.ObjectDetectorOptions.builder()
+                    .setMaxResults(2)
+                    .setScoreThreshold(0.8f)
+                    .setNumThreads(2)
+                    .build();
 
 //        Model.Options options;
 //        CompatibilityList compatList = new CompatibilityList();
@@ -63,6 +64,43 @@ public class ScanForGoalTFL extends OpenCvPipeline {
 //        if (compatList.isDelegateSupportedOnThisDevice()) {
 //            options = Model.Options.Builder().setDevice(Model.Device.GPU).build();
 //        }
+
+            try {
+                detector = ObjectDetector.createFromFileAndOptions(
+                        Robot.getInstance().hardwareMap.appContext, // the application context
+                        "goal.tflite", // must be same as the filename in assets folder
+                        options
+                );
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void blueGoal() {
+        ObjectDetector.ObjectDetectorOptions options = ObjectDetector.ObjectDetectorOptions.builder()
+                .setMaxResults(2)
+                .setScoreThreshold(0.8f)
+                .setNumThreads(2)
+                .build();
+
+        try {
+            detector = ObjectDetector.createFromFileAndOptions(
+                    Robot.getInstance().hardwareMap.appContext, // the application context
+                    "BlueGoal.tflite", // must be same as the filename in assets folder
+                    options
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void redGoal() {
+        ObjectDetector.ObjectDetectorOptions options = ObjectDetector.ObjectDetectorOptions.builder()
+                .setMaxResults(2)
+                .setScoreThreshold(0.8f)
+                .setNumThreads(2)
+                .build();
 
         try {
             detector = ObjectDetector.createFromFileAndOptions(

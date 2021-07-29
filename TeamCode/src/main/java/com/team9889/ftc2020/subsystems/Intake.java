@@ -43,10 +43,10 @@ public class Intake extends Subsystem {
 
     @Override
     public void update() {
-        if (ringsIntaken >= 4) {
-            frontIntakeOn = false;
-            backIntakeOn = false;
-        }
+//        if (ringsIntaken >= 4) {
+//            frontIntakeOn = false;
+//            backIntakeOn = false;
+//        }
 
         if (frontIntakeOn) {
             if (outtake)

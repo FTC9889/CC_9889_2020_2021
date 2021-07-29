@@ -3,14 +3,13 @@ package com.team9889.ftc2020.auto.actions.teleop;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.FlyWheel;
 import com.team9889.ftc2020.subsystems.Robot;
-import com.team9889.lib.CruiseLib;
-import com.team9889.lib.control.controllers.PID;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /**
@@ -20,160 +19,129 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @Config
 public class PowerShots extends Action {
     public static double p = 8, i = 0, d = 100, max = 0;
-    public static double p2 = .05, i2 = 0, d2 = 2, max2 = 0;
-    public static double p3 = .05, i3 = 0, d3 = 2, max3 = 0;
-    public static int readyCount = 6;
+    public static int readyCount = 10;
 
-    private PID yOrientationPID = new PID(1, 0, 8, 100);
-    private PID camOrientationPID = new PID(1, 0, 8, 100);
-    private PID angleOrientationPID = new PID(1, 0, 8, 100);
+    boolean firstShot = true;
+    int ready = 0;
+    ElapsedTime beginning = new ElapsedTime();
 
-    boolean first = true;
-    int num = 1, ready = 0;
-    ElapsedTime timer = new ElapsedTime(), beginning = new ElapsedTime();
-    Telemetry telemetry;
+    boolean first, second, third;
 
-    double turn, y;
+    public PowerShots(){
+        first = true;
+        second = true;
+        third = true;
+    }
 
-    public PowerShots(Telemetry telemetry) {
-        this.telemetry = telemetry;
+    public PowerShots(boolean first, boolean second, boolean third) {
+        this.first = first;
+        this.second = second;
+        this.third = third;
     }
 
     @Override
     public void start() {
-        Robot.getInstance().getCamera().setPS1CamPos();
+        firstShot = true;
+
+        Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.POWERSHOT1;
+
         Robot.getInstance().getCamera().setScanForGoal();
         Robot.getInstance().getMecanumDrive().setPower(0,0,0);
-        Robot.getInstance().getMecanumDrive().writeAngleToFile();
-        Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.POWERSHOT1;
         Robot.getInstance().getFlyWheel().autoPower = true;
-        Robot.getInstance().fwLock.setPosition(.4);
-        Robot.getInstance().fwFlap.setPosition(.52);
-
-//        y = Robot.getInstance().getMecanumDrive().getAdjustedPose().getX();
+        Robot.getInstance().getFlyWheel().unlocked();
+        Robot.getInstance().getFlyWheel().wantedRampPos = FlyWheel.RampPositions.PS;
 
         beginning.reset();
     }
 
     @Override
     public void update() {
-//        Robot.getInstance().update();
-        turn = Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES) -
-                Math.toDegrees(Robot.getInstance().getMecanumDrive().angleFromAuton);
-
-        Log.v("Turn", turn + "");
-
-        if (first && beginning.milliseconds() > 600) {
+//        if (first && beginning.milliseconds() > 600) {
+        if (first) {
             if (ready < readyCount) {
-                timer.reset();
+                double angle = -Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES);
+                if (angle < 0) {
+                    angle += 360;
+                }
 
-                if (Math.abs(Robot.getInstance().getCamera().getPosOfTarget().x) < 0.02 && Math.abs(turn) < .5) {
+                Log.i("Angle", "" + (Math.toDegrees(Robot.getInstance().getMecanumDrive().theta) - angle));
+
+                if (Math.abs(Math.toDegrees(Robot.getInstance().getMecanumDrive().theta) - angle) < 1) {
+                    Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, 0));
                     ready++;
                 } else {
-                    turn(1);
                     ready = 0;
+                    Robot.getInstance().getMecanumDrive().turn(new Vector2d(73, -23), new Vector2d(0, 0));
                 }
             } else if (beginning.milliseconds() > 1500) {
-                if (timer.milliseconds() < 300) {
-                    Robot.getInstance().getCamera().setPS2CamPos();
-                    Robot.getInstance().fwArm.setPosition(.65);
-                } else {
-                    num = 2;
-                    ready = 0;
+                boolean ringShot = Robot.getInstance().getFlyWheel().shootRing();
+                if (ringShot) {
                     first = false;
-                    camOrientationPID = new PID(0, 0, 0, 0);
-//                    Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOT2);
-                    Robot.getInstance().fwArm.setPosition(0.5);
+                    ready = 0;
+                    firstShot = false;
+                    Robot.getInstance().getMecanumDrive().theta = 1000;
                 }
             }
-        } else if (num == 2 && !first) {
-            if (ready < readyCount) {
-                timer.reset();
+        } else if (third) {
+            if (ready < readyCount && second) {
+                double angle = -Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES);
+                if (angle < 0) {
+                    angle += 360;
+                }
 
-                if (Math.abs(Robot.getInstance().getCamera().getPosOfTarget().x) < 0.02 && Math.abs(turn) < .5) {
+                Log.i("Angle", "" + (Math.toDegrees(Robot.getInstance().getMecanumDrive().theta) - angle));
+
+                if (Math.abs(Math.toDegrees(Robot.getInstance().getMecanumDrive().theta) - angle) < 1) {
+                    Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, 0));
                     ready++;
                 } else {
-                    turn(1);
                     ready = 0;
+                    Robot.getInstance().getMecanumDrive().turn(new Vector2d(73, -7), new Vector2d(0, 0));
                 }
             } else {
-                if (timer.milliseconds() < 300) {
-                    Robot.getInstance().getCamera().setPS3CamPos();
-                    Robot.getInstance().fwArm.setPosition(.65);
-                } else {
-                    num = 3;
+                boolean ringShot = Robot.getInstance().getFlyWheel().shootRing();
+                if (ringShot) {
+                    third = false;
                     ready = 0;
-                    camOrientationPID = new PID(0, 0, 0, 0);
-//                    Robot.getInstance().getFlyWheel().setMode(FlyWheel.Mode.POWERSHOT3);
-                    Robot.getInstance().fwArm.setPosition(0.5);
+                    Robot.getInstance().getMecanumDrive().theta = 1000;
                 }
             }
-        } else if (!first) {
+        } else if (second) {
             if (ready < readyCount) {
-                timer.reset();
+                double angle = -Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES);
+                if (angle < 0) {
+                    angle += 360;
+                }
 
-                if (Math.abs(Robot.getInstance().getCamera().getPosOfTarget().x) < 0.025 && Math.abs(turn) < .5) {
+                Log.i("Angle", "" + (Math.toDegrees(Robot.getInstance().getMecanumDrive().theta) - angle));
+
+                if (Math.abs(Math.toDegrees(Robot.getInstance().getMecanumDrive().theta) - angle) < 1) {
+                    Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, 0));
                     ready++;
                 } else {
-                    turn(1);
                     ready = 0;
+                    Robot.getInstance().getMecanumDrive().turn(new Vector2d(73, -13), new Vector2d(0, 0));
                 }
             } else {
-                if (timer.milliseconds() < 300) {
-                    Robot.getInstance().fwArm.setPosition(.65);
-                } else {
-                    num = 4;
+                boolean ringShot = Robot.getInstance().getFlyWheel().shootRing();
+                if (ringShot) {
+                    second = false;
                     ready = 0;
-                    camOrientationPID = new PID(0, 0, 0, 0);
-                    Robot.getInstance().fwArm.setPosition(0.5);
+                    Robot.getInstance().getMecanumDrive().theta = 1000;
                 }
             }
         }
-    }
-
-    void turn (double speedMultiplier) {
-        camOrientationPID.p = p;
-        camOrientationPID.i = i;
-        camOrientationPID.d = d;
-        camOrientationPID.maxIntegral = max;
-
-        angleOrientationPID.p = p2;
-        angleOrientationPID.i = i2;
-        angleOrientationPID.d = d2;
-        angleOrientationPID.maxIntegral = max2;
-
-        yOrientationPID.p = p3;
-        yOrientationPID.i = i3;
-        yOrientationPID.d = d3;
-        yOrientationPID.maxIntegral = max3;
-
-        double speed = 0;
-        if (Robot.getInstance().getCamera().getPosOfTarget().x != 1e10) {
-            double camera = Robot.getInstance().getCamera().getPosOfTarget().x;
-            telemetry.addData("Camera", camera);
-            camOrientationPID.update(camera, 0);
-            speed = CruiseLib.limitValue(camOrientationPID.getOutput() / 1.2, -0.1, -1, 0.1, 1);
-        }
-
-        angleOrientationPID.update(turn, 0);
-        Robot.getInstance().getMecanumDrive().turnSpeed += CruiseLib.limitValue(angleOrientationPID.getOutput(), -.05, -.6, .05, .6);
-
-//        yOrientationPID.update(Robot.getInstance().getMecanumDrive().getAdjustedPose().getX(), y);
-//        Robot.getInstance().getMecanumDrive().xSpeed += CruiseLib.limitValue(yOrientationPID.getOutput(), -.05, -.6, .05, .6);
-
-        Robot.getInstance().getMecanumDrive().ySpeed += (speed * speedMultiplier);
     }
 
     @Override
     public boolean isFinished() {
-        return num >= 4;
+        return !first && !second && !third;
     }
 
     @Override
     public void done() {
-        Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.DEFAULT;
         Robot.getInstance().getFlyWheel().autoPower = false;
-        Robot.getInstance().fwLock.setPosition(1);
-        Robot.getInstance().fwFlap.setPosition(.5);
+        Robot.getInstance().getFlyWheel().locked();
+        Robot.getInstance().getFlyWheel().wantedRampPos = FlyWheel.RampPositions.DOWN;
     }
 }

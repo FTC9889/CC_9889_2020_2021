@@ -21,18 +21,13 @@ public class PickUpWG extends Action {
 
     @Override
     public void start() {
+        Robot.getInstance().getWobbleGoal().wgTimer.reset();
+        timer.reset();
     }
 
     @Override
     public void update() {
-        if (timer.milliseconds() > time) {
-            if (timer.milliseconds() < 700 + time) {
-                Robot.getInstance().wgGrabber.setPosition(0.25);
-            } else {
-                Robot.getInstance().wgLeft.setPosition(.6);
-                Robot.getInstance().wgRight.setPosition(.6);
-            }
-        }
+        Robot.getInstance().getWobbleGoal().pickUpWG();
     }
 
     @Override

@@ -167,7 +167,7 @@ public class RRTeleOp extends Team9889Linear {
 
                 if (gamepad1.dpad_right) {
                     if (psFirst) {
-                        ps = new PowerShots(telemetry);
+                        ps = new PowerShots();
                         ps.start();
 
                         psFirst = false;
