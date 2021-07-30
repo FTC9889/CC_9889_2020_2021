@@ -1,7 +1,5 @@
 package com.team9889.ftc2020;
 
-import android.util.Log;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -126,14 +124,15 @@ public class Teleop extends Team9889Linear {
 
 //                    gamepad1.right_bumper
 
-                    if (driverStation.getAim()) {
-                        if (ready > 5 || Robot.getFlyWheel().shooting) {
-
+                    if (driverStation.getAim() || driverStation.getShoot()) {
+                        if (ready > 5 || Robot.getFlyWheel().shooting || driverStation.getShoot()) {
                             if (!ringShot) {
                                 ringShot = Robot.getFlyWheel().shootRing(fwTolerance);
                             }
 
                             Robot.getFlyWheel().shooting = true;
+
+                            Robot.getIntake().passThroughIntakeOnPartial = true;
 
                             if (ringShot) {
                                 if (driverStation.getAutoPS() && psWait == 0) {
@@ -159,9 +158,9 @@ public class Teleop extends Team9889Linear {
                                 } else if (!driverStation.getAutoPS()) {
                                     ringShot = false;
 
-                                    if (Robot.hopperDist.getDistance(DistanceUnit.INCH) > 2.5) {
-                                        driverStation.codeToggle = !driverStation.codeToggle;
-                                    }
+//                                    if (Robot.hopperDist.getDistance(DistanceUnit.INCH) > 2.5) {
+//                                        driverStation.codeToggle = !driverStation.codeToggle;
+//                                    }
                                 }
 
                                 if (driverStation.getAutoPS())
@@ -186,7 +185,7 @@ public class Teleop extends Team9889Linear {
                                 }
                             } else {
                                 if (Robot.blue) {
-                                    Robot.getMecanumDrive().turn(new Vector2d(73, 42), new Vector2d(0, 0));
+                                    Robot.getMecanumDrive().turn(new Vector2d(73, 36), new Vector2d(0, 0));
                                 } else {
                                     Robot.getMecanumDrive().turn(new Vector2d(73, -42), new Vector2d(0, 0));
                                 }
@@ -200,7 +199,9 @@ public class Teleop extends Team9889Linear {
                         Robot.getFlyWheel().shooting = false;
                         ringShot = false;
 
-                        driverStation.codeToggle = false;
+                        Robot.getIntake().passThroughIntakeOnPartial = false;
+
+//                        driverStation.codeToggle = false;
 
                         Robot.fwArm.setPosition(0.47);
 
@@ -209,8 +210,6 @@ public class Teleop extends Team9889Linear {
 //                        third = true;
                     }
 
-                    Log.i("PS Info", "" + first + ", " + second + ", " + third + ", " + ", " + ready + ", " + psWait + ", " + ringShot + ", " + Robot.getFlyWheel().shooting);
-
                     if (driverStation.getPS()) {
                         Robot.getFlyWheel().wantedRampPos = FlyWheel.RampPositions.PS;
                     } else if (!Robot.getFlyWheel().autoPower) {
@@ -218,33 +217,15 @@ public class Teleop extends Team9889Linear {
                     }
                 }
 
-
-                if (!driverStation.getAutoPS()) {
-                    first = driverStation.getPSFirst();
-                    second = driverStation.getPSSecond();
-                    third = driverStation.getPSThird();
-                    fourth = second;
+                if (Robot.blue == driverStation.getMiddleGoal()) {
+                    Robot.getCamera().scanForGoal.redGoal();
+                } else {
+                    Robot.getCamera().scanForGoal.blueGoal();
                 }
-//
-//                if (driverStation.getAutoPS()) {
-//                    if (psFirst) {
-//                        psAction = new PowerShots(first, second, third);
-//                        psAction.start();
-//                        psFirst = false;
-//                    } else if (!psAction.isFinished()) {
-//                        psAction.update();
-//                    } else {
-//                        psAction.done();
-//                    }
-//                } else {
-//                    psFirst = true;
-//                    Robot.getFlyWheel().autoPower = false;
-//                }
 
 //                --------------------
 //                |    WobbleGoal    |
 //                --------------------
-//                 && Robot.getWobbleGoal().currentArmPos != WobbleGoal.wgArmPositions.UP
                 if (gamepad1.left_bumper) {
                     Robot.getWobbleGoal().wgTimer.reset();
                     wgFirst = false;
@@ -285,7 +266,7 @@ public class Teleop extends Team9889Linear {
 
             telemetry.addData("Auto Aim", driverStation.getAim());
             telemetry.addData("Hopper Distance", Robot.hopperDist.getDistance(DistanceUnit.INCH));
-            telemetry.addData("Code Toggle", driverStation.codeToggle);
+//            telemetry.addData("Code Toggle", driverStation.codeToggle);
 
             telemetry.addData("First", first + ", Second : " + second + ", Third : " + third);
 

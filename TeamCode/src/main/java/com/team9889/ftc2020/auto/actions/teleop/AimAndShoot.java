@@ -34,8 +34,7 @@ public class AimAndShoot extends Action {
         updatePIDValues();
 
         double cameraTarget = Robot.getInstance().getCamera().getPosOfTarget().x;
-        double turn = Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS) -
-                Robot.getInstance().getMecanumDrive().angleFromAuton;
+        double turn = Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS);
 
         double speed = 0;
         if (Math.abs(turn) > Math.toRadians(25)) {

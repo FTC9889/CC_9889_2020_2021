@@ -16,6 +16,7 @@ public class Intake extends Subsystem {
     public boolean frontIntakeOn = false;
     public boolean backIntakeOn = false;
     public boolean passThroughIntakeOn = false;
+    public boolean passThroughIntakeOnPartial = false;
     public boolean outtake = false;
 
     boolean auto = false;
@@ -39,6 +40,7 @@ public class Intake extends Subsystem {
     @Override
     public void outputToTelemetry(Telemetry telemetry) {
         telemetry.addData("Ring Intaken", ringsIntaken);
+        telemetry.addData("Current", current);
     }
 
     @Override
@@ -64,7 +66,13 @@ public class Intake extends Subsystem {
         } else {
             SetBackIntakePower(0);
         }
-        if (passThroughIntakeOn) {
+
+        if (passThroughIntakeOnPartial) {
+            if (outtake)
+                SetPassThroughPower(-.4);
+            else
+                SetPassThroughPower(.4);
+        } else if (passThroughIntakeOn) {
             if (outtake)
                 SetPassThroughPower(-1);
             else

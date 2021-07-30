@@ -19,7 +19,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class FlyWheel extends Subsystem{
     public enum Mode {
-        OFF, POWERSHOT1, POWERSHOT2, POWERSHOT3, POWERSHOTAUTO1, POWERSHOTAUTO2, POWERSHOTAUTO3, DEFAULT
+        OFF, POWERSHOT1, POWERSHOT2, POWERSHOT3, POWERSHOTAUTO1, POWERSHOTAUTO2, POWERSHOTAUTO3, DEFAULT, MIDDLE
     }
     public Mode currentMode = Mode.OFF;
     public Mode wantedMode = Mode.OFF;
@@ -63,6 +63,8 @@ public class FlyWheel extends Subsystem{
 
     @Override
     public void update() {
+        rpm = distanceBasedPower();
+
         if (currentRampPos != wantedRampPos) {
             switch (wantedRampPos) {
                 case UP:
@@ -87,7 +89,6 @@ public class FlyWheel extends Subsystem{
 //        if (currentMode != wantedMode) {
             switch (wantedMode) {
                 case OFF:
-//                    Robot.getInstance().flyWheel.motor.setVelocity(0);
                     setRPM(0);
                     currentSetSpeed = 0;
                     break;
@@ -95,6 +96,9 @@ public class FlyWheel extends Subsystem{
                     setRPM(rpm);
                     currentSetSpeed = (int) rpm;
                     break;
+                case MIDDLE:
+                    setRPM(rpm - 300);
+                    currentSetSpeed = (int) rpm - 300;
                 case POWERSHOT1:
                     setRPM(2420);
                     currentSetSpeed = 2420;
@@ -158,7 +162,7 @@ public class FlyWheel extends Subsystem{
             ready = 0;
         }
 
-        if (shootTimer.milliseconds() > time && ready > 4) {
+        if (shootTimer.milliseconds() > time && ready > 2) {
             shootTimer.reset();
             if (extend) {
                 Robot.getInstance().fwArm.setPosition(0.47);
@@ -242,10 +246,16 @@ public class FlyWheel extends Subsystem{
          */
 
         Pose2d pos = Robot.getInstance().rr.getLocalizer().getPoseEstimate();
-        double dist = Math.sqrt(Math.pow(pos.getX(), 2) + Math.pow(pos.getY(), 2));
+        int y = Robot.getInstance().blue ? 36 : -36;
+        double dist = Math.sqrt(Math.pow(63 - pos.getX(), 2) + Math.pow(y - pos.getY(), 2));
+        Log.i("Dist", "" + dist);
+
+        double rpm = (0.0579 * Math.pow(dist, 2)) - (7.8302 * dist) + 3131;
 
 //        rpm = dist;
 
-        return dist;
+        rpm = CruiseLib.limitValue(rpm, 3100, 2500);
+
+        return rpm;
     }
 }

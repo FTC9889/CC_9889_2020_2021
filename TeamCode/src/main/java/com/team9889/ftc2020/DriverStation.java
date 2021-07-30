@@ -88,18 +88,26 @@ public class DriverStation {
         return fwOn;
     }
 
-    private boolean aimToggle = true;
-    private boolean aimOn = false;
-    public boolean codeToggle = false;
-    boolean getAim() {
-        if((gamepad2.left_bumper || codeToggle) && aimToggle) {
-            aimOn = !aimOn;
-            aimToggle = false;
-            codeToggle = false;
-        } else if(!gamepad2.left_bumper && !codeToggle)
-            aimToggle = true;
+//    private boolean aimToggle = true;
+//    private boolean aimOn = false;
+//    public boolean codeToggle = false;
+//    boolean getAim() {
+//        if((gamepad2.left_bumper || codeToggle) && aimToggle) {
+//            aimOn = !aimOn;
+//            aimToggle = false;
+//            codeToggle = false;
+//        } else if(!gamepad2.left_bumper && !codeToggle)
+//            aimToggle = true;
+//
+//        return aimOn;
+//    }
 
-        return aimOn;
+    boolean getAim() {
+        return gamepad2.left_bumper;
+    }
+
+    boolean getShoot() {
+        return gamepad1.right_bumper;
     }
 
     private boolean psToggle = true;
@@ -141,8 +149,8 @@ public class DriverStation {
     }
 
     private boolean psThirdToggle = true;
-    private boolean psThird = true;
-    boolean getPSThird() {
+    private boolean psThird = false;
+    boolean getMiddleGoal() {
         if(gamepad2.y && psThirdToggle) {
             psThird = !psThird;
             psThirdToggle = false;

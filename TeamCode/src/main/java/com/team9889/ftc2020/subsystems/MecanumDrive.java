@@ -267,6 +267,7 @@ public class MecanumDrive extends Subsystem {
 
         headingInput = CruiseLib.limitValue(headingInput, -0.1, -1, 0.1, 1);
         Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, headingInput));
+//        turnSpeed = headingInput;
 
         // Update the heading controller with our current heading
         headingController.update(Math.toRadians(angle));

@@ -251,21 +251,21 @@ public class Camera extends Subsystem{
                 double fullAngle = (fovAngle + Math.toDegrees(scan.odoPos.getHeading()));
                 Log.i("Cam to Goal Angle", "" + fullAngle);
 
-                Pose2d pos;
-                if (Robot.getInstance().blue) {
-                     pos = new Pose2d(-Math.cos(Math.toRadians(fullAngle)) * dist,
-                            -Math.sin(Math.toRadians(fullAngle)) * dist,
-                            Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS));
-                } else {
-                    pos = new Pose2d(-Math.cos(Math.toRadians(fullAngle)) * dist,
-                            Math.sin(Math.toRadians(fullAngle)) * dist,
-                            -Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS));
-                }
+//                Pose2d pos;
+//                if (Robot.getInstance().blue) {
+//                     pos = new Pose2d(-Math.cos(Math.toRadians(fullAngle)) * dist,
+//                            Math.sin(Math.toRadians(fullAngle)) * dist,
+//                            -Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS));
+//                } else {
+                Pose2d pos = new Pose2d(-Math.cos(Math.toRadians(fullAngle)) * dist,
+                        Math.sin(Math.toRadians(fullAngle)) * dist,
+                        -Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.RADIANS));
+//                }
 
 
                 Log.i("Goal Pos", "" + pos);
                 if (Robot.getInstance().blue) {
-                    pos = pos.plus(new Pose2d(64, 32, 0));
+                    pos = pos.plus(new Pose2d(64, 36, 0));
                 } else {
                     pos = pos.plus(new Pose2d(64, -40, 0));
                 }
