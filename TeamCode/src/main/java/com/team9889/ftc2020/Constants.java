@@ -89,6 +89,7 @@ public class Constants {
         public final static String kFWArm = "fwarm";
         public final static String kFWLock = "lock";
         public final static String kFWFlap = "flap";
+        public final static String kHopperDist = "hopperdetector";
     }
 
     /*---------------------

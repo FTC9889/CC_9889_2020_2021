@@ -25,6 +25,8 @@ import org.opencv.core.Point;
 public class MecanumDrive extends Subsystem {
     public double x, y, xSpeed, ySpeed, turnSpeed;
 
+    double[] turnError = new double[5];
+
     public static PIDCoefficients HEADING_PID = new PIDCoefficients(15, 0, .8);
     public PIDFController headingController = new PIDFController(HEADING_PID);
 
@@ -220,7 +222,7 @@ public class MecanumDrive extends Subsystem {
 //            theta -= Math.toRadians((45 - (0.25 * (Math.toDegrees(theta) - 180))));
 //        }
 
-        Log.i("Theta", "" + Math.toDegrees(theta));
+//        Log.i("Theta", "" + Math.toDegrees(theta));
 
         // Not technically omega because its power. This is the derivative of atan2
         double thetaFF = -fieldFrameInput.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
@@ -238,6 +240,28 @@ public class MecanumDrive extends Subsystem {
         double headingInput = (headingController.update(Math.toRadians(angle))
                 * DriveConstants.kV + thetaFF)
                 * DriveConstants.TRACK_WIDTH;
+
+        Log.i("Error", "" + headingController.getLastError());
+
+        int numOfBad = 0;
+        for (int i = 0; i < turnError.length; i++) {
+//            Log.i("Turn Error " + i, "" + (turnError[i] - headingController.getLastError()));
+            if (Math.abs(turnError[i] - headingController.getLastError()) < Math.toRadians(.1))
+                numOfBad += 1;
+
+            if (i + 1 < turnError.length) {
+                turnError[i] = turnError[i + 1];
+            } else {
+                turnError[i] = headingController.getLastError();
+            }
+        }
+
+//        Log.i("BAD", "" + numOfBad);
+
+        if (numOfBad == 5) {
+            Log.i("BAD", "");
+            headingInput += .5;
+        }
 
 //        turnSpeed += headingInput;
 

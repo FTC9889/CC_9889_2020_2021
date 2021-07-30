@@ -78,8 +78,8 @@ public class ScanForRS extends OpenCvPipeline {
 //        double[] hsvThresholdSaturation = {210, 255};
 //        double[] hsvThresholdValue = {0.0, 255.0};
 
-        double[] hsvThresholdHue = {100, 138};
-        double[] hsvThresholdSaturation = {126, 253};
+        double[] hsvThresholdHue = {90, 140};
+        double[] hsvThresholdSaturation = {110, 255};
         double[] hsvThresholdValue = {0.0, 255.0};
         hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);
 

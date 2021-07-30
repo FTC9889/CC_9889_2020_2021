@@ -1,7 +1,5 @@
 package com.team9889.ftc2020.auto.actions.flywheel;
 
-import android.util.Log;
-
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
 import com.team9889.ftc2020.subsystems.FlyWheel;
@@ -19,7 +17,7 @@ public class ShootRings extends Action {
     private ElapsedTime totalTimer = new ElapsedTime();
     int stage = 0, ringsShot = 0, rings, time, power = 1145;
 //    1135
-    boolean extend = false, stop = true;
+    boolean extend = false, stop = false, ps = false;
 
     Telemetry telemetry;
 
@@ -44,35 +42,56 @@ public class ShootRings extends Action {
         this.stop = stop;
     }
 
+    public ShootRings (int rings, int time, Telemetry telemetry, boolean ps, boolean stop) {
+        this.rings = rings;
+        this.time = time;
+        this.telemetry = telemetry;
+        this.ps = ps;
+        this.stop = stop;
+    }
+
     @Override
     public void start() {
         shootTimer.reset();
         loopTimer.reset();
         totalTimer.reset();
 
-        Robot.getInstance().fwFlap.setPosition(.4);
+        if (ps) {
+            Robot.getInstance().getFlyWheel().wantedRampPos = FlyWheel.RampPositions.PS;
+        } else {
+            Robot.getInstance().fwFlap.setPosition(.4);
+        }
         Robot.getInstance().fwLock.setPosition(.4);
         Robot.getInstance().flyWheel.resetEncoder();
     }
 
     @Override
     public void update() {
-        if (totalTimer.milliseconds() > time && shootTimer.milliseconds() > 80) {
-            if (extend) {
-                Robot.getInstance().fwArm.setPosition(0.47);
-                extend = false;
+//        if (totalTimer.milliseconds() > time && shootTimer.milliseconds() > 150) {
+//            if (extend) {
+//                Robot.getInstance().fwArm.setPosition(0.47);
+//                extend = false;
+//                ringsShot++;
+//            } else {
+//                Robot.getInstance().fwArm.setPosition(.62);
+//                extend = true;
+//            }
+//
+//            shootTimer.reset();
+//        }
+
+        if (ps) {
+            if (Robot.getInstance().getFlyWheel().shootRing(50)) {
                 ringsShot++;
-            } else {
-                Robot.getInstance().fwArm.setPosition(.62);
-                extend = true;
             }
-
-            shootTimer.reset();
+        } else {
+            if (Robot.getInstance().getFlyWheel().shootRing(100)) {
+                ringsShot++;
+            }
         }
-
 //        RobotLog.a("Loops Time: " + String.valueOf(loopTimer.milliseconds()) + " | Velocity: " + String.valueOf(Robot.getInstance().flyWheel.getVelocity()));
 
-        Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.DEFAULT;
+//        Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.DEFAULT;
         telemetry.update();
 
 //        Robot.getInstance().update();
@@ -87,9 +106,8 @@ public class ShootRings extends Action {
     @Override
     public void done() {
         if (stop) {
-            Robot.getInstance().flyWheel.setPower(0);
+            Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.OFF;
             Robot.getInstance().fwLock.setPosition(1);
-            Log.i("Shot", "");
         }
 
         Robot.getInstance().getIntake().ringsIntaken = 0;

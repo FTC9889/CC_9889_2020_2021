@@ -24,7 +24,7 @@ public class WobbleGoal extends Subsystem{
     @Override
     public void init(boolean auto) {
         if (auto) {
-            Robot.getInstance().wgGrabber.setPosition(.7);
+            Robot.getInstance().wgGrabber.setPosition(.9);
         }
     }
 
@@ -51,8 +51,10 @@ public class WobbleGoal extends Subsystem{
                     break;
 
                 case DOWN:
-                    Robot.getInstance().wgLeft.setPosition(.8);
-                    Robot.getInstance().wgRight.setPosition(.8);
+//                    Robot.getInstance().wgLeft.setPosition(.8);
+//                    Robot.getInstance().wgRight.setPosition(.8);
+                    Robot.getInstance().wgLeft.setPosition(.9);
+                    Robot.getInstance().wgRight.setPosition(.9);
                     break;
 
                 case IN:

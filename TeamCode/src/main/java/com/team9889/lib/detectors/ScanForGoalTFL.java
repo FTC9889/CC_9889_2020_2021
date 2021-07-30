@@ -58,17 +58,26 @@ public class ScanForGoalTFL extends OpenCvPipeline {
                     .setNumThreads(2)
                     .build();
 
-//        Model.Options options;
-//        CompatibilityList compatList = new CompatibilityList();
-
-//        if (compatList.isDelegateSupportedOnThisDevice()) {
-//            options = Model.Options.Builder().setDevice(Model.Device.GPU).build();
-//        }
-
             try {
                 detector = ObjectDetector.createFromFileAndOptions(
                         Robot.getInstance().hardwareMap.appContext, // the application context
                         "goal.tflite", // must be same as the filename in assets folder
+                        options
+                );
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            ObjectDetector.ObjectDetectorOptions options = ObjectDetector.ObjectDetectorOptions.builder()
+                    .setMaxResults(2)
+                    .setScoreThreshold(0.8f)
+                    .setNumThreads(2)
+                    .build();
+
+            try {
+                detector = ObjectDetector.createFromFileAndOptions(
+                        Robot.getInstance().hardwareMap.appContext, // the application context
+                        "BlueGoal.tflite", // must be same as the filename in assets folder
                         options
                 );
             } catch (IOException e) {

@@ -46,8 +46,14 @@ public class Camera extends Subsystem{
     }
     public Pipelines currentPipeline = Pipelines.NULL;
 
+    boolean auto;
+
     @Override
     public void init(final boolean auto) {
+        this.auto = auto;
+
+        scanForGoal = new ScanForGoalTFL();
+
         Robot.getInstance().camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
             @Override
@@ -61,12 +67,11 @@ public class Camera extends Subsystem{
                 }
             }
         });
-
-        scanForGoal = new ScanForGoalTFL();
     }
 
     @Override
     public void outputToTelemetry(Telemetry telemetry) {
+        if (auto) { telemetry.addData("Box", Math.abs(getPosOfTarget().y)); }
         telemetry.addData("Pos Of Target", getPosOfTarget());
         telemetry.addData("Camera Error", Math.abs(Math.round(getPosOfTarget().x * 100.0))/100.0);
     }
@@ -116,9 +121,9 @@ public class Camera extends Subsystem{
         AutoModeBase.Boxes box = AutoModeBase.Boxes.CLOSE;
         if (Math.abs(getPosOfTarget().y) == 0) {
             box = AutoModeBase.Boxes.CLOSE;
-        } else if (Math.abs(getPosOfTarget().y) < 17) {
+        } else if (Math.abs(getPosOfTarget().y) < 15) {
             box = AutoModeBase.Boxes.MIDDLE;
-        } else if (Math.abs(getPosOfTarget().y) >= 17) {
+        } else if (Math.abs(getPosOfTarget().y) >= 15) {
             box = AutoModeBase.Boxes.FAR;
         }
 
@@ -243,7 +248,7 @@ public class Camera extends Subsystem{
 
                 double goalPos = ((bb.centerX()) / 160) - 1;
                 double fovAngle = goalPos * (53.4 / 2) * 0.625;
-                double fullAngle = -(fovAngle + Math.toDegrees(scan.odoPos.getHeading()));
+                double fullAngle = (fovAngle + Math.toDegrees(scan.odoPos.getHeading()));
                 Log.i("Cam to Goal Angle", "" + fullAngle);
 
                 Pose2d pos;

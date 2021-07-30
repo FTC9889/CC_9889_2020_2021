@@ -3,8 +3,12 @@ package com.team9889.ftc2020.auto.actions.flywheel;
 import android.util.Log;
 
 import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.ftc2020.auto.actions.Action;
+import com.team9889.ftc2020.subsystems.FlyWheel;
 import com.team9889.ftc2020.subsystems.Robot;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /**
  * Created by Eric on 6/7/2021.
@@ -14,7 +18,9 @@ public class PowerShots extends Action {
 
     boolean ps1, ps2, ps3, red;
 
-    Vector2d ps1Pos = new Vector2d(73, -22), ps2Pos = new Vector2d(73, -1), ps3Pos = new Vector2d(73, -8);
+    ElapsedTime timer = new ElapsedTime();
+
+    Vector2d ps1Pos = new Vector2d(73, -19), ps2Pos = new Vector2d(73, -1), ps3Pos = new Vector2d(73, -10);
 
     public PowerShots (boolean red) {
         ps1 = true;
@@ -50,13 +56,13 @@ public class PowerShots extends Action {
 
         if (ps1) {
 //            double angle = Robot.getInstance().getMecanumDrive().robotAngleToTarget(ps1Pos, Robot.getInstance().rr.getPoseEstimate());
-//            if (ready < 5)
+            if (ready < 10)
                 Robot.getInstance().getMecanumDrive().turn(ps1Pos);
 
             boolean shot = false;
 
             if (ready > 20)
-                 shot = Robot.getInstance().getFlyWheel().shootRing();
+                 shot = Robot.getInstance().getFlyWheel().shootRing(80);
 
             if (shot) {
                 ps1 = false;
@@ -64,12 +70,12 @@ public class PowerShots extends Action {
             }
         } else if (ps2) {
 //            double angle = Robot.getInstance().getMecanumDrive().robotAngleToTarget(ps2Pos, Robot.getInstance().rr.getPoseEstimate());
-//            if (ready < 0)
+            if (ready < 10)
                 Robot.getInstance().getMecanumDrive().turn(ps2Pos);
 
             boolean shot = false;
             if (ready > 20)
-                shot = Robot.getInstance().getFlyWheel().shootRing();
+                shot = Robot.getInstance().getFlyWheel().shootRing(80);
 
             if (shot) {
                 ps2 = false;
@@ -77,20 +83,26 @@ public class PowerShots extends Action {
             }
         } else if (ps3) {
 //            double angle = Robot.getInstance().getMecanumDrive().robotAngleToTarget(ps3Pos, Robot.getInstance().rr.getPoseEstimate());
-//            if (ready < 0)
+            if (ready < 10)
                 Robot.getInstance().getMecanumDrive().turn(ps3Pos);
 
             boolean shot = false;
             if (ready > 20)
-                shot = Robot.getInstance().getFlyWheel().shootRing();
+                shot = Robot.getInstance().getFlyWheel().shootRing(80);
 
             if (shot) {
                 ps3 = false;
+                timer.reset();
                 ready = 0;
             }
         }
 
-        if (Math.abs(Robot.getInstance().getMecanumDrive().headingController.getLastError()) < Math.toRadians(1.5)) {
+        double angle = -Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES);
+        if (angle < 0) {
+            angle += 360;
+        }
+
+        if (Math.abs(Math.toDegrees(Robot.getInstance().getMecanumDrive().theta) - angle) < 1) {
             Log.i("Worked", "true: " + Robot.getInstance().getMecanumDrive().headingController.getLastError());
             ready++;
         }
@@ -102,12 +114,12 @@ public class PowerShots extends Action {
 
     @Override
     public boolean isFinished() {
-        return !ps1 && !ps2 && !ps3;
+        return !ps1 && !ps2 && !ps3 && timer.milliseconds() > 1000;
     }
 
     @Override
     public void done() {
-        Robot.getInstance().flyWheel.motor.setVelocity(0);
+        Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.OFF;
         Robot.getInstance().fwFlap.setPosition(.4);
         Robot.getInstance().fwLock.setPosition(1);
         Robot.getInstance().getIntake().SetPassThroughPower(0);

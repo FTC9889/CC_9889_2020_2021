@@ -88,6 +88,20 @@ public class DriverStation {
         return fwOn;
     }
 
+    private boolean aimToggle = true;
+    private boolean aimOn = false;
+    public boolean codeToggle = false;
+    boolean getAim() {
+        if((gamepad2.left_bumper || codeToggle) && aimToggle) {
+            aimOn = !aimOn;
+            aimToggle = false;
+            codeToggle = false;
+        } else if(!gamepad2.left_bumper && !codeToggle)
+            aimToggle = true;
+
+        return aimOn;
+    }
+
     private boolean psToggle = true;
     private boolean psOn = false;
     boolean getPS() {

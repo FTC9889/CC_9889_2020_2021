@@ -19,18 +19,26 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @Config
 public class PowerShots extends Action {
     public static double p = 8, i = 0, d = 100, max = 0;
-    public static int readyCount = 10;
+    public static int readyCount = 30;
 
     boolean firstShot = true;
     int ready = 0;
-    ElapsedTime beginning = new ElapsedTime();
+    ElapsedTime beginning = new ElapsedTime(), timer = new ElapsedTime();
 
-    boolean first, second, third;
+    boolean first, second, third, auto;
 
     public PowerShots(){
         first = true;
         second = true;
         third = true;
+        auto = false;
+    }
+
+    public PowerShots(boolean auto){
+        first = true;
+        second = true;
+        third = true;
+        this.auto = auto;
     }
 
     public PowerShots(boolean first, boolean second, boolean third) {
@@ -43,7 +51,7 @@ public class PowerShots extends Action {
     public void start() {
         firstShot = true;
 
-        Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.POWERSHOT1;
+        Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.POWERSHOT2;
 
         Robot.getInstance().getCamera().setScanForGoal();
         Robot.getInstance().getMecanumDrive().setPower(0,0,0);
@@ -69,9 +77,9 @@ public class PowerShots extends Action {
                 if (Math.abs(Math.toDegrees(Robot.getInstance().getMecanumDrive().theta) - angle) < 1) {
                     Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, 0));
                     ready++;
-                } else {
+                } else if (ready < readyCount / 2){
                     ready = 0;
-                    Robot.getInstance().getMecanumDrive().turn(new Vector2d(73, -23), new Vector2d(0, 0));
+                    Robot.getInstance().getMecanumDrive().turn(new Vector2d(73, -22), new Vector2d(0, 0));
                 }
             } else if (beginning.milliseconds() > 1500) {
                 boolean ringShot = Robot.getInstance().getFlyWheel().shootRing();
@@ -94,9 +102,9 @@ public class PowerShots extends Action {
                 if (Math.abs(Math.toDegrees(Robot.getInstance().getMecanumDrive().theta) - angle) < 1) {
                     Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, 0));
                     ready++;
-                } else {
+                } else if (ready < readyCount / 2) {
                     ready = 0;
-                    Robot.getInstance().getMecanumDrive().turn(new Vector2d(73, -7), new Vector2d(0, 0));
+                    Robot.getInstance().getMecanumDrive().turn(new Vector2d(73, 0), new Vector2d(0, 0));
                 }
             } else {
                 boolean ringShot = Robot.getInstance().getFlyWheel().shootRing();
@@ -118,9 +126,9 @@ public class PowerShots extends Action {
                 if (Math.abs(Math.toDegrees(Robot.getInstance().getMecanumDrive().theta) - angle) < 1) {
                     Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, 0));
                     ready++;
-                } else {
+                } else if (ready < readyCount / 2) {
                     ready = 0;
-                    Robot.getInstance().getMecanumDrive().turn(new Vector2d(73, -13), new Vector2d(0, 0));
+                    Robot.getInstance().getMecanumDrive().turn(new Vector2d(73, -9), new Vector2d(0, 0));
                 }
             } else {
                 boolean ringShot = Robot.getInstance().getFlyWheel().shootRing();
@@ -131,6 +139,13 @@ public class PowerShots extends Action {
                 }
             }
         }
+
+        if (auto) {
+            while (timer.milliseconds() < 20) {}
+            timer.reset();
+        }
+
+//        Robot.getInstance().update();
     }
 
     @Override

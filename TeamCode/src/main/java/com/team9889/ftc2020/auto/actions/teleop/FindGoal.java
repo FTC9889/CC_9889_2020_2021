@@ -22,9 +22,9 @@ public class FindGoal extends Action {
 
     @Override
     public void update() {
-        Robot.getInstance().getCamera().scanForGoal.findGoal();
-
         if (Robot.getInstance().getFlyWheel().shooting || Robot.getInstance().getMecanumDrive().resetPos) {
+            Robot.getInstance().getCamera().scanForGoal.findGoal();
+
             Pose2d updatedPos = Robot.getInstance().getCamera().getRobotPos();
             if (updatedPos.getX() < 900 && Math.abs(Robot.getInstance().getMecanumDrive().gyroAngle.getTheda(AngleUnit.DEGREES)) < 40
                     && Robot.getInstance().getFlyWheel().shooting || (updatedPos.getX() < 900 && Robot.getInstance().getMecanumDrive().resetPos)) {

@@ -3,6 +3,7 @@ package com.team9889.ftc2020.subsystems;
 import android.util.Log;
 
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -47,6 +48,7 @@ public class Robot{
 
     public Motor flyWheel;
     public Servo fwArm, fwLock, fwFlap;
+    public DistanceSensor hopperDist;
 
     public Servo wgGrabber, wgLeft, wgRight, autoWG;
 
@@ -132,6 +134,8 @@ public class Robot{
         fwArm = hardwareMap.get(Servo.class, Constants.ShooterConstants.kFWArm);
         fwLock = hardwareMap.get(Servo.class, Constants.ShooterConstants.kFWLock);
         fwFlap = hardwareMap.get(Servo.class, Constants.ShooterConstants.kFWFlap);
+
+        hopperDist = hardwareMap.get(DistanceSensor.class, Constants.ShooterConstants.kHopperDist);
 
         wgGrabber = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGGrabber);
         wgLeft = hardwareMap.get(Servo.class, Constants.WobbleGoalConstants.kWGLeft);

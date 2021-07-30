@@ -3,6 +3,7 @@ package com.team9889.ftc2020.subsystems;
 import android.util.Log;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.lib.CruiseLib;
 import com.team9889.lib.control.controllers.FFFBMath;
@@ -25,11 +26,11 @@ public class FlyWheel extends Subsystem{
 
     public boolean shooting = false;
 
-    public static double time = 100, rpm = 2900;
+    public static double time = 100, rpm = 2850;
     ElapsedTime shootTimer = new ElapsedTime();
     boolean extend = false;
 
-    public static double P = 0.0005, I = 0, D = 0, F = 0, V = 0.0002, A, S;
+    public static double P = 0.003, I = 0, D = 0.0001, F = 0, V = 0.0002, A, S;
     public PIDF pid = new PIDF(150, 0, 20, 0.3);
 
     public boolean done = false;
@@ -41,6 +42,8 @@ public class FlyWheel extends Subsystem{
     }
     public RampPositions currentRampPos = RampPositions.NULL;
     public RampPositions wantedRampPos = RampPositions.NULL;
+
+    public int currentSetSpeed = 0, ready = 0;
 
     @Override
     public void init(boolean auto) {
@@ -54,6 +57,8 @@ public class FlyWheel extends Subsystem{
     @Override
     public void outputToTelemetry(Telemetry telemetry) {
         telemetry.addData("Fly Wheel Speed", getRPM());
+
+        telemetry.addData("Fly Wheel Error", getRPM() - currentSetSpeed);
     }
 
     @Override
@@ -84,25 +89,36 @@ public class FlyWheel extends Subsystem{
                 case OFF:
 //                    Robot.getInstance().flyWheel.motor.setVelocity(0);
                     setRPM(0);
+                    currentSetSpeed = 0;
                     break;
                 case DEFAULT:
                     setRPM(rpm);
+                    currentSetSpeed = (int) rpm;
                     break;
                 case POWERSHOT1:
                     setRPM(2420);
+                    currentSetSpeed = 2420;
                     break;
                 case POWERSHOT2:
-                    setRPM(1250);
+                    setRPM(2480);
+                    currentSetSpeed = 2450;
                     break;
                 case POWERSHOT3:
                     setRPM(1250);
+                    currentSetSpeed = 1250;
                     break;
                 case POWERSHOTAUTO1:
                     setRPM(1250 + 100);
+                    currentSetSpeed = 1250 + 100;
+                    break;
                 case POWERSHOTAUTO2:
                     setRPM(1250 + 65);
+                    currentSetSpeed = 1250 + 65;
+                    break;
                 case POWERSHOTAUTO3:
                     setRPM(1250 + 80);
+                    currentSetSpeed = 1250 + 80;
+                    break;
             }
 
             currentMode = wantedMode;
@@ -121,6 +137,28 @@ public class FlyWheel extends Subsystem{
 
     public boolean shootRing() {
         if (shootTimer.milliseconds() > time) {
+            shootTimer.reset();
+            if (extend) {
+                Robot.getInstance().fwArm.setPosition(0.47);
+                extend = false;
+                Robot.getInstance().getIntake().ringsIntaken--;
+                return true;
+            } else {
+                Robot.getInstance().fwArm.setPosition(.62);
+                extend = true;
+            }
+        }
+        return false;
+    }
+
+    public boolean shootRing(int tolerance) {
+        if (Math.abs(getRPM() - currentSetSpeed) < tolerance) {
+            ready++;
+        } else {
+            ready = 0;
+        }
+
+        if (shootTimer.milliseconds() > time && ready > 4) {
             shootTimer.reset();
             if (extend) {
                 Robot.getInstance().fwArm.setPosition(0.47);
@@ -182,6 +220,7 @@ public class FlyWheel extends Subsystem{
     }
 
     public double distanceBasedPower () {
+        /*
         double initHeight = 1.16, gravity = -32.17, length = 15, y = 0;
         double vX, vY, t;
         double ringVel = 0, angle = 29;
@@ -200,5 +239,13 @@ public class FlyWheel extends Subsystem{
 
 //        14.925
 //        y - initHeight - (0.5 * gravity * (Math.pow(t, 2))) = (vY * t);
+         */
+
+        Pose2d pos = Robot.getInstance().rr.getLocalizer().getPoseEstimate();
+        double dist = Math.sqrt(Math.pow(pos.getX(), 2) + Math.pow(pos.getY(), 2));
+
+//        rpm = dist;
+
+        return dist;
     }
 }

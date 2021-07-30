@@ -22,6 +22,12 @@ public class RobotUpdate extends Action {
 //            Robot.getInstance().getIntake().SetFrontIntakePower(0);
 //            Robot.getInstance().getIntake().SetBackIntakePower(0);
 //        }
+
+        while (timer.milliseconds() < 20) {
+
+        }
+
+        timer.reset();
     }
 
     @Override

@@ -16,6 +16,7 @@ import com.team9889.ftc2020.subsystems.Intake;
 import com.team9889.ftc2020.subsystems.WobbleGoal;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
  * Created by MannoMation on 1/14/2019.
@@ -24,6 +25,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @TeleOp
 @Config
 public class Teleop extends Team9889Linear {
+    public static int fwTolerance = 100;
+
     int ready = 0, psWait = 10;
     boolean wgFirst = true, psFirst = true;
 
@@ -62,9 +65,11 @@ public class Teleop extends Team9889Linear {
 //                --------------------
 //                |      Drive       |
 //                --------------------
-                Robot.getMecanumDrive().xSpeed += driverStation.getX();
-                Robot.getMecanumDrive().ySpeed += driverStation.getY();
-                Robot.getMecanumDrive().turnSpeed += driverStation.getSteer();
+                if (!driverStation.getAim()) {
+                    Robot.getMecanumDrive().xSpeed += driverStation.getX();
+                    Robot.getMecanumDrive().ySpeed += driverStation.getY();
+                    Robot.getMecanumDrive().turnSpeed += driverStation.getSteer();
+                }
 
                 if (gamepad1.dpad_down) {
                     Robot.getMecanumDrive().resetPos = true;
@@ -119,16 +124,18 @@ public class Teleop extends Team9889Linear {
                         Robot.getFlyWheel().wantedMode = FlyWheel.Mode.OFF;
                     }
 
-                    if (gamepad1.right_bumper || gamepad2.right_trigger > .5) {
-                        if (ready > 5 || Robot.getFlyWheel().shooting || gamepad2.right_trigger > .5) {
+//                    gamepad1.right_bumper
+
+                    if (driverStation.getAim()) {
+                        if (ready > 5 || Robot.getFlyWheel().shooting) {
 
                             if (!ringShot) {
-                                ringShot = Robot.getFlyWheel().shootRing();
+                                ringShot = Robot.getFlyWheel().shootRing(fwTolerance);
                             }
 
-                            if (ringShot) {
-                                Robot.getFlyWheel().shooting = true;
+                            Robot.getFlyWheel().shooting = true;
 
+                            if (ringShot) {
                                 if (driverStation.getAutoPS() && psWait == 0) {
                                     if (first) {
                                         first = false;
@@ -151,9 +158,14 @@ public class Teleop extends Team9889Linear {
                                     }
                                 } else if (!driverStation.getAutoPS()) {
                                     ringShot = false;
+
+                                    if (Robot.hopperDist.getDistance(DistanceUnit.INCH) > 2.5) {
+                                        driverStation.codeToggle = !driverStation.codeToggle;
+                                    }
                                 }
 
-                                psWait--;
+                                if (driverStation.getAutoPS())
+                                    psWait--;
                             }
                             Robot.getFlyWheel().unlocked();
 
@@ -163,20 +175,20 @@ public class Teleop extends Team9889Linear {
                             if (driverStation.getAutoPS()) {
                                 Robot.getFlyWheel().unlocked();
                                 if (first) {
-                                    Robot.getMecanumDrive().turn(new Vector2d(73, -22), new Vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
+                                    Robot.getMecanumDrive().turn(new Vector2d(73, -22), new Vector2d(0, 0));
                                 } else if (third) {
-                                    Robot.getMecanumDrive().turn(new Vector2d(73, -8), new Vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
+                                    Robot.getMecanumDrive().turn(new Vector2d(73, -8), new Vector2d(0, 0));
                                 } else if (fourth) {
-                                    Robot.getMecanumDrive().turn(new Vector2d(73, 10), new Vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
+                                    Robot.getMecanumDrive().turn(new Vector2d(73, 10), new Vector2d(0, 0));
                                     fourth = false;
                                 } else if (second) {
-                                    Robot.getMecanumDrive().turn(new Vector2d(73, -18), new Vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
+                                    Robot.getMecanumDrive().turn(new Vector2d(73, -18), new Vector2d(0, 0));
                                 }
                             } else {
                                 if (Robot.blue) {
-                                    Robot.getMecanumDrive().turn(new Vector2d(73, 42), new Vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
+                                    Robot.getMecanumDrive().turn(new Vector2d(73, 42), new Vector2d(0, 0));
                                 } else {
-                                    Robot.getMecanumDrive().turn(new Vector2d(73, -42), new Vector2d(gamepad1.left_stick_x, gamepad1.left_stick_y));
+                                    Robot.getMecanumDrive().turn(new Vector2d(73, -42), new Vector2d(0, 0));
                                 }
                             }
                         }
@@ -187,6 +199,8 @@ public class Teleop extends Team9889Linear {
                         Robot.getFlyWheel().locked();
                         Robot.getFlyWheel().shooting = false;
                         ringShot = false;
+
+                        driverStation.codeToggle = false;
 
                         Robot.fwArm.setPosition(0.47);
 
@@ -268,6 +282,10 @@ public class Teleop extends Team9889Linear {
             telemetry.addData("Speed", Robot.getFlyWheel().distanceBasedPower());
 
             telemetry.addData("Blue", Robot.blue);
+
+            telemetry.addData("Auto Aim", driverStation.getAim());
+            telemetry.addData("Hopper Distance", Robot.hopperDist.getDistance(DistanceUnit.INCH));
+            telemetry.addData("Code Toggle", driverStation.codeToggle);
 
             telemetry.addData("First", first + ", Second : " + second + ", Third : " + third);
 
