@@ -19,18 +19,18 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @Config
 public class FlyWheel extends Subsystem{
     public enum Mode {
-        OFF, POWERSHOT1, POWERSHOT2, POWERSHOT3, POWERSHOTAUTO1, POWERSHOTAUTO2, POWERSHOTAUTO3, DEFAULT, MIDDLE
+        OFF, POWERSHOT1, POWERSHOT2, POWERSHOT3, POWERSHOTAUTO1, POWERSHOTAUTO2, POWERSHOTAUTO3, DEFAULT, MIDDLE, AUTO
     }
     public Mode currentMode = Mode.OFF;
     public Mode wantedMode = Mode.OFF;
 
     public boolean shooting = false;
 
-    public static double time = 100, rpm = 2850;
+    public double time = 100, rpm = 2850;
     ElapsedTime shootTimer = new ElapsedTime();
     boolean extend = false;
 
-    public static double P = 0.003, I = 0, D = 0.0001, F = 0, V = 0.0002, A, S;
+    public static double P = 0.0015, I = 0, D = 0.0001, F = 0, V = 0.0002, A, S;
     public PIDF pid = new PIDF(150, 0, 20, 0.3);
 
     public boolean done = false;
@@ -48,6 +48,8 @@ public class FlyWheel extends Subsystem{
     @Override
     public void init(boolean auto) {
 //        Robot.getInstance().flyWheel.motor.setVelocityPIDFCoefficients(P, I, D, F);
+
+        wantedMode = Mode.OFF;
 
         if (auto) {
             setRampUp();
@@ -122,6 +124,10 @@ public class FlyWheel extends Subsystem{
                 case POWERSHOTAUTO3:
                     setRPM(1250 + 80);
                     currentSetSpeed = 1250 + 80;
+                    break;
+                case AUTO:
+                    setRPM(2850);
+                    currentSetSpeed = 2850;
                     break;
             }
 

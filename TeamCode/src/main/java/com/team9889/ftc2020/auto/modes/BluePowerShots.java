@@ -22,7 +22,7 @@ public class BluePowerShots extends AutoModeBase {
     public void run(StartPosition startPosition, Boxes box) {
         Robot.localizer.setPoseEstimate(new Pose2d(-63, 18, Math.toRadians(0)));
 
-        Robot.getFlyWheel().wantedMode = FlyWheel.Mode.DEFAULT;
+        Robot.getFlyWheel().wantedMode = FlyWheel.Mode.AUTO;
         Robot.getFlyWheel().wantedRampPos = FlyWheel.RampPositions.DOWN;
 
         traj = Robot.rr.trajectoryBuilder(new Pose2d(-63, 18, Math.toRadians(0)))
@@ -82,7 +82,7 @@ public class BluePowerShots extends AutoModeBase {
             case MIDDLE:
                 traj = Robot.rr.trajectoryBuilder(new Pose2d(-10, 13, Math.toRadians(-15)))
                         .splineTo(new Vector2d(20, 13), Math.toRadians(0))
-                        .splineTo(new Vector2d(32, 25), Math.toRadians(90))
+                        .splineTo(new Vector2d(32, 22), Math.toRadians(90))
                         .build();
                 Robot.rr.followTrajectory(traj);
 

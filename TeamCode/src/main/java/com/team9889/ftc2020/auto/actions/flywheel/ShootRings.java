@@ -63,6 +63,8 @@ public class ShootRings extends Action {
         }
         Robot.getInstance().fwLock.setPosition(.4);
         Robot.getInstance().flyWheel.resetEncoder();
+
+        Robot.getInstance().getFlyWheel().time = 200;
     }
 
     @Override
@@ -111,5 +113,7 @@ public class ShootRings extends Action {
         }
 
         Robot.getInstance().getIntake().ringsIntaken = 0;
+
+        Robot.getInstance().getFlyWheel().time = 100;
     }
 }

@@ -23,10 +23,11 @@ public class RedStack extends AutoModeBase {
     @Override
     public void run(StartPosition startPosition, Boxes box) {
         Robot.localizer.setPoseEstimate(new Pose2d(-63, -58, Math.toRadians(0)));
+        Robot.getFlyWheel().wantedRampPos = FlyWheel.RampPositions.DOWN;
 
         switch (box) {
             case CLOSE:
-                Robot.getFlyWheel().wantedMode = FlyWheel.Mode.DEFAULT;
+                Robot.getFlyWheel().wantedMode = FlyWheel.Mode.AUTO;
 
                 traj = Robot.rr.trajectoryBuilder(new Pose2d(-63, -58, Math.toRadians(0)))
                         .splineTo(new Vector2d(-20, -60), Math.toRadians(13))
@@ -68,7 +69,7 @@ public class RedStack extends AutoModeBase {
                 runAction(new Wait(700));
                 ThreadAction(new BackIntakeDown());
 
-                Robot.getFlyWheel().wantedMode = FlyWheel.Mode.DEFAULT;
+                Robot.getFlyWheel().wantedMode = FlyWheel.Mode.AUTO;
 
                 traj = Robot.rr.trajectoryBuilder(traj.end(), true)
                         .splineTo(new Vector2d(20, -60), Math.toRadians(180))
@@ -76,6 +77,11 @@ public class RedStack extends AutoModeBase {
                         .splineTo(new Vector2d(-10, -39), Math.toRadians(180))
                         .build();
                 Robot.rr.followTrajectory(traj);
+
+//                traj = Robot.rr.trajectoryBuilder(traj.end(), false)
+//                        .splineTo(new Vector2d(0, -39), Math.toRadians(0))
+//                        .build();
+//                Robot.rr.followTrajectory(traj);
 
                 Robot.getIntake().backIntakeOn = true;
                 Robot.getIntake().passThroughIntakeOn = true;
@@ -104,7 +110,7 @@ public class RedStack extends AutoModeBase {
                 runAction(new Wait(200));
                 ThreadAction(new BackIntakeDown());
 
-                Robot.getFlyWheel().wantedMode = FlyWheel.Mode.DEFAULT;
+                Robot.getFlyWheel().wantedMode = FlyWheel.Mode.AUTO;
 
                 traj = Robot.rr.trajectoryBuilder(traj.end(), true)
                         .splineTo(new Vector2d(10, -61), Math.toRadians(180))

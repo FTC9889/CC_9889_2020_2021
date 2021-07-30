@@ -26,7 +26,7 @@ public class Teleop extends Team9889Linear {
     public static int fwTolerance = 100;
 
     int ready = 0, psWait = 10;
-    boolean wgFirst = true, psFirst = true;
+    boolean wgFirst = true, psFirst = true, wgTimerReset;
 
     boolean first = true, second = true, third = true, fourth = true, ringShot = false;
 
@@ -75,6 +75,11 @@ public class Teleop extends Team9889Linear {
                     Robot.getMecanumDrive().resetPos = false;
                 }
 
+                if (gamepad2.a) {
+                    Robot.getMecanumDrive().move();
+                } else
+                    Robot.getMecanumDrive().setInitPowerShotPos();
+
 //                --------------------
 //                |      Intake      |
 //                --------------------
@@ -116,18 +121,36 @@ public class Teleop extends Team9889Linear {
                 if (!Robot.getFlyWheel().autoPower) {
                     if (driverStation.getFW()) {
                         Robot.getFlyWheel().wantedMode = FlyWheel.Mode.DEFAULT;
-                    } else if (driverStation.getPS()) {
-                        Robot.getFlyWheel().wantedMode = FlyWheel.Mode.POWERSHOT1;
-                    } else if (!Robot.getFlyWheel().autoPower) {
+                        driverStation.psOn = false;
+                        Robot.getFlyWheel().time = 100;
+                    } else if (!Robot.getFlyWheel().autoPower && !driverStation.getPS()) {
                         Robot.getFlyWheel().wantedMode = FlyWheel.Mode.OFF;
+                        driverStation.fwOn = false;
+                        driverStation.psOn = false;
+                        Robot.getFlyWheel().time = 100;
+                    }
+
+                    if (driverStation.getPS()) {
+                        Robot.getFlyWheel().wantedMode = FlyWheel.Mode.POWERSHOT1;
+                        driverStation.fwOn = false;
+                        Robot.getFlyWheel().time = 300;
                     }
 
 //                    gamepad1.right_bumper
 
+                    if (driverStation.getAim()) {
+                        driverStation.fwOn = true;
+                        driverStation.psOn = false;
+                    }
+
                     if (driverStation.getAim() || driverStation.getShoot()) {
                         if (ready > 5 || Robot.getFlyWheel().shooting || driverStation.getShoot()) {
                             if (!ringShot) {
-                                ringShot = Robot.getFlyWheel().shootRing(fwTolerance);
+                                if (driverStation.psOn) {
+                                    ringShot = Robot.getFlyWheel().shootRing(50);
+                                } else {
+                                    ringShot = Robot.getFlyWheel().shootRing(fwTolerance);
+                                }
                             }
 
                             Robot.getFlyWheel().shooting = true;
@@ -188,6 +211,7 @@ public class Teleop extends Team9889Linear {
                                     Robot.getMecanumDrive().turn(new Vector2d(73, 36), new Vector2d(0, 0));
                                 } else {
                                     Robot.getMecanumDrive().turn(new Vector2d(73, -42), new Vector2d(0, 0));
+//                                    Robot.getMecanumDrive().turn(new Vector2d(73, -42), true);
                                 }
                             }
                         }
@@ -226,9 +250,12 @@ public class Teleop extends Team9889Linear {
 //                --------------------
 //                |    WobbleGoal    |
 //                --------------------
-                if (gamepad1.left_bumper) {
+                if (gamepad1.left_bumper && wgTimerReset) {
                     Robot.getWobbleGoal().wgTimer.reset();
                     wgFirst = false;
+                    wgTimerReset = false;
+                } else if (!gamepad1.left_bumper) {
+                    wgTimerReset = true;
                 }
 
                 if (driverStation.getWG() && !wgFirst) {
@@ -249,7 +276,7 @@ public class Teleop extends Team9889Linear {
                 if (angle < 0) {
                     angle += 360;
                 }
-                if (Math.abs(Math.toDegrees(Robot.getMecanumDrive().theta) - angle) < 1) {
+                if (Math.abs(Math.toDegrees(Robot.getMecanumDrive().theta) - angle) < 4) {
                     ready++;
                 } else {
                     ready = 0;

@@ -77,7 +77,7 @@ public class DriverStation {
     }
 
     private boolean fwToggle = true;
-    private boolean fwOn = false;
+    public boolean fwOn = false;
     boolean getFW() {
         if(gamepad1.right_trigger > 0.3 && fwToggle) {
             fwOn = !fwOn;
@@ -111,7 +111,7 @@ public class DriverStation {
     }
 
     private boolean psToggle = true;
-    private boolean psOn = false;
+    public boolean psOn = false;
     boolean getPS() {
         if(gamepad1.left_trigger > 0.3 && psToggle) {
             psOn = !psOn;

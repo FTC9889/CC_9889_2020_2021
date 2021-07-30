@@ -27,7 +27,7 @@ public class MecanumDrive extends Subsystem {
 
     double[] turnError = new double[5];
 
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(15, 0, .8);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(9, 0, .8);
     public PIDFController headingController = new PIDFController(HEADING_PID);
 
     public double theta;
@@ -40,6 +40,8 @@ public class MecanumDrive extends Subsystem {
     ElapsedTime timer = new ElapsedTime();
 
     private String filename = "gyro.txt";
+
+    public boolean dontMove = false;
 
     @Override
     public void init(boolean auto) {
@@ -68,10 +70,12 @@ public class MecanumDrive extends Subsystem {
     public void update() {
         getAngle();
 
-        setFieldCentricPower(xSpeed, ySpeed, turnSpeed, Robot.getInstance().blue);
-        xSpeed = 0;
-        ySpeed = 0;
-        turnSpeed = 0;
+//        if (!dontMove) {
+            setFieldCentricPower(xSpeed, ySpeed, turnSpeed, Robot.getInstance().blue);
+            xSpeed = 0;
+            ySpeed = 0;
+            turnSpeed = 0;
+//        }
     }
 
     @Override
@@ -274,5 +278,99 @@ public class MecanumDrive extends Subsystem {
 
         // Update he localizer
 //        Robot.getInstance().rr.getLocalizer().update();
+    }
+
+
+
+    public void turn (Vector2d targetPosition, boolean rr) {
+        Pose2d poseEstimate = Robot.getInstance().rr.getLocalizer().getPoseEstimate();
+        poseEstimate = new Pose2d(poseEstimate.getX(), poseEstimate.getY(), -gyroAngle.getTheda(AngleUnit.RADIANS));
+        Robot.getInstance().rr.update();
+
+        // Create a vector from the gamepad x/y inputs which is the field relative movement
+        // Then, rotate that vector by the inverse of that heading for field centric control
+        Vector2d fieldFrameInput = new Vector2d(0, 0);
+        Vector2d robotFrameInput = fieldFrameInput.rotated(-poseEstimate.getHeading());
+
+        // Difference between the target vector and the bot's position
+        Vector2d difference = targetPosition.minus(poseEstimate.vec());
+        // Obtain the target angle for feedback and derivative for feedforward
+        theta = difference.angle();
+        double thetaFF = -fieldFrameInput.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
+
+        // Set the target heading for the heading controller to our desired angle
+        headingController.setTargetPosition(theta);
+
+        // Set desired angular velocity to the heading controller output + angular
+        // velocity feedforward
+        double angle = -gyroAngle.getTheda(AngleUnit.DEGREES);
+        if (angle < 0) {
+            angle += 360;
+        }
+
+        double headingInput = (headingController.update(Math.toRadians(angle))
+                * DriveConstants.kV + thetaFF)
+                * DriveConstants.TRACK_WIDTH;
+
+        Log.i("Error", "" + headingController.getLastError());
+
+        int numOfBad = 0;
+        for (int i = 0; i < turnError.length; i++) {
+//            Log.i("Turn Error " + i, "" + (turnError[i] - headingController.getLastError()));
+            if (Math.abs(turnError[i] - headingController.getLastError()) < Math.toRadians(.1))
+                numOfBad += 1;
+
+            if (i + 1 < turnError.length) {
+                turnError[i] = turnError[i + 1];
+            } else {
+                turnError[i] = headingController.getLastError();
+            }
+        }
+
+        if (numOfBad == 5) {
+            Log.i("BAD", "");
+            headingInput += .5;
+        }
+
+//        turnSpeed += headingInput;
+
+        headingInput = CruiseLib.limitValue(headingInput, -0.1, -.4, 0.1, .4);
+//        Robot.getInstance().rr.setWeightedDrivePower(new Pose2d(0, 0, headingInput));
+
+        Log.i("Turn", "" + (theta - angle));
+        Robot.getInstance().rr.turnAsync(theta - angle);
+
+//        turnSpeed = headingInput;
+
+        // Update the heading controller with our current heading
+        headingController.update(Math.toRadians(angle));
+
+        // Update he localizer
+//        Robot.getInstance().rr.getLocalizer().update();
+    }
+
+
+    Pose2d moveStartPos = new Pose2d(0, 0, 0);
+
+    public void move () {
+        dontMove = true;
+
+//        double side = Robot.getInstance().blue ? -1 : 1;
+//        Robot.getInstance().rr.followTrajectoryAsync(
+//                Robot.getInstance().rr.trajectoryBuilder(Robot.getInstance().rr.getPoseEstimate())
+//                .strafeTo(moveStartPos.vec().plus(new Vector2d(0, 8 * side)))
+//                        .build());
+//
+//        Robot.getInstance().rr.update();
+
+        if (Math.abs(Robot.getInstance().rr.getPoseEstimate().getY() - moveStartPos.getY()) < 6) {
+            xSpeed = 0;
+            ySpeed += .7;
+        }
+    }
+
+    public void setInitPowerShotPos () {
+        moveStartPos = Robot.getInstance().rr.getPoseEstimate();
+        dontMove = false;
     }
 }
