@@ -99,7 +99,7 @@ public class RedPowerShots extends AutoModeBase {
                 traj = Robot.rr.trajectoryBuilder(new Pose2d(-10, -13, Math.toRadians(15)))
                         .splineTo(new Vector2d(45, -13), Math.toRadians(0))
                         .splineTo(new Vector2d(58, -40), Math.toRadians(-90))
-                        .splineTo(new Vector2d(58, -45), Math.toRadians(45))
+                        .splineTo(new Vector2d(58, -45), Math.toRadians(-45))
                         .build();
                 Robot.rr.followTrajectory(traj);
 

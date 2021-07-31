@@ -7,8 +7,8 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.team9889.lib.CruiseLib;
 import com.team9889.lib.control.controllers.FFFBMath;
+import com.team9889.lib.control.controllers.PID;
 import com.team9889.lib.control.controllers.PIDF;
-import com.team9889.lib.control.controllers.PIDMath;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -30,7 +30,7 @@ public class FlyWheel extends Subsystem{
     ElapsedTime shootTimer = new ElapsedTime();
     boolean extend = false;
 
-    public static double P = 0.0015, I = 0, D = 0.0001, F = 0, V = 0.0002, A, S;
+    public static double P = 0.0017, I = 0, D = 0.15, F = 0, V = 0.00004, A, S = 0.45;
     public PIDF pid = new PIDF(150, 0, 20, 0.3);
 
     public boolean done = false;
@@ -136,7 +136,9 @@ public class FlyWheel extends Subsystem{
 
 //        Robot.getInstance().flyWheel.motor.setVelocityPIDFCoefficients(P, I, D, F);
 
-        PMath.PIDConstants(P, I, D);
+        PMath.p = P;
+        PMath.i = I;
+        PMath.d = D;
         FFMath.FFConstants(V, A, S);
     }
 
@@ -184,13 +186,13 @@ public class FlyWheel extends Subsystem{
     }
 
     FFFBMath FFMath = new FFFBMath(0, 0, 0);
-    PIDMath PMath = new PIDMath(0, 0, 0);
+    PID PMath = new PID(0, 0, 0);
 
     public int counter = 0;
     public double power;
     public void setRPM(double rpm) {
 //        Robot.getInstance().flyWheel.motor.setVelocity(rpm);
-        double power = FFMath.calculateFFFBGain(rpm)+PMath.calculateGain(rpm - (Robot.getInstance().flyWheel.getVelocity() / 28 * 60));
+        double power = FFMath.calculateFFFBGain(rpm) + PMath.update(Robot.getInstance().flyWheel.getVelocity() / 28 * 60, rpm);
         power = CruiseLib.limitValue(power, 1, 0);
         Log.i("Power", "" + power);
 

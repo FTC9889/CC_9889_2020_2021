@@ -141,7 +141,7 @@ public class RedStack extends AutoModeBase {
                         .build();
                 Robot.rr.followTrajectory(traj);
 
-                runAction(new ShootRings(10, 500, telemetry, 0, false));
+                runAction(new ShootRings(5, 500, telemetry, 0, false));
 
                 traj = Robot.rr.trajectoryBuilder(traj.end(), true)
                         .lineToSplineHeading(new Pose2d(-40, -38, Math.toRadians(0)),
@@ -156,7 +156,7 @@ public class RedStack extends AutoModeBase {
                         .build();
                 Robot.rr.followTrajectory(traj);
 
-                runAction(new ShootRings(10, 500, telemetry, 0, true));
+                runAction(new ShootRings(5, 500, telemetry, 0, true));
 
                 traj = Robot.rr.trajectoryBuilder(traj.end())
                         .splineTo(new Vector2d(10, -60), Math.toRadians(0))

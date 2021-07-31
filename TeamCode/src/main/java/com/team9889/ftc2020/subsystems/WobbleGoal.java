@@ -35,7 +35,7 @@ public class WobbleGoal extends Subsystem{
 
     @Override
     public void update() {
-        if (currentArmPos != wantedArmPos) {
+//        if (currentArmPos != wantedArmPos) {
             if (Robot.getInstance().robotTimer.milliseconds() - grabberTime > 700) {
                 grabberTime = Robot.getInstance().robotTimer.milliseconds();
             }
@@ -67,7 +67,7 @@ public class WobbleGoal extends Subsystem{
             }
 
 //            currentArmPos = wantedArmPos;
-        }
+//        }
 
         if (wantedGrabberOpen) {
             Robot.getInstance().wgGrabber.setPosition(.7);
@@ -104,8 +104,11 @@ public class WobbleGoal extends Subsystem{
         if (wgTimer.milliseconds() < 500)
             wantedArmPos = wgArmPositions.DOWN;
 //        } else {
-        else
+        else {
             wantedGrabberOpen = true;
+        }
+
+        wantedArmPos = wgArmPositions.DOWN;
 //        }
     }
 
@@ -115,6 +118,7 @@ public class WobbleGoal extends Subsystem{
             wantedGrabberOpen = false;
 //        } else {
         else {
+            wantedGrabberOpen = false;
             wantedArmPos = wgArmPositions.UP;
             Log.i("PickUp", "");
         }

@@ -67,7 +67,7 @@ public abstract class Team9889Linear extends LinearOpMode {
 
         telemetry.setMsTransmissionInterval(autonomous ? 50:1000);
 
-//        telemetry = dashboard.getTelemetry();
+        telemetry = dashboard.getTelemetry();
 
         if(autonomous){
             // Autonomous Init Loop code

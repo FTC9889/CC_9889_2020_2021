@@ -217,7 +217,7 @@ public class Teleop extends Team9889Linear {
                         }
 
                     } else {
-                        Robot.getMecanumDrive().theta = 1000;
+//                        Robot.getMecanumDrive().theta = 1000;
                         psWait = 10;
                         Robot.getFlyWheel().locked();
                         Robot.getFlyWheel().shooting = false;

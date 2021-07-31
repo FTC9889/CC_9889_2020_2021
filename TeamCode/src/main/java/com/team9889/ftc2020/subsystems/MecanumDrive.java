@@ -27,7 +27,7 @@ public class MecanumDrive extends Subsystem {
 
     double[] turnError = new double[5];
 
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(9, 0, .8);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(7.5, 0.0015, 0.55);
     public PIDFController headingController = new PIDFController(HEADING_PID);
 
     public double theta;
@@ -64,6 +64,8 @@ public class MecanumDrive extends Subsystem {
         telemetry.addData("Pos", Robot.getInstance().rr.getLocalizer().getPoseEstimate());
 
         telemetry.addData("Gyro", gyroAngle.getTheda(AngleUnit.DEGREES) - angleFromAuton);
+
+        telemetry.addData("Error", theta - angle);
     }
 
     @Override
@@ -203,6 +205,7 @@ public class MecanumDrive extends Subsystem {
         Robot.getInstance().rr.getLocalizer().update();
     }
 
+    public double angle;
     public void turn (Vector2d targetPosition, Vector2d input) {
         Pose2d poseEstimate = Robot.getInstance().rr.getLocalizer().getPoseEstimate();
         poseEstimate = new Pose2d(poseEstimate.getX(), poseEstimate.getY(), -gyroAngle.getTheda(AngleUnit.RADIANS));
@@ -236,7 +239,7 @@ public class MecanumDrive extends Subsystem {
 
         // Set desired angular velocity to the heading controller output + angular
         // velocity feedforward
-        double angle = -gyroAngle.getTheda(AngleUnit.DEGREES);
+        angle = -gyroAngle.getTheda(AngleUnit.DEGREES);
         if (angle < 0) {
             angle += 360;
         }
