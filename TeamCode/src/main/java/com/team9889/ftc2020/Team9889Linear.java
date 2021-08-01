@@ -39,10 +39,12 @@ public abstract class Team9889Linear extends LinearOpMode {
         Robot.init(hardwareMap, autonomous);
         Robot.update();
 
-        if (Constants.pose.equals(new Pose2d(0, 0, 0))) {
-            Robot.rr.getLocalizer().setPoseEstimate(new Pose2d(-63, -17.5, Math.toRadians(0)));
-        } else {
-            Robot.rr.getLocalizer().setPoseEstimate(Constants.pose);
+        if (Constants.pose != null) {
+            if (Constants.pose.equals(new Pose2d(0, 0, 0))) {
+                Robot.rr.getLocalizer().setPoseEstimate(new Pose2d(-63, -17.5, Math.toRadians(0)));
+            } else {
+                Robot.rr.getLocalizer().setPoseEstimate(Constants.pose);
+            }
         }
 
         if (autonomous) {

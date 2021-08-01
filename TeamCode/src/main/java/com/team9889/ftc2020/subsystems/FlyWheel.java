@@ -26,11 +26,13 @@ public class FlyWheel extends Subsystem{
 
     public boolean shooting = false;
 
-    public double time = 100, rpm = 2850;
+    public double time = 20, rpm = 2850;
     ElapsedTime shootTimer = new ElapsedTime();
     boolean extend = false;
 
-    public static double P = 0.0017, I = 0, D = 0.15, F = 0, V = 0.00004, A, S = 0.45;
+//    public static double P = 0.0015, I = 0, D = 0.06, F = 0, V = 0.00011, A, S = 0.25;
+//    public static double P = 0.0022, I = 0, D = 0, F = 0, V = 0.0002, A, S = 0;
+public static double P = 0.0007, I = 0, D = 0.2, F = 0, V = 0.0002, A, S = 0;
     public PIDF pid = new PIDF(150, 0, 20, 0.3);
 
     public boolean done = false;
@@ -60,12 +62,22 @@ public class FlyWheel extends Subsystem{
     public void outputToTelemetry(Telemetry telemetry) {
         telemetry.addData("Fly Wheel Speed", getRPM());
 
-        telemetry.addData("Fly Wheel Error", getRPM() - currentSetSpeed);
+        telemetry.addData("Shooting", shooting);
+
+        telemetry.addData("Ready", ready);
+
+        telemetry.addData("Error", error);
     }
 
     @Override
     public void update() {
-        rpm = distanceBasedPower();
+        if (!shooting) {
+            rpm = distanceBasedPower();
+        }
+
+        if (currentMode == Mode.DEFAULT) {
+            currentSetSpeed = (int) rpm;
+        }
 
         if (currentRampPos != wantedRampPos) {
             switch (wantedRampPos) {
@@ -164,22 +176,52 @@ public class FlyWheel extends Subsystem{
     }
 
     public boolean shootRing(int tolerance) {
-        if (Math.abs(getRPM() - currentSetSpeed) < tolerance) {
+        double error = getRPM() - currentSetSpeed;
+        if (Math.abs(error) < tolerance) {
             ready++;
         } else {
             ready = 0;
         }
 
-        if (shootTimer.milliseconds() > time && ready > 2) {
+        if (shootTimer.milliseconds() > time) {
             shootTimer.reset();
             if (extend) {
                 Robot.getInstance().fwArm.setPosition(0.47);
                 extend = false;
                 Robot.getInstance().getIntake().ringsIntaken--;
                 return true;
-            } else {
+            } else if (ready > 5) {
                 Robot.getInstance().fwArm.setPosition(.62);
                 extend = true;
+                ready = 0;
+            }
+        }
+        return false;
+    }
+
+    double error = 0;
+    public boolean shootRing(int tolerance, int highTolerance) {
+        error = getRPM() - currentSetSpeed;
+
+        if (error < tolerance && error > -highTolerance) {
+            ready++;
+        } else {
+            ready = 0;
+        }
+
+//        ready = 10;
+
+        if (shootTimer.milliseconds() > time) {
+            shootTimer.reset();
+            if (extend) {
+                Robot.getInstance().fwArm.setPosition(0.47);
+                extend = false;
+                Robot.getInstance().getIntake().ringsIntaken--;
+                return true;
+            } else if (ready >= 3) {
+                Robot.getInstance().fwArm.setPosition(.62);
+                extend = true;
+                ready = 0;
             }
         }
         return false;
@@ -195,6 +237,18 @@ public class FlyWheel extends Subsystem{
         double power = FFMath.calculateFFFBGain(rpm) + PMath.update(Robot.getInstance().flyWheel.getVelocity() / 28 * 60, rpm);
         power = CruiseLib.limitValue(power, 1, 0);
         Log.i("Power", "" + power);
+
+        Robot.getInstance().flyWheel.setPower(power);
+    }
+
+    public void setRPM(double rpm, double tolerance, double highTolerance) {
+        if (error < tolerance && error > -highTolerance) {
+            power = 0;
+        } else {
+            double power = FFMath.calculateFFFBGain(rpm) + PMath.update(Robot.getInstance().flyWheel.getVelocity() / 28 * 60, rpm);
+            power = CruiseLib.limitValue(power, 1, 0);
+            Log.i("Power", "" + power);
+        }
 
         Robot.getInstance().flyWheel.setPower(power);
     }
@@ -262,7 +316,7 @@ public class FlyWheel extends Subsystem{
 
 //        rpm = dist;
 
-        rpm = CruiseLib.limitValue(rpm, 3100, 2500);
+        rpm = CruiseLib.limitValue(rpm + 10, 3100, 2500);
 
         return rpm;
     }

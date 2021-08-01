@@ -118,7 +118,7 @@ public class WobbleGoal extends Subsystem{
             wantedGrabberOpen = false;
 //        } else {
         else {
-            wantedGrabberOpen = false;
+//            wantedGrabberOpen = false;
             wantedArmPos = wgArmPositions.UP;
             Log.i("PickUp", "");
         }

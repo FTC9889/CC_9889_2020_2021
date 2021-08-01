@@ -46,7 +46,10 @@ public class Camera extends Subsystem{
     }
     public Pipelines currentPipeline = Pipelines.NULL;
 
-    boolean auto;
+    ElapsedTime resetTimer = new ElapsedTime();
+
+    boolean auto, resetPosLast;
+    public boolean resetPos = false;
 
     @Override
     public void init(final boolean auto) {
@@ -72,12 +75,23 @@ public class Camera extends Subsystem{
     @Override
     public void outputToTelemetry(Telemetry telemetry) {
         if (auto) { telemetry.addData("Box", Math.abs(getPosOfTarget().y)); }
-        telemetry.addData("Pos Of Target", getPosOfTarget());
-        telemetry.addData("Camera Error", Math.abs(Math.round(getPosOfTarget().x * 100.0))/100.0);
+//        telemetry.addData("Pos Of Target", getPosOfTarget());
+//        telemetry.addData("Camera Error", Math.abs(Math.round(getPosOfTarget().x * 100.0))/100.0);
+        telemetry.addData("Reset", resetPos);
     }
 
     @Override
     public void update() {
+        if (resetPos != resetPosLast) {
+            resetTimer.reset();
+        }
+        if (resetTimer.milliseconds() > 700) {
+            resetPos = false;
+            resetPosLast = false;
+        }
+
+        resetPosLast = resetPos;
+
         if (currentCamState != wantedCamState) {
             switch (wantedCamState) {
                 case GOAL:

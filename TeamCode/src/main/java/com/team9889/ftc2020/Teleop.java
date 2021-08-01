@@ -23,7 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @TeleOp
 @Config
 public class Teleop extends Team9889Linear {
-    public static int fwTolerance = 100;
+    public static int fwTolerance = 80, fwHighTolerance = 100;
 
     int ready = 0, psWait = 10;
     boolean wgFirst = true, psFirst = true, wgTimerReset;
@@ -122,12 +122,12 @@ public class Teleop extends Team9889Linear {
                     if (driverStation.getFW()) {
                         Robot.getFlyWheel().wantedMode = FlyWheel.Mode.DEFAULT;
                         driverStation.psOn = false;
-                        Robot.getFlyWheel().time = 100;
+//                        Robot.getFlyWheel().time = 100;
                     } else if (!Robot.getFlyWheel().autoPower && !driverStation.getPS()) {
                         Robot.getFlyWheel().wantedMode = FlyWheel.Mode.OFF;
                         driverStation.fwOn = false;
                         driverStation.psOn = false;
-                        Robot.getFlyWheel().time = 100;
+//                        Robot.getFlyWheel().time = 100;
                     }
 
                     if (driverStation.getPS()) {
@@ -147,9 +147,11 @@ public class Teleop extends Team9889Linear {
                         if (ready > 5 || Robot.getFlyWheel().shooting || driverStation.getShoot()) {
                             if (!ringShot) {
                                 if (driverStation.psOn) {
+//                                    ringShot = Robot.getFlyWheel().shootRing(50, fwHighTolerance);
                                     ringShot = Robot.getFlyWheel().shootRing(50);
                                 } else {
-                                    ringShot = Robot.getFlyWheel().shootRing(fwTolerance);
+//                                    ringShot = Robot.getFlyWheel().shootRing(fwTolerance, fwHighTolerance);
+                                    ringShot = Robot.getFlyWheel().shootRing(fwTolerance, fwHighTolerance);
                                 }
                             }
 
@@ -287,7 +289,10 @@ public class Teleop extends Team9889Linear {
             }
 
             Robot.getCamera().getRobotPos();
-            telemetry.addData("Speed", Robot.getFlyWheel().distanceBasedPower());
+            telemetry.addData("High Tolerance", fwHighTolerance + Robot.getFlyWheel().rpm);
+            telemetry.addData("Low Tolerance", Robot.getFlyWheel().rpm - fwTolerance);
+
+            telemetry.addData("Speed", Robot.getFlyWheel().rpm);
 
             telemetry.addData("Blue", Robot.blue);
 

@@ -24,7 +24,7 @@ public class Constants {
     public final static String kWebcam = "Webcam";
 
     public static int side = Color.RED;
-    public static Pose2d pose = new Pose2d(0, 0, 0);
+    public static Pose2d pose;
 
     /*---------------------
     |                     |

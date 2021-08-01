@@ -31,6 +31,8 @@ public class FindGoal extends Action {
                 Robot.getInstance().rr.setPoseEstimate(updatedPos);
 
                 Robot.getInstance().rr.getLocalizer().update();
+
+                Robot.getInstance().getCamera().resetPos = true;
             }
         }
 

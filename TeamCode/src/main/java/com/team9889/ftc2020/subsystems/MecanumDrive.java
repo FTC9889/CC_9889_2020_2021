@@ -48,8 +48,10 @@ public class MecanumDrive extends Subsystem {
         if(auto) {
             Robot.getInstance().leftArm.setPosition(0);
             Robot.getInstance().rightArm.setPosition(1);
-        } else {
-            angleFromAuton = Math.toDegrees(Constants.pose.getHeading());
+        } else if (Constants.pose != null) {
+            Robot.getInstance().rr.setPoseEstimate(Constants.pose);
+            Robot.getInstance().rr.update();
+            angleFromAuton = Constants.pose.getHeading();
         }
 
         // Set input bounds for the heading controller

@@ -62,7 +62,7 @@ public class PowerShots extends Action {
             boolean shot = false;
 
             if (ready > 20)
-                 shot = Robot.getInstance().getFlyWheel().shootRing(80);
+                 shot = Robot.getInstance().getFlyWheel().shootRing(80, 80);
 
             if (shot) {
                 ps1 = false;
@@ -75,7 +75,7 @@ public class PowerShots extends Action {
 
             boolean shot = false;
             if (ready > 20)
-                shot = Robot.getInstance().getFlyWheel().shootRing(80);
+                shot = Robot.getInstance().getFlyWheel().shootRing(80, 80);
 
             if (shot) {
                 ps2 = false;
@@ -88,7 +88,7 @@ public class PowerShots extends Action {
 
             boolean shot = false;
             if (ready > 20)
-                shot = Robot.getInstance().getFlyWheel().shootRing(80);
+                shot = Robot.getInstance().getFlyWheel().shootRing(80, 80);
 
             if (shot) {
                 ps3 = false;
