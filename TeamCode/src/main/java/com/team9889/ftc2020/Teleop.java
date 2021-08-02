@@ -23,7 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 @TeleOp
 @Config
 public class Teleop extends Team9889Linear {
-    public static int fwTolerance = 80, fwHighTolerance = 100;
+    public static int fwTolerance = 80, fwHighTolerance = 90;
 
     int ready = 0, psWait = 10;
     boolean wgFirst = true, psFirst = true, wgTimerReset;
@@ -182,6 +182,7 @@ public class Teleop extends Team9889Linear {
                                     }
                                 } else if (!driverStation.getAutoPS()) {
                                     ringShot = false;
+                                    Robot.getFlyWheel().shooting = false;
 
 //                                    if (Robot.hopperDist.getDistance(DistanceUnit.INCH) > 2.5) {
 //                                        driverStation.codeToggle = !driverStation.codeToggle;
@@ -212,7 +213,7 @@ public class Teleop extends Team9889Linear {
                                 if (Robot.blue) {
                                     Robot.getMecanumDrive().turn(new Vector2d(73, 36), new Vector2d(0, 0));
                                 } else {
-                                    Robot.getMecanumDrive().turn(new Vector2d(73, -42), new Vector2d(0, 0));
+                                    Robot.getMecanumDrive().turn(new Vector2d(73, -36), new Vector2d(0, 0));
 //                                    Robot.getMecanumDrive().turn(new Vector2d(73, -42), true);
                                 }
                             }

@@ -137,7 +137,7 @@ public class BlueStack extends AutoModeBase {
                         .build();
                 Robot.rr.followTrajectory(traj);
 
-                runAction(new ShootRings(5, 500, telemetry, 0, false));
+                runAction(new ShootRings(3, 500, telemetry, 0, false));
 
                 traj = Robot.rr.trajectoryBuilder(traj.end(), true)
                         .lineToSplineHeading(new Pose2d(-40, 39, Math.toRadians(0)),
@@ -152,7 +152,7 @@ public class BlueStack extends AutoModeBase {
                         .build();
                 Robot.rr.followTrajectory(traj);
 
-                runAction(new ShootRings(5, 500, telemetry, 0, true));
+                runAction(new ShootRings(3, 500, telemetry, 0, true));
 
                 traj = Robot.rr.trajectoryBuilder(traj.end())
                         .splineTo(new Vector2d(10, 60), Math.toRadians(0))
@@ -164,7 +164,7 @@ public class BlueStack extends AutoModeBase {
         Robot.getIntake().backIntakeOn = false;
         Robot.getIntake().passThroughIntakeOn = false;
 
-        Robot.getIntake().currentArmPos = Intake.ArmPositions.DOWN;
+        Robot.getIntake().currentArmPos = Intake.ArmPositions.HALF;
         runAction(new Wait(500));
         Robot.getIntake().currentArmPos = Intake.ArmPositions.UP;
         runAction(new Wait(500));

@@ -16,7 +16,7 @@ public class ShootRings extends Action {
     private ElapsedTime loopTimer = new ElapsedTime();
     private ElapsedTime totalTimer = new ElapsedTime();
     int stage = 0, ringsShot = 0, rings, time, power = 1145;
-//    1135
+    //    1135
     boolean extend = false, stop = false, ps = false;
 
     Telemetry telemetry;
@@ -109,8 +109,9 @@ public class ShootRings extends Action {
     public void done() {
         if (stop) {
             Robot.getInstance().getFlyWheel().wantedMode = FlyWheel.Mode.OFF;
-            Robot.getInstance().fwLock.setPosition(1);
         }
+
+        Robot.getInstance().fwLock.setPosition(1);
 
         Robot.getInstance().getIntake().ringsIntaken = 0;
 

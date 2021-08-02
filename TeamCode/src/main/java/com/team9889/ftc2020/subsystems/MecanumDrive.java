@@ -31,7 +31,7 @@ public class MecanumDrive extends Subsystem {
     public PIDFController headingController = new PIDFController(HEADING_PID);
 
     public double theta;
-    public boolean resetPos = false;
+    public boolean resetPos = false, resetFirst = true;
 
     public Rotation2d gyroAngle = new Rotation2d();
     private double Right_Position_Offset = 0, Left_Position_Offset = 0, Y_Position_Offset = 0;

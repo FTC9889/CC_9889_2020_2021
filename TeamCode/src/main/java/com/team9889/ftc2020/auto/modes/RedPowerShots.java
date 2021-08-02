@@ -116,7 +116,7 @@ public class RedPowerShots extends AutoModeBase {
 
         ThreadAction(new BackIntakeDown());
 
-        Robot.getIntake().wantedArmPos = Intake.ArmPositions.DOWN;
+        Robot.getIntake().wantedArmPos = Intake.ArmPositions.HALF;
         runAction(new Wait(500));
         Robot.getIntake().wantedArmPos = Intake.ArmPositions.UP;
         runAction(new Wait(2000));
